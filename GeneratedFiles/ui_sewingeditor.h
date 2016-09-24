@@ -23,6 +23,7 @@
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 #include "squarewidget.h"
+#include "svgviewer.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -34,7 +35,7 @@ public:
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     SquareWidget *squareWidget;
-    QWidget *widget;
+    SvgViewer *widget;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QToolBar *mainToolBar;
@@ -61,9 +62,9 @@ public:
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         squareWidget = new SquareWidget(centralWidget);
         squareWidget->setObjectName(QStringLiteral("squareWidget"));
-        widget = new QWidget(squareWidget);
+        widget = new SvgViewer(squareWidget);
         widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(340, 260, 120, 80));
+        widget->setGeometry(QRect(130, 60, 621, 511));
 
         gridLayout->addWidget(squareWidget, 0, 0, 1, 1);
 

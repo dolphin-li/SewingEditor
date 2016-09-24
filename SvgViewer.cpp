@@ -1,46 +1,35 @@
-#include "basemeshviewer.h"
+#include "glew.h"
+#include "SvgViewer.h"
 #include "glut.h"
 #include "global_data_holder.h"
 #include "Renderable.h"
+#include "svgpp\SvgRenderer.h"
 
-const static int N_COLOR_TABLE = 10;
-const static ldp::Float3 COLOR_TABLE[] = 
-{
-	ldp::Float3(1, 0, 0),
-	ldp::Float3(0, 0, 1),
-	ldp::Float3(1, 0, 1),
-	ldp::Float3(0, 1, 1),
-	ldp::Float3(1, 0.7, 0.4),
-	ldp::Float3(1, 0.4, 0.7),
-	ldp::Float3(0.7, 1, 0.4),
-	ldp::Float3(0.7, 0.4, 1),
-	ldp::Float3(0.4, 1, 0.7),
-	ldp::Float3(0.4, 0.7, 1),
-};
-
-BaseMeshViewer::BaseMeshViewer(QWidget *parent)
+SvgViewer::SvgViewer(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
 	setMouseTracking(true);
 	m_buttons = Qt::MouseButton::NoButton;
 	m_meshOperationMode = ObjectMode;
 	m_isBoxMode = false;
+	m_svgRenderer = new SvgRenderer();
 }
 
-BaseMeshViewer::~BaseMeshViewer()
+SvgViewer::~SvgViewer()
 {
-
+	delete m_svgRenderer;
 }
 
-void BaseMeshViewer::resetCamera()
+void SvgViewer::resetCamera()
 {
 	m_camera.setPerspective(60, float(width()) / float(height()), 0.1, 100);
 	m_camera.setScalar(1);
 	m_camera.lookAt(ldp::Float3(0, 0, 0), ldp::Float3(0, 0, -1), ldp::Float3(0, 1, 0));
 }
 
-void BaseMeshViewer::initializeGL()
+void SvgViewer::initializeGL()
 {
+	glewInit();
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
@@ -59,7 +48,6 @@ void BaseMeshViewer::initializeGL()
 
 	resetCamera();
 
-	m_shaderManager.create("./Shader");
 
 	// depth fbo
 	QGLFramebufferObjectFormat fmt;
@@ -70,9 +58,11 @@ void BaseMeshViewer::initializeGL()
 		printf("error: invalid depth fbo!\n");
 	if (glGetError() != GL_NO_ERROR)
 		printf("%s\n", gluErrorString(glGetError()));
+
+	m_svgRenderer->init();
 }
 
-void BaseMeshViewer::resizeGL(int w, int h)
+void SvgViewer::resizeGL(int w, int h)
 {
 	m_camera.setViewPort(0, w, 0, h);
 	m_camera.setPerspective(m_camera.getFov(), float(w) / float(h), 
@@ -86,12 +76,12 @@ void BaseMeshViewer::resizeGL(int w, int h)
 	m_fbo = new QGLFramebufferObject(width(), height(), fmt);
 }
 
-void BaseMeshViewer::setMeshOpMode(MeshOperationMode mode)
+void SvgViewer::setMeshOpMode(MeshOperationMode mode)
 { 
 	m_meshOperationMode = mode;
 }
 
-void BaseMeshViewer::paintGL()
+void SvgViewer::paintGL()
 {
 	//// we first render for selection
 	//renderSelectionOnFbo();
@@ -108,10 +98,10 @@ void BaseMeshViewer::paintGL()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-
+	m_svgRenderer->render();
 }
 
-void BaseMeshViewer::mousePressEvent(QMouseEvent *ev)
+void SvgViewer::mousePressEvent(QMouseEvent *ev)
 {
 	setFocus();
 	m_lastPos = ev->pos();
@@ -129,7 +119,7 @@ void BaseMeshViewer::mousePressEvent(QMouseEvent *ev)
 	}
 }
 
-void BaseMeshViewer::keyPressEvent(QKeyEvent*ev)
+void SvgViewer::keyPressEvent(QKeyEvent*ev)
 {
 	bool noMod = ((ev->modifiers() & Qt::SHIFT) == 0)
 		&& ((ev->modifiers() & Qt::CTRL) == 0)
@@ -189,12 +179,12 @@ void BaseMeshViewer::keyPressEvent(QKeyEvent*ev)
 	updateGL();
 }
 
-void BaseMeshViewer::keyReleaseEvent(QKeyEvent*ev)
+void SvgViewer::keyReleaseEvent(QKeyEvent*ev)
 {
 
 }
 
-void BaseMeshViewer::mouseReleaseEvent(QMouseEvent *ev)
+void SvgViewer::mouseReleaseEvent(QMouseEvent *ev)
 {
 	// clear buttons
 	m_isBoxMode = false;
@@ -202,7 +192,7 @@ void BaseMeshViewer::mouseReleaseEvent(QMouseEvent *ev)
 	updateGL();
 }
 
-void BaseMeshViewer::mouseMoveEvent(QMouseEvent*ev)
+void SvgViewer::mouseMoveEvent(QMouseEvent*ev)
 {
 	if (m_buttons == Qt::NoButton)
 	{
@@ -228,7 +218,7 @@ void BaseMeshViewer::mouseMoveEvent(QMouseEvent*ev)
 	updateGL();
 }
 
-void BaseMeshViewer::wheelEvent(QWheelEvent*ev)
+void SvgViewer::wheelEvent(QWheelEvent*ev)
 {
 	float s = 1.1;
 	if (ev->delta() < 0)
@@ -240,7 +230,7 @@ void BaseMeshViewer::wheelEvent(QWheelEvent*ev)
 	updateGL();
 }
 
-void BaseMeshViewer::toggleMeshOperationMode()
+void SvgViewer::toggleMeshOperationMode()
 {
 	if (m_meshOperationMode == ObjectMode)
 	{

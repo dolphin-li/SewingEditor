@@ -17,13 +17,13 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="SquareWidget" name="squareWidget" native="true">
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="SvgViewer" name="widget" native="true">
        <property name="geometry">
         <rect>
-         <x>340</x>
-         <y>260</y>
-         <width>120</width>
-         <height>80</height>
+         <x>130</x>
+         <y>60</y>
+         <width>621</width>
+         <height>511</height>
         </rect>
        </property>
       </widget>
@@ -99,6 +99,12 @@
    <class>SquareWidget</class>
    <extends>QWidget</extends>
    <header>squarewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SvgViewer</class>
+   <extends>QWidget</extends>
+   <header>svgviewer.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -160,6 +160,18 @@
     <ClCompile Include="algorithm\Shader\ShaderManager.cpp">
       <Filter>algorithm\shader</Filter>
     </ClCompile>
+    <ClCompile Include="SvgViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_SvgViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_SvgViewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\svgpp\SvgRenderer.cpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="sewingeditor.ui">
@@ -172,6 +184,9 @@
       <Filter>Source Files</Filter>
     </CustomBuild>
     <CustomBuild Include="basemeshviewer.h">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SvgViewer.h">
       <Filter>Source Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -321,6 +336,9 @@
       <Filter>algorithm\svgpp</Filter>
     </ClInclude>
     <ClInclude Include="algorithm\svgpp\include\svgpp\template_parameters.hpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\SvgRenderer.h">
       <Filter>algorithm\svgpp</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,0 +1,327 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{689d84ba-471e-45b2-a209-674b5ca9bdc6}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{47c100e0-981e-460f-a41b-c9de54ea2c29}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="algorithm">
+      <UniqueIdentifier>{0de2faa0-12da-4228-bb63-ecbf59d389a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\camera">
+      <UniqueIdentifier>{8c0be3e5-177e-4535-a250-e1357d7a3c16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\conv">
+      <UniqueIdentifier>{d22d544b-ddb6-41f2-a58c-8cefb0b06b10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\freeImage">
+      <UniqueIdentifier>{19d0c743-227c-4666-9862-2f3706e528b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\kdtree">
+      <UniqueIdentifier>{28a06150-5a0b-467d-ae71-f689c52026e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\ldpMat">
+      <UniqueIdentifier>{13d2eccb-8484-490e-9a46-6df638bc10fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\openmesh">
+      <UniqueIdentifier>{1b305bf4-4974-4a36-908a-9c87a8991314}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\renderable">
+      <UniqueIdentifier>{f5d0d2eb-5677-4c9c-a1d4-e806730fd6aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\shader">
+      <UniqueIdentifier>{65328cca-380a-417f-a2a1-d0c7f480b2fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\svgpp">
+      <UniqueIdentifier>{d42d5c11-4c40-4af7-a44d-08b117081341}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sewingeditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_sewingeditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_sewingeditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_sewingeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SquareWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="basemeshviewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_basemeshviewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_basemeshviewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\global_data_holder.cpp">
+      <Filter>algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\Param.cpp">
+      <Filter>algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\qimdebug.cpp">
+      <Filter>algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\util.cpp">
+      <Filter>algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\camera\Camera.cpp">
+      <Filter>algorithm\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\conv\Convolution_Helper.cpp">
+      <Filter>algorithm\conv</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\conv\ConvolutionPyramid.cpp">
+      <Filter>algorithm\conv</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\conv\ImageData.cpp">
+      <Filter>algorithm\conv</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\FreeImage\CFreeImage.cpp">
+      <Filter>algorithm\freeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\kdtree\AABB.cpp">
+      <Filter>algorithm\kdtree</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\kdtree\KdTree.cpp">
+      <Filter>algorithm\kdtree</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\kdtree\Primitive.cpp">
+      <Filter>algorithm\kdtree</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\Renderable\AbstractMesh.cpp">
+      <Filter>algorithm\renderable</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\Renderable\bmesh.cpp">
+      <Filter>algorithm\renderable</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\Renderable\BoneMesh.cpp">
+      <Filter>algorithm\renderable</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\Renderable\ConnComponent.cpp">
+      <Filter>algorithm\renderable</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\Renderable\CreaseMesh.cpp">
+      <Filter>algorithm\renderable</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\Renderable\GLNode.cpp">
+      <Filter>algorithm\renderable</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\Renderable\ObjMesh.cpp">
+      <Filter>algorithm\renderable</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\OpenMesh\OpenMeshWrapper.cpp">
+      <Filter>algorithm\openmesh</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\OpenMesh\triangle.c">
+      <Filter>algorithm\openmesh</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\Shader\glsl.cpp">
+      <Filter>algorithm\shader</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\Shader\glslprogram.cpp">
+      <Filter>algorithm\shader</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\Shader\ShaderManager.cpp">
+      <Filter>algorithm\shader</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="sewingeditor.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="sewingeditor.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="sewingeditor.h">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="basemeshviewer.h">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GeneratedFiles\ui_sewingeditor.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SquareWidget.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\global_data_holder.h">
+      <Filter>algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\LMSolver.h">
+      <Filter>algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Param.h">
+      <Filter>algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\qimdebug.h">
+      <Filter>algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\util.h">
+      <Filter>algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\ldpMat\half.hpp">
+      <Filter>algorithm\ldpMat</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\ldpMat\ldp_basic_mat.h">
+      <Filter>algorithm\ldpMat</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\ldpMat\ldp_basic_vec.h">
+      <Filter>algorithm\ldpMat</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\ldpMat\ldpdef.h">
+      <Filter>algorithm\ldpMat</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\ldpMat\Quaternion.h">
+      <Filter>algorithm\ldpMat</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\camera\Camera.h">
+      <Filter>algorithm\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\camera\fmath.h">
+      <Filter>algorithm\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\conv\Convolution_Helper.h">
+      <Filter>algorithm\conv</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\conv\ConvolutionPyramid.h">
+      <Filter>algorithm\conv</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\conv\ImageData.h">
+      <Filter>algorithm\conv</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\FreeImage\CFreeImage.h">
+      <Filter>algorithm\freeImage</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\FreeImage\FreeImage.h">
+      <Filter>algorithm\freeImage</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\kdtree\AABB.h">
+      <Filter>algorithm\kdtree</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\kdtree\BSphere.h">
+      <Filter>algorithm\kdtree</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\kdtree\common.h">
+      <Filter>algorithm\kdtree</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\kdtree\KdTree.h">
+      <Filter>algorithm\kdtree</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\kdtree\nanoflann.hpp">
+      <Filter>algorithm\kdtree</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\kdtree\PointTree.h">
+      <Filter>algorithm\kdtree</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\kdtree\Primitive.h">
+      <Filter>algorithm\kdtree</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\kdtree\Ray.h">
+      <Filter>algorithm\kdtree</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Renderable\AbstractMesh.h">
+      <Filter>algorithm\renderable</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Renderable\bmesh.h">
+      <Filter>algorithm\renderable</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Renderable\bmesh_private.h">
+      <Filter>algorithm\renderable</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Renderable\BoneMesh.h">
+      <Filter>algorithm\renderable</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Renderable\ConnComponent.h">
+      <Filter>algorithm\renderable</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Renderable\CreaseMesh.h">
+      <Filter>algorithm\renderable</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Renderable\Error.h">
+      <Filter>algorithm\renderable</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Renderable\GLNode.h">
+      <Filter>algorithm\renderable</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Renderable\ObjMesh.h">
+      <Filter>algorithm\renderable</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Renderable\Renderable.h">
+      <Filter>algorithm\renderable</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\OpenMesh\OpenMeshWrapper.h">
+      <Filter>algorithm\openmesh</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\OpenMesh\triangle.h">
+      <Filter>algorithm\openmesh</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Shader\glsl.h">
+      <Filter>algorithm\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Shader\glslprogram.h">
+      <Filter>algorithm\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\Shader\ShaderManager.h">
+      <Filter>algorithm\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\include\svgpp\attribute_dispatcher.hpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\include\svgpp\config.hpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\include\svgpp\definitions.hpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\include\svgpp\document_traversal.hpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\include\svgpp\number_type.hpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\include\svgpp\svgpp.hpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\include\svgpp\template_parameters.hpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

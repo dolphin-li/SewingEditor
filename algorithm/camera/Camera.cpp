@@ -348,7 +348,6 @@ Float3 Camera::getScalar()const
 * */
 void Camera::enableOrtho(bool enable)
 {
-	setFrustum(getFrustumLeft(), getFrustumRight(), getFrustumTop(), getFrustumBottom(), getFrustumNear(), getFrustumFar());
 	isOrtho = enable;
 }
 

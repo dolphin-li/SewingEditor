@@ -22,8 +22,9 @@ SvgViewer::~SvgViewer()
 
 void SvgViewer::resetCamera()
 {
-	m_camera.setPerspective(60, float(width()) / float(height()), 0.1, 100);
-	m_camera.setScalar(1);
+	m_camera.setViewPort(0, width(), 0, height());
+	m_camera.enableOrtho(true);
+	m_camera.setFrustum(0, 500, 0, 400, -1, 1);
 	m_camera.lookAt(ldp::Float3(0, 0, 0), ldp::Float3(0, 0, -1), ldp::Float3(0, 1, 0));
 }
 
@@ -59,14 +60,12 @@ void SvgViewer::initializeGL()
 	if (glGetError() != GL_NO_ERROR)
 		printf("%s\n", gluErrorString(glGetError()));
 
-	m_svgRenderer->init();
+	m_svgRenderer->init(&m_camera);
 }
 
 void SvgViewer::resizeGL(int w, int h)
 {
 	m_camera.setViewPort(0, w, 0, h);
-	m_camera.setPerspective(m_camera.getFov(), float(w) / float(h), 
-		m_camera.getFrustumNear(), m_camera.getFrustumFar());
 
 	if (m_fbo)
 		delete m_fbo;
@@ -83,20 +82,12 @@ void SvgViewer::setMeshOpMode(MeshOperationMode mode)
 
 void SvgViewer::paintGL()
 {
-	//// we first render for selection
-	//renderSelectionOnFbo();
+	glClearStencil(0);
+	glStencilMask(~0);
+	glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	// then we do formal rendering=========================
-	if (m_meshOperationMode == ObjectMode)
-	{
-		glClearColor(1.f, 1.f, 1.f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-	else
-	{
-		glClearColor(0.f, 0.f, 0.f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
+	m_camera.apply();
 
 	m_svgRenderer->render();
 }

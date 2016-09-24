@@ -1,7 +1,8 @@
 #include "glew.h"
 #include "freeglut.h"
 #include "SvgRenderer.h"
-#pragma comment(lib, "glew32.lib")
+#include "Camera.h"
+#include "nvprsvg\svg_loader.hpp"
 
 SvgRenderer::SvgRenderer()
 {
@@ -21,8 +22,25 @@ int path_specification_mode = 0;
 int filling = 1;
 int stroking = 1;
 int even_odd = 0;
-void SvgRenderer::init()
+
+class TestVisitor : public Visitor
+{
+public:
+	void visit(ShapePtr shape)
+	{
+		printf("v\n");
+	}
+};
+
+void SvgRenderer::init(Camera* cam)
 {    
+	m_renderCam = cam;
+
+	SvgScenePtr svg_scene = svg_loader("data/test.svg");
+	GenericTraversal tr;
+	VisitorPtr vis = VisitorPtr(new TestVisitor);
+	tr.traverse(svg_scene, vis);
+
 	/* The PostScript path syntax also supports compact and precise binary
 	 encoding and includes PostScript-style circular arcs.
 
@@ -50,23 +68,6 @@ void SvgRenderer::init()
 
 void SvgRenderer::render()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	/* Before rendering to a window with a stencil buffer, clear the stencil
-	buffer to zero and the color buffer to black: */
-
-	glClearStencil(0);
-	glClearColor(0, 0, 0, 0);
-	glStencilMask(~0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	/* Use an orthographic path-to-clip-space transform to map the
-	[0..500]x[0..400] range of the star's path coordinates to the [-1..1]
-	clip space cube: */
-
-	glMatrixLoadIdentityEXT(GL_PROJECTION);
-	glMatrixLoadIdentityEXT(GL_MODELVIEW);
-	glMatrixOrthoEXT(GL_MODELVIEW, 0, 500, 0, 400, -1, 1);
-
 	if (filling) {
 
 		/* Stencil the path: */

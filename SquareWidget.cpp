@@ -27,13 +27,13 @@ void SquareWidget::resizeEvent(QResizeEvent *event)
 	if (thisAspectRatio > m_aspect) // too wide
 	{
 		m_layout->setDirection(QBoxLayout::LeftToRight);
-		widgetStretch = height(); // i.e., my width
+		widgetStretch = height() * m_aspect; // i.e., my width
 		outerStretch = (width() - widgetStretch) / 2 + 0.5;
 	}
 	else // too tall
 	{
 		m_layout->setDirection(QBoxLayout::TopToBottom);
-		widgetStretch = width(); // i.e., my height
+		widgetStretch = width() / m_aspect; // i.e., my height
 		outerStretch = (height() - widgetStretch) / 2 + 0.5;
 	}
 

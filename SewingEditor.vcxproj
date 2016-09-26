@@ -93,7 +93,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;UNICODE;WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -126,7 +126,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -278,8 +278,13 @@
     <ClCompile Include="algorithm\svgpp\nvprsvg\stc\scene_stc.cpp" />
     <ClCompile Include="algorithm\svgpp\nvprsvg\svg_files.cpp" />
     <ClCompile Include="algorithm\svgpp\nvprsvg\svg_loader.cpp" />
-    <ClCompile Include="algorithm\svgpp\SvgContext.cpp" />
-    <ClCompile Include="algorithm\svgpp\SvgRenderer.cpp" />
+    <ClCompile Include="algorithm\svgpp\SvgAbstractObject.cpp" />
+    <ClCompile Include="algorithm\svgpp\SvgAttribute.cpp" />
+    <ClCompile Include="algorithm\svgpp\SvgClipPath.cpp" />
+    <ClCompile Include="algorithm\svgpp\SvgGroup.cpp" />
+    <ClCompile Include="algorithm\svgpp\SvgManager.cpp" />
+    <ClCompile Include="algorithm\svgpp\SvgPath.cpp" />
+    <ClCompile Include="algorithm\svgpp\SvgText.cpp" />
     <ClCompile Include="algorithm\tinyxml\tinystr.cpp" />
     <ClCompile Include="algorithm\tinyxml\tinyxml.cpp" />
     <ClCompile Include="algorithm\tinyxml\tinyxmlerror.cpp" />
@@ -439,8 +444,13 @@
     <ClInclude Include="algorithm\svgpp\nvprsvg\stc\scene_stc.hpp" />
     <ClInclude Include="algorithm\svgpp\nvprsvg\svg_files.hpp" />
     <ClInclude Include="algorithm\svgpp\nvprsvg\svg_loader.hpp" />
-    <ClInclude Include="algorithm\svgpp\SvgContext.h" />
-    <ClInclude Include="algorithm\svgpp\SvgRenderer.h" />
+    <ClInclude Include="algorithm\svgpp\SvgAbstractObject.h" />
+    <ClInclude Include="algorithm\svgpp\SvgAttribute.h" />
+    <ClInclude Include="algorithm\svgpp\SvgClipPath.h" />
+    <ClInclude Include="algorithm\svgpp\SvgGroup.h" />
+    <ClInclude Include="algorithm\svgpp\SvgManager.h" />
+    <ClInclude Include="algorithm\svgpp\SvgPath.h" />
+    <ClInclude Include="algorithm\svgpp\SvgText.h" />
     <ClInclude Include="algorithm\tinyxml\tinystr.h" />
     <ClInclude Include="algorithm\tinyxml\tinyxml.h" />
     <ClInclude Include="algorithm\util.h" />

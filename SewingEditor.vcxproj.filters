@@ -190,12 +190,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_SvgViewer.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="algorithm\svgpp\SvgRenderer.cpp">
-      <Filter>algorithm\svgpp</Filter>
-    </ClCompile>
-    <ClCompile Include="algorithm\svgpp\SvgContext.cpp">
-      <Filter>algorithm\svgpp</Filter>
-    </ClCompile>
     <ClCompile Include="algorithm\svgpp\nvprsvg\ActiveControlPoint.cpp">
       <Filter>algorithm\svgpp\nvprsvg</Filter>
     </ClCompile>
@@ -553,6 +547,27 @@
     <ClCompile Include="algorithm\svgpp\nvprsvg\cg4cpp\src\upper4x4.cpp">
       <Filter>algorithm\svgpp\nvprsvg\cg</Filter>
     </ClCompile>
+    <ClCompile Include="algorithm\svgpp\SvgManager.cpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\svgpp\SvgAbstractObject.cpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\svgpp\SvgAttribute.cpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\svgpp\SvgClipPath.cpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\svgpp\SvgPath.cpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\svgpp\SvgText.cpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\svgpp\SvgGroup.cpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="sewingeditor.ui">
@@ -698,12 +713,6 @@
     <ClInclude Include="algorithm\Shader\ShaderManager.h">
       <Filter>algorithm\shader</Filter>
     </ClInclude>
-    <ClInclude Include="algorithm\svgpp\SvgRenderer.h">
-      <Filter>algorithm\svgpp</Filter>
-    </ClInclude>
-    <ClInclude Include="algorithm\svgpp\SvgContext.h">
-      <Filter>algorithm\svgpp</Filter>
-    </ClInclude>
     <ClInclude Include="algorithm\svgpp\nvprsvg\ActiveControlPoint.hpp">
       <Filter>algorithm\svgpp\nvprsvg</Filter>
     </ClInclude>
@@ -811,6 +820,27 @@
     </ClInclude>
     <ClInclude Include="algorithm\svgpp\nvprsvg\nvpr\renderer_nvpr.hpp">
       <Filter>algorithm\svgpp\nvprsvg\nvpr</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\SvgManager.h">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\SvgAbstractObject.h">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\SvgAttribute.h">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\SvgClipPath.h">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\SvgPath.h">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\SvgText.h">
+      <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\SvgGroup.h">
+      <Filter>algorithm\svgpp</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

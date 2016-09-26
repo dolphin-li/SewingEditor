@@ -2,7 +2,9 @@
 #define GLSLPROGRAM_H
 
 #include <ctype.h>
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <stdio.h>
 #include <math.h>
 

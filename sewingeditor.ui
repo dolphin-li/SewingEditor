@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1081</width>
-    <height>855</height>
+    <width>1080</width>
+    <height>869</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1081</width>
+     <width>1080</width>
      <height>21</height>
     </rect>
    </property>
@@ -86,10 +86,16 @@
    <property name="text">
     <string>open svg</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionSave_svg">
    <property name="text">
     <string>save svg</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

@@ -35,6 +35,12 @@
 
 #include "nvpr_init.h"
 
+#ifdef NDEBUG
+const static int verbose = 0;
+#else
+const static int verbose = 1;
+#endif
+
 using std::cout;
 using std::endl;
 
@@ -143,7 +149,7 @@ NVprRenderer::NVprRenderer(bool noDSA,
     }
 
     initExtensions(noDSA);
-    initializeNVPR("nvpr_svg");
+   // initializeNVPR("nvpr_svg");
 
     interrogateFramebuffer();
 

@@ -6,6 +6,7 @@ class GlobalDataHolder
 {
 public:
 	void init();
+public:
 };
 
 extern GlobalDataHolder g_dataholder;

@@ -52,7 +52,7 @@ using std::endl;
 
 // Release builds shouldn't have verbose conditions.
 #ifdef NDEBUG
-const static int verbose = 1;
+const static int verbose = 0;
 #else
 const static int verbose = 1;
 #endif

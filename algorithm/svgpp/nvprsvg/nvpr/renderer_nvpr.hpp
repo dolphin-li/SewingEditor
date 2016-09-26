@@ -18,7 +18,7 @@
 #include "path.hpp"
 #include "scene.hpp"
 
-#include "nvpr_init.h"
+//#include "nvpr_init.h"
 #include "showfps.h"
 
 #include "stc/renderer_stc.hpp"

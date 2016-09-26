@@ -3,7 +3,7 @@
 #include "glut.h"
 #include "global_data_holder.h"
 #include "Renderable.h"
-#include "svgpp\SvgRenderer.h"
+#include "svgpp\SvgManager.h"
 
 SvgViewer::SvgViewer(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -12,43 +12,38 @@ SvgViewer::SvgViewer(QWidget *parent)
 	m_buttons = Qt::MouseButton::NoButton;
 	m_meshOperationMode = ObjectMode;
 	m_isBoxMode = false;
-	m_svgRenderer = new SvgRenderer();
+	m_svgManager= new svg::SvgManager();
 }
 
 SvgViewer::~SvgViewer()
 {
-	delete m_svgRenderer;
+	delete m_svgManager;
 }
 
 void SvgViewer::resetCamera()
 {
 	m_camera.setViewPort(0, width(), 0, height());
 	m_camera.enableOrtho(true);
-	m_camera.setFrustum(0, 500, 0, 400, -1, 1);
+	m_camera.setFrustum(0, width(), 0, height(), -1, 1);
 	m_camera.lookAt(ldp::Float3(0, 0, 0), ldp::Float3(0, 0, -1), ldp::Float3(0, 1, 0));
+	if (m_svgManager)
+		m_camera.setFrustum(0, m_svgManager->width(), 0, m_svgManager->height(), -1, 1);
 }
 
 void SvgViewer::initializeGL()
 {
 	glewInit();
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_MULTISAMPLE);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_FRONT_AND_BACK);
-	//glEnable(GL_CULL_FACE);
-	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
-	float diffuse[3] = { 0, 0, 0 };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, diffuse);
-
-	m_showType = Renderable::SW_E | Renderable::SW_F | Renderable::SW_V | Renderable::SW_LIGHTING
-		| Renderable::SW_FLAT | Renderable::SW_TEXTURE;
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 0, 0x1F);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
 	resetCamera();
-
 
 	// depth fbo
 	QGLFramebufferObjectFormat fmt;
@@ -60,7 +55,7 @@ void SvgViewer::initializeGL()
 	if (glGetError() != GL_NO_ERROR)
 		printf("%s\n", gluErrorString(glGetError()));
 
-	m_svgRenderer->init(&m_camera);
+	m_svgManager->init(&m_camera);
 }
 
 void SvgViewer::resizeGL(int w, int h)
@@ -75,6 +70,11 @@ void SvgViewer::resizeGL(int w, int h)
 	m_fbo = new QGLFramebufferObject(width(), height(), fmt);
 }
 
+svg::SvgManager* SvgViewer::getSvgManager()
+{
+	return m_svgManager;
+}
+
 void SvgViewer::setMeshOpMode(MeshOperationMode mode)
 { 
 	m_meshOperationMode = mode;
@@ -84,30 +84,12 @@ void SvgViewer::paintGL()
 {
 	glClearStencil(0);
 	glStencilMask(~0);
-	glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
+	glClearColor(1,1,1, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	m_camera.apply();
 
-	m_svgRenderer->render();
-}
-
-void SvgViewer::mousePressEvent(QMouseEvent *ev)
-{
-	setFocus();
-	m_lastPos = ev->pos();
-	m_buttons = ev->buttons();
-
-	// move operation
-	if (ev->button() == Qt::MouseButton::LeftButton)
-	{
-
-	}
-	if (ev->button() == Qt::MouseButton::MiddleButton)
-	{
-		resetCamera();
-		updateGL();
-	}
+	m_svgManager->render();
 }
 
 void SvgViewer::keyPressEvent(QKeyEvent*ev)
@@ -175,6 +157,39 @@ void SvgViewer::keyReleaseEvent(QKeyEvent*ev)
 
 }
 
+
+void SvgViewer::mousePressEvent(QMouseEvent *ev)
+{
+	setFocus();
+	m_lastPos = ev->pos();
+	m_buttons = ev->buttons();
+
+	// move operation
+	if (ev->button() == Qt::MouseButton::LeftButton)
+	{
+
+	}
+}
+
+
+void SvgViewer::mouseDoubleClickEvent(QMouseEvent *ev)
+{
+	setFocus();
+	m_lastPos = ev->pos();
+	m_buttons = ev->buttons();
+
+	// move operation
+	if (ev->button() == Qt::MouseButton::LeftButton)
+	{
+
+	}
+	if (ev->button() == Qt::MouseButton::MiddleButton)
+	{
+		resetCamera();
+		updateGL();
+	}
+}
+
 void SvgViewer::mouseReleaseEvent(QMouseEvent *ev)
 {
 	// clear buttons
@@ -199,9 +214,27 @@ void SvgViewer::mouseMoveEvent(QMouseEvent*ev)
 
 	if (m_buttons & Qt::LeftButton)
 	{
+
 	}
+
 	if (m_buttons & Qt::RightButton)
 	{
+
+	}
+
+	if (m_buttons & Qt::MidButton)
+	{
+		float l = m_camera.getFrustumLeft();
+		float r = m_camera.getFrustumRight();
+		float t = m_camera.getFrustumTop();
+		float b = m_camera.getFrustumBottom();
+		float dx = (r - l) / float(width()) * (ev->pos().x() - m_lastPos.x());
+		float dy = (b - t) / float(height()) * (ev->pos().y() - m_lastPos.y());
+		l -= dx;
+		r -= dx;
+		t -= dy;
+		b -= dy;
+		m_camera.setFrustum(l, r, t, b, m_camera.getFrustumNear(), m_camera.getFrustumFar());
 	}
 
 	// backup last position
@@ -211,13 +244,23 @@ void SvgViewer::mouseMoveEvent(QMouseEvent*ev)
 
 void SvgViewer::wheelEvent(QWheelEvent*ev)
 {
-	float s = 1.1;
+	float s = 1.2f;
 	if (ev->delta() < 0)
 		s = 1.f / s;
 
-	float fov = std::max(1e-3f, std::min(90.f, m_camera.getFov()*s));
-	m_camera.setPerspective(fov, m_camera.getAspect(), 
-		m_camera.getFrustumNear(), m_camera.getFrustumFar());
+	float l = m_camera.getFrustumLeft();
+	float r = m_camera.getFrustumRight();
+	float t = m_camera.getFrustumTop();
+	float b = m_camera.getFrustumBottom();
+	float dx = float(ev->pos().x()) / float(width()) * (r - l);
+	float dy = float(ev->pos().y()) / float(height()) * (b - t);
+
+	r = dx + l + (r - l - dx) * s;
+	l = dx + l - dx * s;
+	b = dy + t + (b - t - dy) * s;
+	t = dy + t - dy * s;
+	m_camera.setFrustum(l, r, t, b, m_camera.getFrustumNear(), m_camera.getFrustumFar());
+	
 	updateGL();
 }
 

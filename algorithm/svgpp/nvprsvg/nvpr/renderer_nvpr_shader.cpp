@@ -31,7 +31,7 @@ extern int verbose;
 
 static const char *gradientProgramFileName = "gradient.cg";
 
-extern const char *myProgramName; // XXX put in header
+static const char *myProgramName; // XXX put in header
 
 void NVprRenderer::checkForCgError(const char *situation)
 {

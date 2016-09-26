@@ -12,7 +12,7 @@
 
 // FreeType2
 // http://www.freetype.org/
-//#define USE_FREETYPE2 1
+#define USE_FREETYPE2 1
 
 // Khronos OpenVG 1.1 royalty-free, cross-platform API is a low-level hardware acceleration interface for vector graphics
 // http://www.khronos.org/openvg/

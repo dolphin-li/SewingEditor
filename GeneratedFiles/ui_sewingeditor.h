@@ -49,7 +49,7 @@ public:
     {
         if (SewingEditorClass->objectName().isEmpty())
             SewingEditorClass->setObjectName(QStringLiteral("SewingEditorClass"));
-        SewingEditorClass->resize(1081, 855);
+        SewingEditorClass->resize(1080, 869);
         actionLoad_svg = new QAction(SewingEditorClass);
         actionLoad_svg->setObjectName(QStringLiteral("actionLoad_svg"));
         actionSave_svg = new QAction(SewingEditorClass);
@@ -71,7 +71,7 @@ public:
         SewingEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(SewingEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1081, 21));
+        menuBar->setGeometry(QRect(0, 0, 1080, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         SewingEditorClass->setMenuBar(menuBar);
@@ -109,7 +109,9 @@ public:
     {
         SewingEditorClass->setWindowTitle(QApplication::translate("SewingEditorClass", "SewingEditor", 0));
         actionLoad_svg->setText(QApplication::translate("SewingEditorClass", "open svg", 0));
+        actionLoad_svg->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+O", 0));
         actionSave_svg->setText(QApplication::translate("SewingEditorClass", "save svg", 0));
+        actionSave_svg->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+S", 0));
         menuFile->setTitle(QApplication::translate("SewingEditorClass", "file", 0));
     } // retranslateUi
 

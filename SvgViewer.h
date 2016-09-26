@@ -3,7 +3,9 @@
 
 #include <QtOpenGL>
 #include "camera.h"
-class SvgRenderer;
+namespace svg{
+	class SvgManager;
+}
 class SvgViewer : public QGLWidget
 {
 	Q_OBJECT
@@ -23,6 +25,8 @@ public:
 	Camera& camera(){ return m_camera; }
 	void resetCamera();
 
+	svg::SvgManager* getSvgManager();
+
 	void initializeGL();
 	void resizeGL(int w, int h);
 	void paintGL();
@@ -33,6 +37,7 @@ public:
 protected:
 	void mousePressEvent(QMouseEvent *);
 	void mouseReleaseEvent(QMouseEvent *);
+	void mouseDoubleClickEvent(QMouseEvent *);
 	void mouseMoveEvent(QMouseEvent*);
 	void wheelEvent(QWheelEvent*);
 	void keyPressEvent(QKeyEvent*);
@@ -57,7 +62,7 @@ protected:
 	QPoint m_boxBegin;
 	QPoint m_boxEnd;
 
-	SvgRenderer* m_svgRenderer;
+	svg::SvgManager* m_svgManager;
 };
 
 #endif // SvgViewer_H

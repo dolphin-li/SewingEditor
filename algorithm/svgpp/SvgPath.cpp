@@ -51,7 +51,9 @@ namespace svg
 	void SvgPath::render()
 	{
 		assert(m_gl_path_id);
+
 		glColor3fv(attribute()->m_color.ptr());
+
 		glPathCommandsNV(m_gl_path_id,
 			GLsizei(m_cmds.size()), &m_cmds[0],
 			GLsizei(m_coords.size()), GL_FLOAT, &m_coords[0]);
@@ -72,14 +74,92 @@ namespace svg
 			glPathDashArrayNV(m_gl_path_id, 0, NULL);
 		}
 
-		glColor4fv(m_attribute->m_color.ptr());
 		glStencilStrokePathNV(m_gl_path_id, 1, ~0);
 		glCoverStrokePathNV(m_gl_path_id, GL_BOUNDING_BOX_NV);	
+
+		// render selected or highlighted
+		if (isHighlighted() || isSelected())
+		{
+			float sz = m_pathStyle.stroke_width / 5;
+			glPathParameterfNV(m_gl_path_id, GL_PATH_STROKE_WIDTH_NV, sz);
+			glColor3f(0, 0, 1);
+			glStencilStrokePathNV(m_gl_path_id, 1, ~0);
+			glCoverStrokePathNV(m_gl_path_id, GL_BOUNDING_BOX_NV);
+
+			if (isHighlighted() && isSelected())
+				sz *= 2;
+
+			// render control points
+			glPushAttrib(GL_ALL_ATTRIB_BITS);
+			glDisable(GL_STENCIL_TEST);
+			glBegin(GL_LINES);
+			for (int i = 0; i < (int)m_segmentPos.size()-1; i++)
+			{
+				int bg = m_segmentPos[i];
+				int ed = m_segmentPos[i + 1];
+				for (int j = bg; j < ed-1; j += 2)
+				{
+					ldp::Float2 c(m_coords[j], m_coords[j+1]);
+					glVertex2f(c[0] - sz, c[1] - sz);
+					glVertex2f(c[0] + sz, c[1] - sz);
+
+					glVertex2f(c[0] - sz, c[1] - sz);
+					glVertex2f(c[0] - sz, c[1] + sz);
+
+					glVertex2f(c[0] + sz, c[1] + sz);
+					glVertex2f(c[0] + sz, c[1] - sz);
+
+					glVertex2f(c[0] + sz, c[1] + sz);
+					glVertex2f(c[0] - sz, c[1] + sz);
+				}
+			}
+			glEnd();
+			glBegin(GL_QUADS);
+			glColor3f(1, 1, 1);
+			for (int i = 0; i < (int)m_segmentPos.size() - 1; i++)
+			{
+				int bg = m_segmentPos[i];
+				int ed = m_segmentPos[i + 1];
+				for (int j = bg; j < ed - 1; j += 2)
+				{
+					ldp::Float2 c(m_coords[j], m_coords[j + 1]);
+					glVertex2f(c[0] - sz, c[1] - sz);
+					glVertex2f(c[0] + sz, c[1] - sz);
+					glVertex2f(c[0] + sz, c[1] + sz);
+					glVertex2f(c[0] - sz, c[1] + sz);
+				}
+			}
+			glEnd();
+			glPopAttrib();
+		}
 	}
 
 	void SvgPath::renderId()
 	{
+		assert(m_gl_path_id);
+		glColor4fv(color_from_index(m_id).ptr());
+		glPathCommandsNV(m_gl_path_id,
+			GLsizei(m_cmds.size()), &m_cmds[0],
+			GLsizei(m_coords.size()), GL_FLOAT, &m_coords[0]);
 
+		glPathParameteriNV(m_gl_path_id, GL_PATH_JOIN_STYLE_NV, lineJoinConverter(this));
+		glPathParameteriNV(m_gl_path_id, GL_PATH_END_CAPS_NV, lineCapConverter(this));
+		glPathParameterfNV(m_gl_path_id, GL_PATH_STROKE_WIDTH_NV, m_pathStyle.stroke_width);
+		glPathParameterfNV(m_gl_path_id, GL_PATH_MITER_LIMIT_NV, m_pathStyle.miter_limit);
+		if (m_pathStyle.dash_array.size())
+		{
+			glPathDashArrayNV(m_gl_path_id, GLsizei(m_pathStyle.dash_array.size()), &m_pathStyle.dash_array[0]);
+			glPathParameteriNV(m_gl_path_id, GL_PATH_DASH_CAPS_NV, lineCapConverter(this));
+			glPathParameterfNV(m_gl_path_id, GL_PATH_DASH_OFFSET_NV, m_pathStyle.dash_offset);
+			glPathParameteriNV(m_gl_path_id, GL_PATH_DASH_OFFSET_RESET_NV, m_pathStyle.dash_phase);
+		}
+		else
+		{
+			glPathDashArrayNV(m_gl_path_id, 0, NULL);
+		}
+
+		glStencilStrokePathNV(m_gl_path_id, 1, ~0);
+		glCoverStrokePathNV(m_gl_path_id, GL_BOUNDING_BOX_NV);
 	}
 
 }

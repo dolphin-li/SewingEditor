@@ -24,6 +24,8 @@ namespace svg
 		glPushMatrix();
 
 		glColor3fv(attribute()->m_color.ptr());
+		if (isHighlighted() || isSelected())
+			glColor3f(0, 0, 1);
 
 		ldp::Mat3f T = attribute()->m_transfrom;
 		ldp::Mat4f M;
@@ -72,7 +74,53 @@ namespace svg
 
 	void SvgText::renderId()
 	{
+		glPushMatrix();
 
+		glColor4fv(color_from_index(m_id).ptr());
+
+		ldp::Mat3f T = attribute()->m_transfrom;
+		ldp::Mat4f M;
+		M.eye();
+		M(0, 0) = T(0, 0);
+		M(0, 1) = T(1, 0);
+		M(1, 0) = T(0, 1);
+		M(1, 1) = T(1, 1);
+		M(0, 3) = T(0, 2);
+		M(1, 3) = T(1, 2);
+		glMultMatrixf(M.ptr());
+		glScalef(1, -1, 1);
+		glScalef(m_font_size, m_font_size, m_font_size);
+
+		bool stroking = false;
+		bool filling = true;
+		FontFacePtr font = requireFontFace(m_font);
+		if (stroking)
+		{
+			glStencilStrokePathInstancedNV(m_text.size(),
+				GL_UNSIGNED_BYTE, m_text.c_str(), font->glyph_base,
+				1, ~0,  /* Use all stencil bits */
+				GL_TRANSLATE_X_NV, m_hori_shifts.data());
+			glCoverStrokePathInstancedNV(m_text.size(),
+				GL_UNSIGNED_BYTE, m_text.c_str(), font->glyph_base,
+				GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV,
+				GL_TRANSLATE_X_NV, m_hori_shifts.data());
+		}
+
+		if (filling) {
+			/* STEP 1: stencil message into stencil buffer.  Results in samples
+			within the message's glyphs to have a non-zero stencil value. */
+			glStencilFillPathInstancedNV(m_text.size(),
+				GL_UNSIGNED_BYTE, m_text.c_str(), font->glyph_base,
+				GL_PATH_FILL_MODE_NV, ~0,  /* Use all stencil bits */
+				GL_TRANSLATE_X_NV, m_hori_shifts.data());
+			glCoverFillPathInstancedNV(m_text.size(),
+				GL_UNSIGNED_BYTE, m_text.c_str(), font->glyph_base,
+				GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV,
+				GL_TRANSLATE_X_NV, m_hori_shifts.data());
+
+		}
+
+		glPopMatrix();
 	}
 
 	void SvgText::updateText()

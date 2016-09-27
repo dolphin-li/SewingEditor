@@ -41,7 +41,8 @@ protected:
 	void mouseMoveEvent(QMouseEvent*);
 	void wheelEvent(QWheelEvent*);
 	void keyPressEvent(QKeyEvent*);
-	void keyReleaseEvent(QKeyEvent*);
+	void keyReleaseEvent(QKeyEvent*); 
+	void renderFbo();
 public:
 	void toggleMeshOperationMode();
 	void setMeshOpMode(MeshOperationMode mode);
@@ -63,6 +64,7 @@ protected:
 	QPoint m_boxEnd;
 
 	svg::SvgManager* m_svgManager;
+	int m_svgLastHighLightId;
 };
 
 #endif // SvgViewer_H

@@ -27,12 +27,17 @@ namespace svg
 		SvgAbstractObject();
 		~SvgAbstractObject();
 
-		static SvgAbstractObject* create(ObjectType type);
-
 		virtual ObjectType objectType()const = 0;
+		virtual void render() = 0;
+		virtual void renderId() = 0;
 
 		void setId(int id) { m_id = id; }
 		int getId()const { return m_id; }
+
+		void setSelected(bool s){ m_selected = s; }
+		bool isSelected()const{ return m_selected; }
+		void setHighlighted(bool s){ m_highlighted = s; }
+		bool isHighlighted()const{ return m_highlighted; }
 
 		SvgGroup* parent();
 		const SvgGroup* parent()const;
@@ -53,15 +58,31 @@ namespace svg
 		ldp::Float2 getSize()const { return ldp::Float2(width(), height()); }
 		float width()const{ return m_bbox[1] - m_bbox[0]; }
 		float height()const{ return m_bbox[3] - m_bbox[2]; }
-
-		static void printGLError(const char* label="");
-
-		virtual void render() = 0;
-		virtual void renderId() = 0;
+	public:
+		static SvgAbstractObject* create(ObjectType type);
+		static void printGLError(const char* label = "");
+		static ldp::Float4 color_from_index(int index)
+		{
+			int r = index & 0xff;
+			int g = (index >> 8) & 0xff;
+			int b = (index >> 16) & 0xff;
+			int a = (index >> 24) & 0xff;
+			return ldp::Float4(r, g, b, a) / 255.f;
+		}
+		static int index_from_color(ldp::Float4 c)
+		{
+			int r = c[0] * 255.f;
+			int g = c[1] * 255.f;
+			int b = c[2] * 255.f;
+			int a = c[3] * 255.f;
+			return r + (g << 8) + (b << 16) + (a << 24);
+		}
 	protected:
 		int m_id;
 		SvgGroup* m_parent;
 		std::shared_ptr<SvgAttribute> m_attribute;
 		ldp::Float4 m_bbox;
+		bool m_selected;
+		bool m_highlighted;
 	};
 }

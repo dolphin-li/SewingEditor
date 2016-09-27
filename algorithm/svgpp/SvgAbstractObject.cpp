@@ -14,6 +14,8 @@ namespace svg
 	{
 		m_id = -1;
 		m_parent = nullptr;
+		m_selected = false;
+		m_highlighted = false;
 		resetBound();
 		m_attribute = std::shared_ptr<SvgAttribute>(new SvgAttribute());
 	}

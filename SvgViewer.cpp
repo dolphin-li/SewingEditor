@@ -4,6 +4,7 @@
 #include "global_data_holder.h"
 #include "Renderable.h"
 #include "svgpp\SvgManager.h"
+#include "svgpp\SvgAbstractObject.h"
 
 SvgViewer::SvgViewer(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -13,6 +14,7 @@ SvgViewer::SvgViewer(QWidget *parent)
 	m_meshOperationMode = ObjectMode;
 	m_isBoxMode = false;
 	m_svgManager= new svg::SvgManager();
+	m_svgLastHighLightId = -1;
 }
 
 SvgViewer::~SvgViewer()
@@ -33,15 +35,6 @@ void SvgViewer::resetCamera()
 void SvgViewer::initializeGL()
 {
 	glewInit();
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_LIGHTING);
-	glEnable(GL_LINE_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
-	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_NOTEQUAL, 0, 0x1F);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
 	resetCamera();
 
@@ -66,8 +59,7 @@ void SvgViewer::resizeGL(int w, int h)
 		delete m_fbo;
 	QGLFramebufferObjectFormat fmt;
 	fmt.setAttachment(QGLFramebufferObject::CombinedDepthStencil);
-	fmt.setMipmap(true);
-	m_fbo = new QGLFramebufferObject(width(), height(), fmt);
+	m_fbo = new QGLFramebufferObject(w, h, fmt);
 }
 
 svg::SvgManager* SvgViewer::getSvgManager()
@@ -82,13 +74,49 @@ void SvgViewer::setMeshOpMode(MeshOperationMode mode)
 
 void SvgViewer::paintGL()
 {
+	renderFbo();
+
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 0, 0x1F);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 	glClearStencil(0);
 	glStencilMask(~0);
-	glClearColor(1,1,1, 0.0f);
+	glClearColor( 1, 1, 1, 0);
+	glColor4f(1, 1, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	
+	m_camera.apply();
+	m_svgManager->render();
+}
+
+void SvgViewer::renderFbo()
+{
+	m_fbo->bind();
+
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NEAREST);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 0, 0x1F);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
+	glClearStencil(0);
+	glStencilMask(~0);
+	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	m_camera.apply();
-	m_svgManager->render();
+	m_svgManager->renderIndex();
+
+	m_fbo->release();
+
+	m_fboImage = m_fbo->toImage();
 }
 
 void SvgViewer::keyPressEvent(QKeyEvent*ev)
@@ -156,7 +184,6 @@ void SvgViewer::keyReleaseEvent(QKeyEvent*ev)
 
 }
 
-
 void SvgViewer::mousePressEvent(QMouseEvent *ev)
 {
 	setFocus();
@@ -169,7 +196,6 @@ void SvgViewer::mousePressEvent(QMouseEvent *ev)
 
 	}
 }
-
 
 void SvgViewer::mouseDoubleClickEvent(QMouseEvent *ev)
 {
@@ -191,6 +217,19 @@ void SvgViewer::mouseDoubleClickEvent(QMouseEvent *ev)
 
 void SvgViewer::mouseReleaseEvent(QMouseEvent *ev)
 {
+	if (m_buttons & Qt::LeftButton)
+	{
+		QRgb cl = m_fboImage.pixel(ev->pos());
+		ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
+		color /= 255.f;
+		int id = svg::SvgAbstractObject::index_from_color(color);
+		svg::SvgManager::SelectOp op = svg::SvgManager::SelectThis;
+		if (ev->modifiers() & Qt::SHIFT)
+			op = svg::SvgManager::SelectUnion;
+		m_svgManager->selectShapeByIndex(id, op);
+		updateGL();
+	}
+
 	// clear buttons
 	m_isBoxMode = false;
 	m_buttons = Qt::NoButton;
@@ -209,6 +248,14 @@ void SvgViewer::mouseMoveEvent(QMouseEvent*ev)
 			if (bMin[0] > bMax[0]) std::swap(bMin[0], bMax[0]);
 			if (bMin[1] > bMax[1]) std::swap(bMin[1], bMax[1]);
 		}
+
+		// hight light mouse clicked
+		QRgb cl = m_fboImage.pixel(ev->pos());
+		ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
+		color /= 255.f;
+		int id = svg::SvgAbstractObject::index_from_color(color);
+		m_svgManager->highlightShapeByIndex(m_svgLastHighLightId, id);
+		m_svgLastHighLightId = id;
 	}
 
 	if (m_buttons & Qt::LeftButton)

@@ -255,12 +255,15 @@ namespace svg
 	void SvgManager::updateIndex()
 	{
 		int idx = SvgAbstractObject::INDEX_BEGIN;
+		m_idxMap.clear();
 		updateIndex(m_rootGroup.get(), idx);
 	}
 
 	void SvgManager::updateIndex(SvgAbstractObject* obj, int& idx)
 	{
-		obj->setId(idx++);
+		obj->setId(idx);
+		m_idxMap.insert(std::make_pair(idx, obj));
+		idx++;
 		if (obj->objectType() == SvgAbstractObject::Group)
 		{
 			SvgGroup* g = (SvgGroup*)obj;
@@ -299,4 +302,57 @@ namespace svg
 		m_rootGroup->render();
 	}
 
+	void SvgManager::renderIndex()
+	{
+		if (m_rootGroup.get() == nullptr)
+			return;
+
+		m_rootGroup->renderId();
+	}
+
+	void SvgManager::selectShapeByIndex(int id, SelectOp op)
+	{
+		selectShapeByIndex(m_rootGroup.get(), id, op);
+	}
+	void SvgManager::selectShapeByIndex(SvgAbstractObject* obj, int id, SelectOp op)
+	{
+		switch (op)
+		{
+		case svg::SvgManager::SelectThis:
+			if (id >= SvgAbstractObject::INDEX_BEGIN)
+				obj->setSelected(obj->getId() == id);
+			break;
+		case svg::SvgManager::SelectUnion:
+			if (obj->getId() == id)
+				obj->setSelected(!obj->isSelected());
+			break;
+		case svg::SvgManager::SelectAll:
+			obj->setSelected(true);
+			break;
+		case svg::SvgManager::SelectNone:
+			obj->setSelected(false);
+			break;
+		case svg::SvgManager::SelectInverse:
+			obj->setSelected(!obj->isSelected());
+			break;
+		default:
+			break;
+		}
+		if (obj->objectType() == SvgAbstractObject::Group)
+		{
+			SvgGroup* g = (SvgGroup*)obj;
+			for (size_t i = 0; i < g->m_children.size(); i++)
+				selectShapeByIndex(g->m_children[i].get(), id, op);
+		}
+	}
+
+	void SvgManager::highlightShapeByIndex(int lastId, int thisId)
+	{
+		auto lastIt = m_idxMap.find(lastId);
+		if (lastIt != m_idxMap.end())
+			lastIt->second->setHighlighted(false);
+		auto thisIt = m_idxMap.find(thisId);
+		if (thisIt != m_idxMap.end())
+			thisIt->second->setHighlighted(true);
+	}
 }

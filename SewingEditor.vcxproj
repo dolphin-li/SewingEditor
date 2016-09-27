@@ -255,6 +255,7 @@
     <ClCompile Include="algorithm\svgpp\nvprsvg\color_names.cpp" />
     <ClCompile Include="algorithm\svgpp\nvprsvg\common\dsa_emulate.c" />
     <ClCompile Include="algorithm\svgpp\nvprsvg\common\mjkimage.c" />
+    <ClCompile Include="algorithm\svgpp\nvprsvg\common\render_font.cpp" />
     <ClCompile Include="algorithm\svgpp\nvprsvg\common\request_vsync.c" />
     <ClCompile Include="algorithm\svgpp\nvprsvg\common\showfps.c" />
     <ClCompile Include="algorithm\svgpp\nvprsvg\common\sRGB_math.c" />
@@ -418,6 +419,7 @@
     <ClInclude Include="algorithm\svgpp\nvprsvg\common\countof.h" />
     <ClInclude Include="algorithm\svgpp\nvprsvg\common\dsa_emulate.h" />
     <ClInclude Include="algorithm\svgpp\nvprsvg\common\mjkimage.h" />
+    <ClInclude Include="algorithm\svgpp\nvprsvg\common\render_font.hpp" />
     <ClInclude Include="algorithm\svgpp\nvprsvg\common\request_vsync.h" />
     <ClInclude Include="algorithm\svgpp\nvprsvg\common\showfps.h" />
     <ClInclude Include="algorithm\svgpp\nvprsvg\common\sRGB_math.h" />

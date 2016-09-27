@@ -568,6 +568,9 @@
     <ClCompile Include="algorithm\svgpp\SvgGroup.cpp">
       <Filter>algorithm\svgpp</Filter>
     </ClCompile>
+    <ClCompile Include="algorithm\svgpp\nvprsvg\common\render_font.cpp">
+      <Filter>algorithm\svgpp\nvprsvg\common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="sewingeditor.ui">
@@ -841,6 +844,9 @@
     </ClInclude>
     <ClInclude Include="algorithm\svgpp\SvgGroup.h">
       <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\nvprsvg\common\render_font.hpp">
+      <Filter>algorithm\svgpp\nvprsvg\common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

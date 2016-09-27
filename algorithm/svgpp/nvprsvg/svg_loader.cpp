@@ -1601,6 +1601,10 @@ bool SVGParser::parseGenericShapeProperty(TiXmlAttribute* a, TiXmlElement* elem)
         use_map[s] = elem;
         return true;
     }
+	if (name == "font-family") {
+		parseFontFamily(a->Value(), style().font_family);
+		return true;
+	}
     return false;
 }
 
@@ -2191,13 +2195,13 @@ NodePtr SVGParser::parseText(TiXmlElement* elem)
 {
     style_stack.pushChild();
 
-    TextPtr text = TextPtr(new Text());
-    float x = 0, y = 0;
+    float x = 0, y = 0, font_size=0;
 
     TiXmlNode* child = elem->FirstChild();
+	std::string textValue = "";
     if (child) {
         if (child->Type() == TiXmlNode::TEXT) {
-            printf("got = <%s>\n", child->Value());  // XXX temporary
+			textValue = child->Value();
         }
     }
 
@@ -2221,11 +2225,21 @@ NodePtr SVGParser::parseText(TiXmlElement* elem)
             ss = parseCoordinate(ss, x);
             continue;
         }
+		if (name == "font-size"){
+			string s = a->Value();
+			const char* ss = s.c_str();
+			font_size = atof(ss);
+			continue;
+		}
         bool got_one = parseGenericShapeProperty(a, elem);
         if (got_one) {
             continue;
         }
     }
+
+
+	TextPtr text = TextPtr(new Text(style().font_family.c_str(),  
+		textValue.c_str(), font_size, style().matrix));
 
     return style_stack.popAndReturn(text);
 }

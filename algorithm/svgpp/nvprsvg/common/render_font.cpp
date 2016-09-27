@@ -29,8 +29,8 @@ FontFace::FontFace(GLenum target, const char *name, int num_chars_, GLuint path_
 
   /* Query font and glyph metrics. */
   GLfloat font_data[4];
-  glGetPathMetricRangeNV(GL_FONT_Y_MIN_BOUNDS_NV|GL_FONT_Y_MAX_BOUNDS_NV|
-    GL_FONT_UNDERLINE_POSITION_NV|GL_FONT_UNDERLINE_THICKNESS_NV,
+  glGetPathMetricRangeNV(GL_FONT_Y_MIN_BOUNDS_BIT_NV|GL_FONT_Y_MAX_BOUNDS_BIT_NV|
+    GL_FONT_UNDERLINE_POSITION_BIT_NV|GL_FONT_UNDERLINE_THICKNESS_BIT_NV,
     glyph_base+' ', /*count*/1,
     4*sizeof(GLfloat),
     font_data);
@@ -57,7 +57,7 @@ Message::Message(const FontFace *font_, const char *message_, Cg::float2 to_quad
   , xtranslate(message_length)
   , stroking(true)
   , filling(true)
-  , underline(1)
+  , underline(0)
   , fill_gradient(0)
 {
   glGetPathSpacingNV(GL_ACCUM_ADJACENT_PAIRS_NV,
@@ -72,8 +72,8 @@ Message::Message(const FontFace *font_, const char *message_, Cg::float2 to_quad
   total_advance = xtranslate[message_length-1] +
     font->horizontal_advance[GLubyte(message[message_length-1])];
 
-  Cg::float4 from_box = float4(0, font->y_min, total_advance, font->y_max);
-  matrix = float3x3(box2quad(from_box, to_quad));
+  bound_before_transform = float4(0, font->y_min, total_advance, font->y_max);
+  matrix = float3x3(box2quad(bound_before_transform, to_quad));
 }
 
 Message::~Message()
@@ -155,6 +155,10 @@ void Message::render()
 Cg::float3x3 Message::getMatrix()
 {
   return matrix;
+}
+void Message::setMatrix(Cg::float3x3 M)
+{
+	matrix = M;
 }
 void Message::multMatrix()
 {

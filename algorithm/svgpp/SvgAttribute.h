@@ -10,5 +10,6 @@ namespace svg
 
 	public:
 		ldp::Float4 m_color;
+		ldp::Mat3f m_transfrom;
 	};
 }

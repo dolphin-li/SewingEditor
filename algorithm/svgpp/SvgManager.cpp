@@ -28,6 +28,7 @@ namespace svg
 
 		vector<GLubyte> cmds;
 		vector<GLfloat> coords;
+		vector<int> cmdPos;
 
 		ConvertPathProcessor(Path *p_, GLuint &path_, GLenum &fill_rule_)
 			: p(p_)
@@ -38,6 +39,7 @@ namespace svg
 		{
 			cmds.clear();
 			coords.clear();
+			cmdPos.clear();
 		}
 
 		void beginPath(PathPtr p) {
@@ -55,16 +57,19 @@ namespace svg
 		}
 		void moveTo(const float2 plist[2], size_t coord_index, char cmd) {
 			cmds.push_back(GL_MOVE_TO_NV);
+			cmdPos.push_back(coords.size());
 			coords.push_back(plist[1].x);
 			coords.push_back(plist[1].y);
 		}
 		void lineTo(const float2 plist[2], size_t coord_index, char cmd) {
 			cmds.push_back(GL_LINE_TO_NV);
+			cmdPos.push_back(coords.size());
 			coords.push_back(plist[1].x);
 			coords.push_back(plist[1].y);
 		}
 		void quadraticCurveTo(const float2 plist[3], size_t coord_index, char cmd) {
 			cmds.push_back(GL_QUADRATIC_CURVE_TO_NV);
+			cmdPos.push_back(coords.size());
 			coords.push_back(plist[1].x);
 			coords.push_back(plist[1].y);
 			coords.push_back(plist[2].x);
@@ -72,6 +77,7 @@ namespace svg
 		}
 		void cubicCurveTo(const float2 plist[4], size_t coord_index, char cmd) {
 			cmds.push_back(GL_CUBIC_CURVE_TO_NV);
+			cmdPos.push_back(coords.size());
 			coords.push_back(plist[1].x);
 			coords.push_back(plist[1].y);
 			coords.push_back(plist[2].x);
@@ -96,6 +102,7 @@ namespace svg
 					cmds.push_back(GL_SMALL_CW_ARC_TO_NV);
 				}
 			}
+			cmdPos.push_back(coords.size());
 			coords.push_back(arc.radii.x);
 			coords.push_back(arc.radii.y);
 			coords.push_back(arc.x_axis_rotation);
@@ -104,6 +111,7 @@ namespace svg
 		}
 		void close(char cmd) {
 			cmds.push_back(GL_CLOSE_PATH_NV);
+			cmdPos.push_back(coords.size());
 		}
 		void endPath(PathPtr p) {
 			if (!path) {
@@ -131,10 +139,29 @@ namespace svg
 				path->m_gl_fill_rull);
 			shape->getPath()->processSegments(processor);
 			path->m_cmds.insert(path->m_cmds.end(), processor.cmds.begin(), processor.cmds.end());
+			path->m_segmentPos.insert(path->m_segmentPos.end(), processor.cmdPos.begin(), processor.cmdPos.end());
 			path->m_coords.insert(path->m_coords.end(), processor.coords.begin(), processor.coords.end());
 			Cg::float4 bd = shape->getPath()->getBounds();
 			path->setBound(ldp::Float4(bd.x, bd.z, bd.y, bd.w));
 			m_group->m_children.push_back(std::shared_ptr<SvgPath>(path));
+		}
+		virtual void visit(TextPtr text)
+		{
+			SvgText* t = new SvgText();
+			double3x3 M = text->transform;
+			ldp::Mat3f& tM = t->attribute()->m_transfrom;
+			for (int r = 0; r < 2; r++)
+			for (int c = 0; c < 2; c++)
+				tM(r, c) = M[c][r]; // a transpose here
+			tM(0, 2) = M[0][2];
+			tM(1, 2) = M[1][2];
+			t->m_font = text->font_family;
+			t->m_text = text->text;
+			t->m_font_size = text->font_size;
+			if (!t->m_gl_path_id)
+				t->m_gl_path_id = glGenPathsNV(1);
+			t->updateText();
+			m_group->m_children.push_back(std::shared_ptr<SvgText>(t));
 		}
 		virtual void apply(GroupPtr group) 
 		{
@@ -173,7 +200,6 @@ namespace svg
 			visitor->unapply(group);
 		}
 	};
-
 
 #pragma endregion
 

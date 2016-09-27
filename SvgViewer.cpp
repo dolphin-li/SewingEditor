@@ -88,7 +88,6 @@ void SvgViewer::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	m_camera.apply();
-
 	m_svgManager->render();
 }
 
@@ -260,7 +259,7 @@ void SvgViewer::wheelEvent(QWheelEvent*ev)
 	b = dy + t + (b - t - dy) * s;
 	t = dy + t - dy * s;
 	m_camera.setFrustum(l, r, t, b, m_camera.getFrustumNear(), m_camera.getFrustumFar());
-	
+
 	updateGL();
 }
 

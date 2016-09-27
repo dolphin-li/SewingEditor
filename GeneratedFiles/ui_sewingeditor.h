@@ -40,10 +40,10 @@ public:
     QMenu *menuFile;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
-    QDockWidget *dockWidget;
-    QWidget *dockWidgetContents_2;
-    QDockWidget *dockWidget_2;
+    QDockWidget *dockWidgetRight;
     QWidget *dockWidgetContents_3;
+    QDockWidget *dockWidgetLeft;
+    QWidget *dockWidgetContents;
 
     void setupUi(QMainWindow *SewingEditorClass)
     {
@@ -81,20 +81,19 @@ public:
         statusBar = new QStatusBar(SewingEditorClass);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         SewingEditorClass->setStatusBar(statusBar);
-        dockWidget = new QDockWidget(SewingEditorClass);
-        dockWidget->setObjectName(QStringLiteral("dockWidget"));
-        dockWidget->setMinimumSize(QSize(80, 150));
-        dockWidgetContents_2 = new QWidget();
-        dockWidgetContents_2->setObjectName(QStringLiteral("dockWidgetContents_2"));
-        dockWidget->setWidget(dockWidgetContents_2);
-        SewingEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockWidget);
-        dockWidget_2 = new QDockWidget(SewingEditorClass);
-        dockWidget_2->setObjectName(QStringLiteral("dockWidget_2"));
-        dockWidget_2->setMinimumSize(QSize(200, 38));
+        dockWidgetRight = new QDockWidget(SewingEditorClass);
+        dockWidgetRight->setObjectName(QStringLiteral("dockWidgetRight"));
+        dockWidgetRight->setMinimumSize(QSize(200, 38));
         dockWidgetContents_3 = new QWidget();
         dockWidgetContents_3->setObjectName(QStringLiteral("dockWidgetContents_3"));
-        dockWidget_2->setWidget(dockWidgetContents_3);
-        SewingEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_2);
+        dockWidgetRight->setWidget(dockWidgetContents_3);
+        SewingEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
+        dockWidgetLeft = new QDockWidget(SewingEditorClass);
+        dockWidgetLeft->setObjectName(QStringLiteral("dockWidgetLeft"));
+        dockWidgetContents = new QWidget();
+        dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
+        dockWidgetLeft->setWidget(dockWidgetContents);
+        SewingEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(1), dockWidgetLeft);
 
         menuBar->addAction(menuFile->menuAction());
         menuFile->addAction(actionLoad_svg);

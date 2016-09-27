@@ -14,7 +14,7 @@ namespace svg
 	{
 		m_id = -1;
 		m_parent = nullptr;
-		m_bbox = ldp::Float4(FLT_MAX, -FLT_MAX, FLT_MAX, -FLT_MAX);
+		resetBound();
 		m_attribute = std::shared_ptr<SvgAttribute>(new SvgAttribute());
 	}
 
@@ -76,6 +76,16 @@ namespace svg
 		return out;
 	}
 
+	ldp::Float4 SvgAbstractObject::unionBound(ldp::Float2 point)const
+	{
+		ldp::Float4 out;
+		out[0] = std::min(m_bbox[0], point[0]);
+		out[1] = std::max(m_bbox[1], point[0]);
+		out[2] = std::min(m_bbox[2], point[1]);
+		out[3] = std::max(m_bbox[3], point[1]);
+		return out;
+	}
+
 	ldp::Float4 SvgAbstractObject::intersectBound(ldp::Float4 b)const
 	{
 		ldp::Float4 out;
@@ -86,4 +96,12 @@ namespace svg
 		return out;
 	}
 
+	void SvgAbstractObject::printGLError(const char* label)
+	{
+		if (label == nullptr)
+			label = "";
+		GLenum er = glGetError();
+		if (er != GL_NO_ERROR)
+			printf("[GLError][%s]: %s\n", label, glewGetErrorString(er));
+	}
 }

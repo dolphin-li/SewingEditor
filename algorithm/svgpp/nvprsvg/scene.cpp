@@ -78,6 +78,13 @@ void Node::traverse(VisitorPtr visitor)
     traverse(visitor, traversal);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// text
+void Text::traverse(VisitorPtr visitor, Traversal &traversal)
+{
+	traversal.traverse(shared_from_this(), visitor);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Shape
@@ -577,6 +584,11 @@ RectBounds RectBounds::dilate(float x_, float y_)
 void GenericTraversal::traverse(ShapePtr shape, VisitorPtr visitor)
 {
     visitor->visit(shape);
+}
+
+void GenericTraversal::traverse(TextPtr shape, VisitorPtr visitor)
+{
+	visitor->visit(shape);
 }
 
 void GenericTraversal::traverse(TransformPtr transform, VisitorPtr visitor)

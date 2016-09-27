@@ -40,14 +40,21 @@ namespace svg
 		SvgGroup* root();
 		const SvgGroup* root()const;
 
+		SvgAttribute* attribute(){ return m_attribute.get(); }
+		const SvgAttribute* attribute()const{ return m_attribute.get(); }
+
 		ldp::Float4 getBound()const{ return m_bbox; }
 		void setBound(ldp::Float4 b){ m_bbox = b; }
+		void resetBound(){ m_bbox = ldp::Float4(FLT_MAX, -FLT_MAX, FLT_MAX, -FLT_MAX); }
 		ldp::Float4 unionBound(ldp::Float4 b)const;
+		ldp::Float4 unionBound(ldp::Float2 point)const;
 		ldp::Float4 intersectBound(ldp::Float4 b)const;
 		ldp::Float2 getOrigion()const{ return ldp::Float2(m_bbox[0], m_bbox[1]); }
 		ldp::Float2 getSize()const { return ldp::Float2(width(), height()); }
 		float width()const{ return m_bbox[1] - m_bbox[0]; }
 		float height()const{ return m_bbox[3] - m_bbox[2]; }
+
+		static void printGLError(const char* label="");
 
 		virtual void render() = 0;
 		virtual void renderId() = 0;

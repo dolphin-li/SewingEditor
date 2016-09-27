@@ -119,11 +119,21 @@ struct Shape;
 typedef shared_ptr<struct RendererState<Shape> > ShapeRendererStatePtr;
 
 typedef shared_ptr<struct Text> TextPtr;
-struct Text : Node, HasRendererState<Text> {
+struct Text : Node, HasRendererState<Text>, enable_shared_from_this<Text> {
 protected:
 public:
-    Text()
-        : HasRendererState<Text>(this)
+	std::string font_family;
+	std::string text;
+	double font_size;
+	double3x3 transform;
+
+    Text(const char* font_, const char* text_, double font_size_,
+		double3x3 matrix_)
+        : HasRendererState<Text>(this),
+		font_family(font_),
+		text(text_),
+		font_size(font_size_),
+		transform(matrix_)
     {}
     virtual ~Text() {}
 
@@ -131,7 +141,7 @@ public:
         invalidateRenderStates();
     }
 
-    void traverse(VisitorPtr visitor, Traversal &traversal) { /* nop for now */ }
+	void traverse(VisitorPtr visitor, Traversal &traversal);
 };
 
 enum OpacityTreatment {
@@ -576,6 +586,8 @@ public:
 
     virtual void visit(ShapePtr shape) = 0;
 
+	virtual void visit(TextPtr text) {}
+
     virtual void apply(TransformPtr transform) { }
     virtual void unapply(TransformPtr transform) { }
 
@@ -597,7 +609,8 @@ public:
     virtual void traverse(ShapePtr shape, VisitorPtr visitor) = 0;
     virtual void traverse(TransformPtr transform, VisitorPtr visitor) = 0;
     virtual void traverse(ClipPtr clip, VisitorPtr visitor) = 0;
-    virtual void traverse(GroupPtr group, VisitorPtr visitor) = 0;
+	virtual void traverse(GroupPtr group, VisitorPtr visitor) = 0;
+	virtual void traverse(TextPtr group, VisitorPtr visitor) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -608,7 +621,8 @@ public:
     virtual void traverse(ShapePtr shape, VisitorPtr visitor);
     virtual void traverse(TransformPtr transform, VisitorPtr visitor);
     virtual void traverse(ClipPtr clip, VisitorPtr visitor);
-    virtual void traverse(GroupPtr group, VisitorPtr visitor);
+	virtual void traverse(GroupPtr group, VisitorPtr visitor);
+	virtual void traverse(TextPtr group, VisitorPtr visitor);
 };
 
 class ReverseTraversal : public GenericTraversal 

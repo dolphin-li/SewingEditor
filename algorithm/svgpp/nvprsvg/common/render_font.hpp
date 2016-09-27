@@ -8,7 +8,6 @@
 #include <Cg/vector.hpp>
 #include <Cg/matrix.hpp>
 
-#include "nvpr_init.h"
 #include "xform.hpp"
 
 struct FontFace {
@@ -36,12 +35,15 @@ struct Message {
   int underline;
   int fill_gradient;
 
+  Cg::float4 bound_before_transform;
+
   Message(const FontFace *font_, const char *message_, Cg::float2 to_quad[4]);
 
   ~Message();
 
   void render();
   Cg::float3x3 getMatrix();
+  void setMatrix(Cg::float3x3 M);
   void multMatrix();
   void loadMatrix();
 

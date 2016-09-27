@@ -39,16 +39,19 @@ namespace svg
 
 	SvgPath::SvgPath() :SvgAbstractObject()
 	{
-		m_gl_path_id = 0;
+		m_gl_path_id = glGenPathsNV(1);
 	}
 
 	SvgPath::~SvgPath()
 	{
+		if (m_gl_path_id)
+			glDeletePathsNV(m_gl_path_id, 1);
 	}
 
 	void SvgPath::render()
 	{
 		assert(m_gl_path_id);
+		glColor3fv(attribute()->m_color.ptr());
 		glPathCommandsNV(m_gl_path_id,
 			GLsizei(m_cmds.size()), &m_cmds[0],
 			GLsizei(m_coords.size()), GL_FLOAT, &m_coords[0]);
@@ -71,7 +74,7 @@ namespace svg
 
 		glColor4fv(m_attribute->m_color.ptr());
 		glStencilStrokePathNV(m_gl_path_id, 1, ~0);
-		glCoverStrokePathNV(m_gl_path_id, GL_BOUNDING_BOX_NV);
+		glCoverStrokePathNV(m_gl_path_id, GL_BOUNDING_BOX_NV);	
 	}
 
 	void SvgPath::renderId()

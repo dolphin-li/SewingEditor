@@ -90,6 +90,10 @@ public:
         SewingEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
         dockWidgetLeft = new QDockWidget(SewingEditorClass);
         dockWidgetLeft->setObjectName(QStringLiteral("dockWidgetLeft"));
+        dockWidgetLeft->setMinimumSize(QSize(50, 38));
+        dockWidgetLeft->setMaximumSize(QSize(50, 99999));
+        dockWidgetLeft->setFloating(false);
+        dockWidgetLeft->setAllowedAreas(Qt::LeftDockWidgetArea);
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
         dockWidgetLeft->setWidget(dockWidgetContents);

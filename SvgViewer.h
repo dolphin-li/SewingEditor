@@ -3,6 +3,7 @@
 
 #include <QtOpenGL>
 #include "camera.h"
+#include "event_handles\AbstractEventHandle.h"
 namespace svg{
 	class SvgManager;
 }
@@ -11,29 +12,24 @@ class SvgViewer : public QGLWidget
 	Q_OBJECT
 
 public:
-	enum MeshOperationMode
-	{
-		EditMode,
-		ObjectMode,
-		MeshOpModeEnd,
-	};
-public:
 	SvgViewer(QWidget *parent);
 	~SvgViewer();
+	void initializeGL();
+	void resizeGL(int w, int h);
+	void paintGL();
 
 	const Camera& camera()const{ return m_camera; }
 	Camera& camera(){ return m_camera; }
 	void resetCamera();
-
 	svg::SvgManager* getSvgManager();
+	Qt::MouseButtons buttons()const{ return m_buttons; }
+	QPoint lastMousePos()const{ return m_lastPos; }
+	const QImage& fboImage()const{ return m_fboImage; }
+	AbstractEventHandle::ProcessorType getEventHandleType()const;
+	void setEventHandleType(AbstractEventHandle::ProcessorType type);
 
-	void initializeGL();
-	void resizeGL(int w, int h);
-	void paintGL();
-	void timerEvent(QTimerEvent *) { update(); }
-
-	void toggleShowType(int t){ if (m_showType & t) m_showType -= t; else m_showType |= t; }
-	int getShowType()const{ return m_showType; }
+	void beginDragBox(QPoint p);
+	void endDragBox();
 protected:
 	void mousePressEvent(QMouseEvent *);
 	void mouseReleaseEvent(QMouseEvent *);
@@ -43,28 +39,21 @@ protected:
 	void keyPressEvent(QKeyEvent*);
 	void keyReleaseEvent(QKeyEvent*); 
 	void renderFbo();
-public:
-	void toggleMeshOperationMode();
-	void setMeshOpMode(MeshOperationMode mode);
-	MeshOperationMode getMeshOpMode()const{ return m_meshOperationMode; }
+	void renderDragBox();
 protected:
 	Camera m_camera;
-
 	QPoint m_lastPos;
-	int m_showType;
-	MeshOperationMode m_meshOperationMode;
 	Qt::MouseButtons m_buttons;
-
-	// for selection rendering
 	QGLFramebufferObject* m_fbo;
 	QImage m_fboImage;
 
-	bool m_isBoxMode;
-	QPoint m_boxBegin;
-	QPoint m_boxEnd;
-
 	svg::SvgManager* m_svgManager;
-	int m_svgLastHighLightId;
+
+	bool m_isDragBox;
+	QPoint m_dragBoxBegin;
+protected:
+	AbstractEventHandle* m_currentEventHandle;
+	std::vector<std::shared_ptr<AbstractEventHandle>> m_eventHandles;
 };
 
 #endif // SvgViewer_H

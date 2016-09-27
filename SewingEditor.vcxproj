@@ -292,6 +292,10 @@
     <ClCompile Include="algorithm\tinyxml\tinyxmlparser.cpp" />
     <ClCompile Include="algorithm\util.cpp" />
     <ClCompile Include="basemeshviewer.cpp" />
+    <ClCompile Include="event_handles\AbstractEventHandle.cpp" />
+    <ClCompile Include="event_handles\GroupEventHandle.cpp" />
+    <ClCompile Include="event_handles\ShapeEventHandle.cpp" />
+    <ClCompile Include="event_handles\ZoomEventHandle.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_basemeshviewer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -492,6 +496,10 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_SVG_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtSvg" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtXml"</Command>
     </CustomBuild>
+    <ClInclude Include="event_handles\AbstractEventHandle.h" />
+    <ClInclude Include="event_handles\GroupEventHandle.h" />
+    <ClInclude Include="event_handles\ShapeEventHandle.h" />
+    <ClInclude Include="event_handles\ZoomEventHandle.h" />
     <ClInclude Include="GeneratedFiles\ui_sewingeditor.h" />
     <ClInclude Include="SquareWidget.h" />
   </ItemGroup>

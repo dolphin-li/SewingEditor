@@ -1,6 +1,7 @@
 #include "GL\glew.h"
 #include "SvgPath.h"
 #include "SvgAttribute.h"
+#include "SvgGroup.h"
 namespace svg
 {
 	static GLenum lineJoinConverter(const SvgPath *path)
@@ -78,7 +79,10 @@ namespace svg
 		glCoverStrokePathNV(m_gl_path_id, GL_BOUNDING_BOX_NV);	
 
 		// render selected or highlighted
-		if (isHighlighted() || isSelected())
+		bool ancestorSelected = false;
+		if (ancestor(root()))
+			ancestorSelected = ancestor(root())->isSelected();
+		if (isHighlighted() || isSelected() || ancestorSelected)
 		{
 			float sz = m_pathStyle.stroke_width / 5;
 			glPathParameterfNV(m_gl_path_id, GL_PATH_STROKE_WIDTH_NV, sz);
@@ -86,7 +90,7 @@ namespace svg
 			glStencilStrokePathNV(m_gl_path_id, 1, ~0);
 			glCoverStrokePathNV(m_gl_path_id, GL_BOUNDING_BOX_NV);
 
-			if (isHighlighted() && isSelected())
+			if (isHighlighted() && (isSelected() || ancestorSelected))
 				sz *= 2;
 
 			// render control points

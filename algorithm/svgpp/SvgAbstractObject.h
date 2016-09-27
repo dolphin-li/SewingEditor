@@ -44,6 +44,9 @@ namespace svg
 		void setParent(SvgGroup* p);
 		SvgGroup* root();
 		const SvgGroup* root()const;
+		// find the ancestor that is the child of given parent
+		const SvgGroup* ancestor(const SvgGroup* parent)const;
+		SvgGroup* ancestor(const SvgGroup* parent);
 
 		SvgAttribute* attribute(){ return m_attribute.get(); }
 		const SvgAttribute* attribute()const{ return m_attribute.get(); }

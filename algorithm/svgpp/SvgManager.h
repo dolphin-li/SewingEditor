@@ -37,12 +37,15 @@ namespace svg
 		// given an index, select shapes
 		void selectShapeByIndex(int id, SelectOp op = SelectThis);
 
+		void selectGroupByIndex(int id, SelectOp op = SelectThis);
+
 		// undo highlight for lastid and do highlight for this id
 		void highlightShapeByIndex(int lastId, int thisId);
 	protected:
 		void updateIndex(SvgAbstractObject* obj, int &idx);
 		void updateBound(SvgAbstractObject* obj);
 		void selectShapeByIndex(SvgAbstractObject* obj, int id, SelectOp op);
+		void selectGroupByIndex(SvgAbstractObject* obj, int id, SelectOp op);
 	private:
 		Camera* m_renderCam;
 		std::shared_ptr<SvgGroup> m_rootGroup;

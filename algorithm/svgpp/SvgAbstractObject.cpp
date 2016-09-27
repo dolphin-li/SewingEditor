@@ -57,16 +57,49 @@ namespace svg
 	const SvgGroup* SvgAbstractObject::root()const
 	{
 		const SvgGroup* p = parent();
-		while (!p) p = p->parent();
-		return p;
+		const SvgGroup* p1 = p;
+		while (p != nullptr)
+		{
+			p1 = p;
+			p = p->parent();
+		}
+		if (p1 == nullptr)
+		{
+			assert(this->objectType() == ObjectType::Group);
+			p1 = (const SvgGroup*)this;
+		}
+		return p1;
 	}
 	SvgGroup* SvgAbstractObject::root()
 	{
 		SvgGroup* p = parent();
-		while (!p) p = p->parent();
+		SvgGroup* p1 = p;
+		while (p != nullptr)
+		{
+			p1 = p;
+			p = p->parent();
+		}
+		if (p1 == nullptr)
+		{
+			assert(this->objectType() == ObjectType::Group);
+			p1 = (SvgGroup*)this;
+		}
+		return p1;
+	}
+	const SvgGroup* SvgAbstractObject::ancestor(const SvgGroup* parent_)const
+	{
+		const SvgGroup* p = parent();
+		while (p!=nullptr && p!=parent_) 
+			p = p->parent();
 		return p;
 	}
-
+	SvgGroup* SvgAbstractObject::ancestor(const SvgGroup* parent_)
+	{
+		SvgGroup* p = parent();
+		while (p!=nullptr && p != parent_) 
+			p = p->parent();
+		return p;
+	}
 
 	ldp::Float4 SvgAbstractObject::unionBound(ldp::Float4 b)const
 	{

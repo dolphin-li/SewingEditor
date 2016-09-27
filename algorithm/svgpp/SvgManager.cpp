@@ -143,6 +143,7 @@ namespace svg
 			path->m_coords.insert(path->m_coords.end(), processor.coords.begin(), processor.coords.end());
 			Cg::float4 bd = shape->getPath()->getBounds();
 			path->setBound(ldp::Float4(bd.x, bd.z, bd.y, bd.w));
+			path->setParent(m_group);
 			m_group->m_children.push_back(std::shared_ptr<SvgPath>(path));
 		}
 		virtual void visit(TextPtr text)
@@ -161,6 +162,7 @@ namespace svg
 			if (!t->m_gl_path_id)
 				t->m_gl_path_id = glGenPathsNV(1);
 			t->updateText();
+			t->setParent(m_group);
 			m_group->m_children.push_back(std::shared_ptr<SvgText>(t));
 		}
 		virtual void apply(GroupPtr group) 
@@ -343,6 +345,50 @@ namespace svg
 			SvgGroup* g = (SvgGroup*)obj;
 			for (size_t i = 0; i < g->m_children.size(); i++)
 				selectShapeByIndex(g->m_children[i].get(), id, op);
+		}
+	}
+
+	void SvgManager::selectGroupByIndex(int id, SelectOp op)
+	{
+		int gid = -1;
+		auto it = m_idxMap.find(id);
+		if (it != m_idxMap.end())
+			gid = it->second->ancestor(m_rootGroup.get())->getId();
+		selectGroupByIndex(m_rootGroup.get(), gid, op);
+	}
+	void SvgManager::selectGroupByIndex(SvgAbstractObject* obj, int id, SelectOp op)
+	{
+		SvgAbstractObject* ans = obj->ancestor(m_rootGroup.get());
+		if (ans)
+		{
+			switch (op)
+			{
+			case svg::SvgManager::SelectThis:
+				if (id >= SvgAbstractObject::INDEX_BEGIN)
+					ans->setSelected(ans->getId() == id);
+				break;
+			case svg::SvgManager::SelectUnion:
+				if (ans->getId() == id)
+					ans->setSelected(!ans->isSelected());
+				break;
+			case svg::SvgManager::SelectAll:
+				ans->setSelected(true);
+				break;
+			case svg::SvgManager::SelectNone:
+				ans->setSelected(false);
+				break;
+			case svg::SvgManager::SelectInverse:
+				ans->setSelected(!ans->isSelected());
+				break;
+			default:
+				break;
+			}
+		}
+		if (obj->objectType() == SvgAbstractObject::Group)
+		{
+			SvgGroup* g = (SvgGroup*)obj;
+			for (size_t i = 0; i < g->m_children.size(); i++)
+				selectGroupByIndex(g->m_children[i].get(), id, op);
 		}
 	}
 

@@ -11,15 +11,49 @@ SvgViewer::SvgViewer(QWidget *parent)
 {
 	setMouseTracking(true);
 	m_buttons = Qt::MouseButton::NoButton;
-	m_meshOperationMode = ObjectMode;
-	m_isBoxMode = false;
 	m_svgManager= new svg::SvgManager();
-	m_svgLastHighLightId = -1;
+	m_isDragBox = false;
+
+	m_eventHandles.resize((size_t)AbstractEventHandle::ProcessorTypeEnd, nullptr);
+	for (size_t i = (size_t)AbstractEventHandle::ProcessorTypeGeneral; 
+		i < (size_t)AbstractEventHandle::ProcessorTypeEnd; i++)
+	{
+		m_eventHandles[i] = std::shared_ptr<AbstractEventHandle>(
+			AbstractEventHandle::create(AbstractEventHandle::ProcessorType(i), this));
+	}
+	setEventHandleType(AbstractEventHandle::ProcessorTypeGroup);
 }
 
 SvgViewer::~SvgViewer()
 {
 	delete m_svgManager;
+}
+
+AbstractEventHandle::ProcessorType SvgViewer::getEventHandleType()const
+{
+	return m_currentEventHandle->type();
+}
+
+void SvgViewer::setEventHandleType(AbstractEventHandle::ProcessorType type)
+{
+	m_currentEventHandle = m_eventHandles[size_t(type)].get();
+	switch (m_currentEventHandle->type())
+	{
+	case AbstractEventHandle::ProcessorTypeGeneral:
+		setCursor(Qt::ArrowCursor);
+		break;
+	case AbstractEventHandle::ProcessorTypeShape:
+		setCursor(Qt::CrossCursor);
+		break;
+	case AbstractEventHandle::ProcessorTypeGroup:
+		setCursor(Qt::ArrowCursor);
+		break;
+	case AbstractEventHandle::ProcessorTypeZoom:
+		setCursor(Qt::SizeAllCursor);
+		break;
+	default:
+		break;
+	}
 }
 
 void SvgViewer::resetCamera()
@@ -67,11 +101,6 @@ svg::SvgManager* SvgViewer::getSvgManager()
 	return m_svgManager;
 }
 
-void SvgViewer::setMeshOpMode(MeshOperationMode mode)
-{ 
-	m_meshOperationMode = mode;
-}
-
 void SvgViewer::paintGL()
 {
 	renderFbo();
@@ -91,6 +120,7 @@ void SvgViewer::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	
 	m_camera.apply();
+	renderDragBox();
 	m_svgManager->render();
 }
 
@@ -119,69 +149,56 @@ void SvgViewer::renderFbo()
 	m_fboImage = m_fbo->toImage();
 }
 
+void SvgViewer::beginDragBox(QPoint p)
+{
+	m_dragBoxBegin = p;
+	m_isDragBox = true;
+}
+
+void SvgViewer::endDragBox()
+{
+	m_isDragBox = false;
+}
+
+void SvgViewer::renderDragBox()
+{
+	if (!m_isDragBox)
+		return;
+
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+	float l = camera().getFrustumLeft();
+	float r = camera().getFrustumRight();
+	float t = camera().getFrustumTop();
+	float b = camera().getFrustumBottom();
+	float x0 = std::min(m_dragBoxBegin.x(), m_lastPos.x()) / float(width()) * (r - l) + l;
+	float x1 = std::max(m_dragBoxBegin.x(), m_lastPos.x()) / float(width()) * (r - l) + l;
+	float y0 = std::min(m_dragBoxBegin.y(), m_lastPos.y()) / float(height()) * (b - t) + t;
+	float y1 = std::max(m_dragBoxBegin.y(), m_lastPos.y()) / float(height()) * (b - t) + t;
+
+	glDisable(GL_STENCIL_TEST);
+	glColor3f(0, 1, 0);
+	glLineWidth(2);
+	//glEnable(GL_LINE_STIPPLE);
+	glLineStipple(0xAAAA, 1);
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(x0, y0);
+	glVertex2f(x0, y1);
+	glVertex2f(x1, y1);
+	glVertex2f(x1, y0);
+	glEnd();
+
+	glPopAttrib();
+}
+
 void SvgViewer::keyPressEvent(QKeyEvent*ev)
 {
-	bool noMod = ((ev->modifiers() & Qt::SHIFT) == 0)
-		&& ((ev->modifiers() & Qt::CTRL) == 0)
-		& ((ev->modifiers() & Qt::ALT) == 0);
-	switch (ev->key())
-	{
-	case Qt::Key_Shift:
-		break;
-	case Qt::Key_B:
-		m_isBoxMode = true;
-		m_boxBegin = m_boxEnd = m_lastPos;
-		break;
-	case Qt::Key_Escape:
-		m_isBoxMode = false;
-		break;
-	case Qt::Key_F:
-		if (noMod)
-		{
-			toggleShowType(Renderable::SW_F);
-			//toggleShowType(Renderable::SW_E);
-		}
-		break;
-	case Qt::Key_L:
-		if (noMod)
-		{
-			//toggleShowType(Renderable::SW_F);
-			toggleShowType(Renderable::SW_E);
-		}
-		break;
-	case Qt::Key_V:
-		if (noMod)
-			toggleShowType(Renderable::SW_V);
-		break;
-	case Qt::Key_T:
-		if (noMod)
-			toggleShowType(Renderable::SW_TEXTURE);
-		break;
-	case Qt::Key_S:
-		if (1)
-		{
-			QString name = QFileDialog::getSaveFileName(this, "grab gl buffer", "data_test", "*.png");
-			if (!name.isEmpty())
-			{
-				if (!name.toLower().endsWith(".png"))
-					name.append(".png");
-				QImage img = grabFrameBuffer();
-				img.save(name);
-			}
-		}
-		break;
-	case Qt::Key_Space:
-		toggleMeshOperationMode();
-		break;
-	default:
-		break;
-	}
-	updateGL();
+	m_currentEventHandle->keyPressEvent(ev);
 }
 
 void SvgViewer::keyReleaseEvent(QKeyEvent*ev)
 {
-
+	m_currentEventHandle->keyReleaseEvent(ev);
 }
 
 void SvgViewer::mousePressEvent(QMouseEvent *ev)
@@ -190,11 +207,9 @@ void SvgViewer::mousePressEvent(QMouseEvent *ev)
 	m_lastPos = ev->pos();
 	m_buttons = ev->buttons();
 
-	// move operation
-	if (ev->button() == Qt::MouseButton::LeftButton)
-	{
+	m_currentEventHandle->mousePressEvent(ev);
 
-	}
+	updateGL();
 }
 
 void SvgViewer::mouseDoubleClickEvent(QMouseEvent *ev)
@@ -203,85 +218,23 @@ void SvgViewer::mouseDoubleClickEvent(QMouseEvent *ev)
 	m_lastPos = ev->pos();
 	m_buttons = ev->buttons();
 
-	// move operation
-	if (ev->button() == Qt::MouseButton::LeftButton)
-	{
+	m_currentEventHandle->mouseDoubleClickEvent(ev);
 
-	}
-	if (ev->button() == Qt::MouseButton::MiddleButton)
-	{
-		resetCamera();
-		updateGL();
-	}
+	updateGL();
 }
 
 void SvgViewer::mouseReleaseEvent(QMouseEvent *ev)
 {
-	if (m_buttons & Qt::LeftButton)
-	{
-		QRgb cl = m_fboImage.pixel(ev->pos());
-		ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
-		color /= 255.f;
-		int id = svg::SvgAbstractObject::index_from_color(color);
-		svg::SvgManager::SelectOp op = svg::SvgManager::SelectThis;
-		if (ev->modifiers() & Qt::SHIFT)
-			op = svg::SvgManager::SelectUnion;
-		m_svgManager->selectShapeByIndex(id, op);
-		updateGL();
-	}
+	m_currentEventHandle->mouseReleaseEvent(ev);
 
 	// clear buttons
-	m_isBoxMode = false;
 	m_buttons = Qt::NoButton;
 	updateGL();
 }
 
 void SvgViewer::mouseMoveEvent(QMouseEvent*ev)
 {
-	if (m_buttons == Qt::NoButton)
-	{
-		if (m_isBoxMode)
-		{
-			m_boxEnd = ev->pos();
-			ldp::Float2 bMin(m_boxBegin.x(), height() - 1 - m_boxBegin.y());
-			ldp::Float2 bMax(m_boxEnd.x(), height() - 1 - m_boxEnd.y());
-			if (bMin[0] > bMax[0]) std::swap(bMin[0], bMax[0]);
-			if (bMin[1] > bMax[1]) std::swap(bMin[1], bMax[1]);
-		}
-
-		// hight light mouse clicked
-		QRgb cl = m_fboImage.pixel(ev->pos());
-		ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
-		color /= 255.f;
-		int id = svg::SvgAbstractObject::index_from_color(color);
-		m_svgManager->highlightShapeByIndex(m_svgLastHighLightId, id);
-		m_svgLastHighLightId = id;
-	}
-
-	if (m_buttons & Qt::LeftButton)
-	{
-
-	}
-
-	if (m_buttons & Qt::RightButton)
-	{
-
-	}
-
-	if (m_buttons & Qt::MidButton)
-	{
-		float l = m_camera.getFrustumLeft();
-		float r = m_camera.getFrustumRight();
-		float t = m_camera.getFrustumTop();
-		float b = m_camera.getFrustumBottom();
-		float dx = (r - l) / float(width()) * (ev->pos().x() - m_lastPos.x());
-		float dy = (b - t) / float(height()) * (ev->pos().y() - m_lastPos.y());
-		l -= dx;
-		r -= dx;
-		t -= dy;
-		b -= dy;
-		m_camera.setFrustum(l, r, t, b, m_camera.getFrustumNear(), m_camera.getFrustumFar());
-	}
+	m_currentEventHandle->mouseMoveEvent(ev);
 
 	// backup last position
 	m_lastPos = ev->pos();
@@ -290,38 +243,10 @@ void SvgViewer::mouseMoveEvent(QMouseEvent*ev)
 
 void SvgViewer::wheelEvent(QWheelEvent*ev)
 {
-	float s = 1.2f;
-	if (ev->delta() < 0)
-		s = 1.f / s;
-
-	float l = m_camera.getFrustumLeft();
-	float r = m_camera.getFrustumRight();
-	float t = m_camera.getFrustumTop();
-	float b = m_camera.getFrustumBottom();
-	float dx = float(ev->pos().x()) / float(width()) * (r - l);
-	float dy = float(ev->pos().y()) / float(height()) * (b - t);
-
-	r = dx + l + (r - l - dx) * s;
-	l = dx + l - dx * s;
-	b = dy + t + (b - t - dy) * s;
-	t = dy + t - dy * s;
-	m_camera.setFrustum(l, r, t, b, m_camera.getFrustumNear(), m_camera.getFrustumFar());
+	m_currentEventHandle->wheelEvent(ev);
 
 	updateGL();
 }
 
-void SvgViewer::toggleMeshOperationMode()
-{
-	if (m_meshOperationMode == ObjectMode)
-	{
-		m_meshOperationMode = EditMode;
-		printf("EditMode\n");
-	}
-	else
-	{
-		m_meshOperationMode = ObjectMode;
-		printf("ObjectMode\n");
-	}
-}
 
 

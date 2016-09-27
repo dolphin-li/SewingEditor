@@ -1,6 +1,7 @@
 #include "GL\glew.h"
 #include "SvgText.h"
 #include "SvgAttribute.h"
+#include "SvgGroup.h"
 namespace svg
 {
 	SvgText::SvgText()
@@ -24,7 +25,11 @@ namespace svg
 		glPushMatrix();
 
 		glColor3fv(attribute()->m_color.ptr());
-		if (isHighlighted() || isSelected())
+
+		bool ancestorSelected = false;
+		if (ancestor(root()))
+			ancestorSelected = ancestor(root())->isSelected();
+		if (isHighlighted() || isSelected() || ancestorSelected)
 			glColor3f(0, 0, 1);
 
 		ldp::Mat3f T = attribute()->m_transfrom;

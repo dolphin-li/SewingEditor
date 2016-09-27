@@ -80,6 +80,9 @@
     <Filter Include="algorithm\svgpp\nvprsvg\cg">
       <UniqueIdentifier>{eb6d9ce6-f5f9-42e4-b765-0a8e47613d6b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="event_handles">
+      <UniqueIdentifier>{8047cc94-d4d4-44ff-bd92-eeb8ec035b97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -571,6 +574,18 @@
     <ClCompile Include="algorithm\svgpp\nvprsvg\common\render_font.cpp">
       <Filter>algorithm\svgpp\nvprsvg\common</Filter>
     </ClCompile>
+    <ClCompile Include="event_handles\AbstractEventHandle.cpp">
+      <Filter>event_handles</Filter>
+    </ClCompile>
+    <ClCompile Include="event_handles\ShapeEventHandle.cpp">
+      <Filter>event_handles</Filter>
+    </ClCompile>
+    <ClCompile Include="event_handles\GroupEventHandle.cpp">
+      <Filter>event_handles</Filter>
+    </ClCompile>
+    <ClCompile Include="event_handles\ZoomEventHandle.cpp">
+      <Filter>event_handles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="sewingeditor.ui">
@@ -847,6 +862,18 @@
     </ClInclude>
     <ClInclude Include="algorithm\svgpp\nvprsvg\common\render_font.hpp">
       <Filter>algorithm\svgpp\nvprsvg\common</Filter>
+    </ClInclude>
+    <ClInclude Include="event_handles\AbstractEventHandle.h">
+      <Filter>event_handles</Filter>
+    </ClInclude>
+    <ClInclude Include="event_handles\ShapeEventHandle.h">
+      <Filter>event_handles</Filter>
+    </ClInclude>
+    <ClInclude Include="event_handles\GroupEventHandle.h">
+      <Filter>event_handles</Filter>
+    </ClInclude>
+    <ClInclude Include="event_handles\ZoomEventHandle.h">
+      <Filter>event_handles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

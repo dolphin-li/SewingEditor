@@ -54,10 +54,10 @@ namespace svg
 		void removeSelected(SvgAbstractObject* obj);
 		bool groupSelected_findCommonParent(std::shared_ptr<SvgAbstractObject> obj,
 			std::shared_ptr<SvgAbstractObject> objParent,
-			std::shared_ptr<SvgAbstractObject>& commonParent);
+			std::shared_ptr<SvgAbstractObject>& commonParent, 
+			int& cnt);
 		void ungroupSelected_collect(SvgAbstractObject* obj, std::set<SvgGroup*>& groups);
-		void removeSingleNodeAndEmptyNode(std::shared_ptr<SvgAbstractObject>& obj,
-			std::shared_ptr<SvgAbstractObject> parent);
+		void removeSingleNodeAndEmptyNode(std::shared_ptr<SvgAbstractObject>& obj);
 	private:
 		Camera* m_renderCam;
 		std::shared_ptr<SvgAbstractObject> m_rootGroup;

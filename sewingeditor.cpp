@@ -1,4 +1,3 @@
-
 #include "SvgManager.h"
 #include "sewingeditor.h"
 #include "global_data_holder.h"
@@ -8,11 +7,52 @@ SewingEditor::SewingEditor(QWidget *parent)
 	ui.setupUi(this);
 
 	ui.squareWidget->setChildWidget(ui.widget);
+
+	initLeftDockActions();
 }
 
 SewingEditor::~SewingEditor()
 {
 
+}
+
+void SewingEditor::initLeftDockActions()
+{
+	m_ldbSignalMapper.reset(new QSignalMapper(this));
+	connect(m_ldbSignalMapper.data(), SIGNAL(mapped(int)), this, SLOT(leftDocButtonsClicked(int)));
+	ui.dockWidgetLeftContents->setLayout(new QGridLayout(ui.dockWidgetLeftContents));
+	ui.dockWidgetLeftContents->layout()->setAlignment(Qt::AlignTop);
+
+	// add buttons
+	addLeftDockWidgetButton(AbstractEventHandle::ProcessorTypeGroup, "icons/groupArrow.png", "group selection");
+	addLeftDockWidgetButton(AbstractEventHandle::ProcessorTypeShape, "icons/shapeArrow.png", "shape selection");
+	addLeftDockWidgetButton(AbstractEventHandle::ProcessorTypeZoom, "icons/zoomArrow.png", "zooming");
+
+	// do connections
+	for (auto it : m_leftDockButtons.toStdMap())
+	{
+		m_ldbSignalMapper->setMapping(it.second.data(), it.first);
+		connect(it.second.data(), SIGNAL(clicked()), m_ldbSignalMapper.data(), SLOT(map()));
+	}
+}
+
+void SewingEditor::leftDocButtonsClicked(int btnId)
+{
+	AbstractEventHandle::ProcessorType type = (AbstractEventHandle::ProcessorType)btnId;
+	ui.widget->setEventHandleType(type);
+}
+
+void SewingEditor::addLeftDockWidgetButton(AbstractEventHandle::ProcessorType type, QString iconImage, QString toolTip)
+{
+	auto colorStr = QString("background-color: rgb(73, 73, 73)");
+	QSharedPointer<QPushButton> btn(new QPushButton(QIcon(iconImage), "", ui.dockWidgetLeftContents));
+	btn->setAutoFillBackground(true);
+	btn->setCheckable(true);
+	btn->setStyleSheet(colorStr);
+	btn->setAutoExclusive(true);
+	btn->setToolTip(toolTip);
+	m_leftDockButtons.insert(type, btn);
+	ui.dockWidgetLeftContents->layout()->addWidget(btn.data());
 }
 
 void SewingEditor::on_actionLoad_svg_triggered()

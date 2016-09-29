@@ -16,6 +16,7 @@ namespace svg
 		m_parent = nullptr;
 		m_selected = false;
 		m_highlighted = false;
+		m_invalid = true;
 		resetBound();
 		m_attribute = std::shared_ptr<SvgAttribute>(new SvgAttribute());
 	}
@@ -86,18 +87,24 @@ namespace svg
 		}
 		return p1;
 	}
-	const SvgGroup* SvgAbstractObject::ancestor(const SvgGroup* parent_)const
+	const SvgAbstractObject* SvgAbstractObject::ancestorAfterRoot()const
 	{
-		const SvgGroup* p = parent();
-		while (p!=nullptr && p!=parent_) 
-			p = p->parent();
+		const SvgAbstractObject* p = this;
+
+		// this is root itself, thus it cannot find ancestorAfterRoot
+		if (p->parent() == nullptr) return nullptr;
+
+		while (p->parent()->parent()) p = p->parent();
 		return p;
 	}
-	SvgGroup* SvgAbstractObject::ancestor(const SvgGroup* parent_)
+	SvgAbstractObject* SvgAbstractObject::ancestorAfterRoot()
 	{
-		SvgGroup* p = parent();
-		while (p!=nullptr && p != parent_) 
-			p = p->parent();
+		SvgAbstractObject* p = this;
+
+		// this is root itself, thus it cannot find ancestorAfterRoot
+		if (p->parent() == nullptr) return nullptr;
+
+		while (p->parent()->parent()) p = p->parent();
 		return p;
 	}
 

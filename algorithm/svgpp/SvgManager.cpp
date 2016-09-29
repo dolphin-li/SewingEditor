@@ -258,11 +258,16 @@ namespace svg
 	{
 		int idx = SvgAbstractObject::INDEX_BEGIN;
 		m_idxMap.clear();
+		m_groups_for_selection.clear();
 		updateIndex(m_rootGroup.get(), idx);
 	}
 
 	void SvgManager::updateIndex(SvgAbstractObject* obj, int& idx)
 	{
+		SvgAbstractObject* ogp = obj->ancestorAfterRoot();
+		if(ogp)
+			m_groups_for_selection.insert(ogp);
+
 		obj->setId(idx);
 		m_idxMap.insert(std::make_pair(idx, obj));
 		idx++;
@@ -286,10 +291,10 @@ namespace svg
 		if (obj->objectType() == SvgAbstractObject::Group)
 		{
 			SvgGroup* g = (SvgGroup*)obj;
-			for (size_t i = 0; i < g->m_children.size(); i++)
+			for (auto child : g->m_children)
 			{
-				updateBound(g->m_children[i].get());
-				box = g->m_children[i]->unionBound(box);
+				updateBound(child.get());
+				box = child->unionBound(box);
 			}
 		}
 
@@ -314,61 +319,52 @@ namespace svg
 
 	void SvgManager::selectShapeByIndex(int id, SelectOp op)
 	{
-		selectShapeByIndex(m_rootGroup.get(), id, op);
-	}
-	void SvgManager::selectShapeByIndex(SvgAbstractObject* obj, int id, SelectOp op)
-	{
-		switch (op)
+		for (auto iter : m_idxMap)
 		{
-		case svg::SvgManager::SelectThis:
-			if (id >= SvgAbstractObject::INDEX_BEGIN)
-				obj->setSelected(obj->getId() == id);
-			break;
-		case svg::SvgManager::SelectUnion:
-			if (obj->getId() == id)
-				obj->setSelected(!obj->isSelected());
-			break;
-		case svg::SvgManager::SelectAll:
-			obj->setSelected(true);
-			break;
-		case svg::SvgManager::SelectNone:
-			obj->setSelected(false);
-			break;
-		case svg::SvgManager::SelectInverse:
-			obj->setSelected(!obj->isSelected());
-			break;
-		default:
-			break;
-		}
-		if (obj->objectType() == SvgAbstractObject::Group)
-		{
-			SvgGroup* g = (SvgGroup*)obj;
-			for (size_t i = 0; i < g->m_children.size(); i++)
-				selectShapeByIndex(g->m_children[i].get(), id, op);
-		}
-	}
-
-	void SvgManager::selectGroupByIndex(int id, SelectOp op)
-	{
-		int gid = -1;
-		auto it = m_idxMap.find(id);
-		if (it != m_idxMap.end())
-			gid = it->second->ancestor(m_rootGroup.get())->getId();
-		selectGroupByIndex(m_rootGroup.get(), gid, op);
-	}
-	void SvgManager::selectGroupByIndex(SvgAbstractObject* obj, int id, SelectOp op)
-	{
-		SvgAbstractObject* ans = obj->ancestor(m_rootGroup.get());
-		if (ans)
-		{
+			SvgAbstractObject* obj = iter.second;
 			switch (op)
 			{
 			case svg::SvgManager::SelectThis:
 				if (id >= SvgAbstractObject::INDEX_BEGIN)
-					ans->setSelected(ans->getId() == id);
+					obj->setSelected(obj->getId() == id);
 				break;
 			case svg::SvgManager::SelectUnion:
-				if (ans->getId() == id)
+				if (obj->getId() == id)
+					obj->setSelected(!obj->isSelected());
+				break;
+			case svg::SvgManager::SelectAll:
+				obj->setSelected(true);
+				break;
+			case svg::SvgManager::SelectNone:
+				obj->setSelected(false);
+				break;
+			case svg::SvgManager::SelectInverse:
+				obj->setSelected(!obj->isSelected());
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	void SvgManager::selectGroupByIndex(int id_, SelectOp op)
+	{
+		SvgAbstractObject* target = nullptr;
+		auto it = m_idxMap.find(id_);
+		if (it != m_idxMap.end())
+			target = it->second->ancestorAfterRoot();
+
+		for (auto giter : m_groups_for_selection)
+		{
+			SvgAbstractObject* ans = giter;
+			switch (op)
+			{
+			case svg::SvgManager::SelectThis:
+				if (target)
+					ans->setSelected(ans == target);
+				break;
+			case svg::SvgManager::SelectUnion:
+				if (ans == target)
 					ans->setSelected(!ans->isSelected());
 				break;
 			case svg::SvgManager::SelectAll:
@@ -383,12 +379,6 @@ namespace svg
 			default:
 				break;
 			}
-		}
-		if (obj->objectType() == SvgAbstractObject::Group)
-		{
-			SvgGroup* g = (SvgGroup*)obj;
-			for (size_t i = 0; i < g->m_children.size(); i++)
-				selectGroupByIndex(g->m_children[i].get(), id, op);
 		}
 	}
 

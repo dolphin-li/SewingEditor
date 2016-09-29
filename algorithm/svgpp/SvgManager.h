@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <map>
+#include <set>
 class Camera;
 namespace svg
 {
@@ -37,6 +38,7 @@ namespace svg
 		// given an index, select shapes
 		void selectShapeByIndex(int id, SelectOp op = SelectThis);
 
+		// given an index, find the largest group that contains this object.
 		void selectGroupByIndex(int id, SelectOp op = SelectThis);
 
 		// undo highlight for lastid and do highlight for this id
@@ -44,11 +46,10 @@ namespace svg
 	protected:
 		void updateIndex(SvgAbstractObject* obj, int &idx);
 		void updateBound(SvgAbstractObject* obj);
-		void selectShapeByIndex(SvgAbstractObject* obj, int id, SelectOp op);
-		void selectGroupByIndex(SvgAbstractObject* obj, int id, SelectOp op);
 	private:
 		Camera* m_renderCam;
 		std::shared_ptr<SvgGroup> m_rootGroup;
 		std::map<int, SvgAbstractObject*> m_idxMap;
+		std::set<SvgAbstractObject*> m_groups_for_selection;
 	};
 }

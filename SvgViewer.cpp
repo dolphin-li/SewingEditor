@@ -21,7 +21,7 @@ SvgViewer::SvgViewer(QWidget *parent)
 		m_eventHandles[i] = std::shared_ptr<AbstractEventHandle>(
 			AbstractEventHandle::create(AbstractEventHandle::ProcessorType(i), this));
 	}
-	setEventHandleType(AbstractEventHandle::ProcessorTypeGroup);
+	setEventHandleType(AbstractEventHandle::ProcessorTypeShape);
 }
 
 SvgViewer::~SvgViewer()
@@ -126,6 +126,7 @@ void SvgViewer::paintGL()
 
 void SvgViewer::renderFbo()
 {
+	ldp::tic();
 	m_fbo->bind();
 
 	glDisable(GL_TEXTURE_2D);
@@ -145,8 +146,8 @@ void SvgViewer::renderFbo()
 	m_svgManager->renderIndex();
 
 	m_fbo->release();
-
 	m_fboImage = m_fbo->toImage();
+	ldp::toc();
 }
 
 void SvgViewer::beginDragBox(QPoint p)

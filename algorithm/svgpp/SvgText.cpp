@@ -22,13 +22,19 @@ namespace svg
 
 	void SvgText::render()
 	{
+		if (m_invalid)
+		{
+			updateText();
+			m_invalid = false;
+		}
+
 		glPushMatrix();
 
 		glColor3fv(attribute()->m_color.ptr());
 
 		bool ancestorSelected = false;
-		if (ancestor(root()))
-			ancestorSelected = ancestor(root())->isSelected();
+		if (ancestorAfterRoot())
+			ancestorSelected = ancestorAfterRoot()->isSelected();
 		if (isHighlighted() || isSelected() || ancestorSelected)
 			glColor3f(0, 0, 1);
 

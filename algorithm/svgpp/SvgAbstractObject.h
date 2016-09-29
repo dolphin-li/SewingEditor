@@ -30,6 +30,7 @@ namespace svg
 		virtual ObjectType objectType()const = 0;
 		virtual void render() = 0;
 		virtual void renderId() = 0;
+		void invalid(){ m_invalid = true; } // call me when render context updated.
 
 		void setId(int id) { m_id = id; }
 		int getId()const { return m_id; }
@@ -44,9 +45,9 @@ namespace svg
 		void setParent(SvgGroup* p);
 		SvgGroup* root();
 		const SvgGroup* root()const;
-		// find the ancestor that is the child of given parent
-		const SvgGroup* ancestor(const SvgGroup* parent)const;
-		SvgGroup* ancestor(const SvgGroup* parent);
+		// find the ancestor that is the child of root
+		const SvgAbstractObject* ancestorAfterRoot()const;
+		SvgAbstractObject* ancestorAfterRoot();
 
 		SvgAttribute* attribute(){ return m_attribute.get(); }
 		const SvgAttribute* attribute()const{ return m_attribute.get(); }
@@ -87,5 +88,6 @@ namespace svg
 		ldp::Float4 m_bbox;
 		bool m_selected;
 		bool m_highlighted;
+		bool m_invalid;
 	};
 }

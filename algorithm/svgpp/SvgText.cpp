@@ -27,6 +27,8 @@ namespace svg
 			updateText();
 			m_invalid = false;
 		}
+		if (isSelected())
+			renderBounds(false);
 
 		glPushMatrix();
 
@@ -42,13 +44,12 @@ namespace svg
 		ldp::Mat4f M;
 		M.eye();
 		M(0, 0) = T(0, 0);
-		M(0, 1) = T(1, 0);
+		M(0, 1) = -T(1, 0);
 		M(1, 0) = T(0, 1);
-		M(1, 1) = T(1, 1);
+		M(1, 1) = -T(1, 1);
 		M(0, 3) = T(0, 2);
 		M(1, 3) = T(1, 2);
 		glMultMatrixf(M.ptr());
-		glScalef(1, -1, 1);
 		glScalef(m_font_size, m_font_size, m_font_size);
 
 		bool stroking = false;
@@ -151,12 +152,15 @@ namespace svg
 			font_face->horizontal_advance[GLubyte(m_text.back())];
 
 		// update bound
-		m_bbox_before_transform = ldp::Float4(0, m_total_advance, font_face->y_min, font_face->y_max);
-		const ldp::Mat3f& tM = m_attribute->m_transfrom;
+		m_bbox_before_transform = m_font_size * ldp::Float4(0, m_total_advance, 
+			font_face->y_min, font_face->y_max);
+		ldp::Mat3f tM = m_attribute->m_transfrom;
 		float l = m_bbox_before_transform[0];
 		float r = m_bbox_before_transform[1];
 		float t = m_bbox_before_transform[2];
 		float b = m_bbox_before_transform[3];
+		tM(1, 0) *= -1;
+		tM(1, 1) *= -1;
 		ldp::Float3 bd[4];
 		bd[0] = tM * ldp::Float3(l, t, 1);
 		bd[1] = tM * ldp::Float3(r, t, 1);

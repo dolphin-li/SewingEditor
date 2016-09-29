@@ -637,7 +637,7 @@
     </palette>
    </property>
    <property name="autoFillBackground">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="styleSheet">
     <string notr="true">background-color: rgb(73, 73, 73);</string>
@@ -765,9 +765,27 @@
     <addaction name="actionSelect_all"/>
     <addaction name="actionSelect_none"/>
     <addaction name="actionSelect_inverse"/>
+    <addaction name="actionDelete_selected"/>
+   </widget>
+   <widget class="QMenu" name="menuGroup">
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(150, 150, 150);</string>
+    </property>
+    <property name="title">
+     <string>group</string>
+    </property>
+    <addaction name="actionGroup"/>
+    <addaction name="actionUngroup"/>
+   </widget>
+   <widget class="QMenu" name="menuPath">
+    <property name="title">
+     <string>path</string>
+    </property>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSelection"/>
+   <addaction name="menuGroup"/>
+   <addaction name="menuPath"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="palette">
@@ -839,7 +857,7 @@
   <widget class="QDockWidget" name="dockWidgetLeft">
    <property name="minimumSize">
     <size>
-     <width>30</width>
+     <width>40</width>
      <height>80</height>
     </size>
    </property>
@@ -886,15 +904,48 @@
    <property name="text">
     <string>select all</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
   </action>
   <action name="actionSelect_none">
    <property name="text">
     <string>select none</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
   </action>
   <action name="actionSelect_inverse">
    <property name="text">
     <string>select inverse</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+I</string>
+   </property>
+  </action>
+  <action name="actionGroup">
+   <property name="text">
+    <string>group</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="actionUngroup">
+   <property name="text">
+    <string>ungroup</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+G</string>
+   </property>
+  </action>
+  <action name="actionDelete_selected">
+   <property name="text">
+    <string>delete selected</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
    </property>
   </action>
  </widget>

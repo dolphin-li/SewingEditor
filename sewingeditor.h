@@ -16,6 +16,12 @@ public:
 	public slots:
 	void on_actionLoad_svg_triggered();
 	void on_actionSave_svg_triggered();
+	void on_actionSelect_all_triggered();
+	void on_actionSelect_none_triggered();
+	void on_actionSelect_inverse_triggered();
+	void on_actionDelete_selected_triggered();
+	void on_actionGroup_triggered();
+	void on_actionUngroup_triggered();
 	void leftDocButtonsClicked(int i);
 public:
 	void initLeftDockActions();

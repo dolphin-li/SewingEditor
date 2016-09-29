@@ -60,12 +60,17 @@ void AbstractEventHandle::mouseMoveEvent(QMouseEvent *ev)
 	if (m_viewer->buttons() == Qt::NoButton)
 	{
 		// hight light mouse clicked
-		QRgb cl = m_viewer->fboImage().pixel(ev->pos());
-		ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
-		color /= 255.f;
-		int id = svg::SvgAbstractObject::index_from_color(color);
-		m_viewer->getSvgManager()->highlightShapeByIndex(m_lastHighlightShapeId, id);
-		m_lastHighlightShapeId = id;
+		if (m_viewer->fboImage().rect().contains(ev->pos()))
+		{
+			QRgb cl = m_viewer->fboImage().pixel(ev->pos());
+			ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
+			color /= 255.f;
+			int id = svg::SvgAbstractObject::index_from_color(color);
+			if (id != 0)
+				id = id;
+			m_viewer->getSvgManager()->highlightShapeByIndex(m_lastHighlightShapeId, id);
+			m_lastHighlightShapeId = id;
+		}
 	}
 
 	if (m_viewer->buttons() == Qt::MidButton)

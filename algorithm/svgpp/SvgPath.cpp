@@ -4,6 +4,8 @@
 #include "SvgGroup.h"
 namespace svg
 {
+#undef min
+#undef max
 	static GLenum lineJoinConverter(const SvgPath *path)
 	{
 		switch (path->m_pathStyle.line_join) {
@@ -60,6 +62,8 @@ namespace svg
 		glColor3fv(attribute()->m_color.ptr());
 		if (isHighlighted() || isSelected() || ancestorSelected)
 			glColor3f(0, 0, 1);
+		if (isSelected())
+			renderBounds(false);
 
 		if (m_invalid)
 		{
@@ -171,5 +175,4 @@ namespace svg
 		glStencilStrokePathNV(m_gl_path_id, 1, ~0);
 		glCoverStrokePathNV(m_gl_path_id, GL_BOUNDING_BOX_NV);
 	}
-
 }

@@ -146,4 +146,63 @@ namespace svg
 		if (er != GL_NO_ERROR)
 			printf("[GLError][%s]: %s\n", label, glewGetErrorString(er));
 	}
+
+	void SvgAbstractObject::renderBounds(bool index_mode)
+	{
+		glPushAttrib(GL_ALL_ATTRIB_BITS);
+		glDisable(GL_STENCIL_TEST);
+
+		if (index_mode)
+		{
+			ldp::Float4 c = color_from_index(m_id);
+			glVertex4fv(c.ptr());
+		}
+
+		float sz = 1;
+		if (isHighlighted())
+			sz = 2;
+
+		ldp::Float2 p[4] = {
+			ldp::Float2(m_bbox[0], m_bbox[2]),
+			ldp::Float2(m_bbox[1], m_bbox[2]),
+			ldp::Float2(m_bbox[1], m_bbox[3]),
+			ldp::Float2(m_bbox[0], m_bbox[3])
+		};
+		const float r = sz * std::min(m_bbox[1] - m_bbox[0], m_bbox[3] - m_bbox[2]) * 0.001f;
+		glLineWidth(3 * sz);
+
+		// main box
+		if (!index_mode)
+			glColor4f(1, 0, 1, 1);
+		glBegin(GL_LINE_LOOP);
+		for (int k = 0; k < 4; k++)
+			glVertex2fv(p[k].ptr());
+		glEnd();
+
+		// corners
+		if (!index_mode)
+			glColor4f(1, 0, 1, 1);
+		for (int k = 0; k < 4; k++)
+		{
+			glBegin(GL_LINE_LOOP);
+			glVertex2f(p[k][0] - r, p[k][1] - r);
+			glVertex2f(p[k][0] + r, p[k][1] - r);
+			glVertex2f(p[k][0] + r, p[k][1] + r);
+			glVertex2f(p[k][0] - r, p[k][1] + r);
+			glEnd();
+		}
+		if (!index_mode)
+			glColor4f(1, 1, 1, 1);
+		glBegin(GL_QUADS);
+		for (int k = 0; k < 4; k++)
+		{
+			glVertex2f(p[k][0] - r, p[k][1] - r);
+			glVertex2f(p[k][0] + r, p[k][1] - r);
+			glVertex2f(p[k][0] + r, p[k][1] + r);
+			glVertex2f(p[k][0] - r, p[k][1] + r);
+		}
+		glEnd();
+
+		glPopAttrib();
+	}
 }

@@ -226,10 +226,11 @@ namespace svg
 		SvgScenePtr svg_scene = svg_loader(svg_file);
 		
 		// convert to my data structure
-		m_rootGroup = std::shared_ptr<SvgGroup>(new SvgGroup);
+		m_rootGroup = std::shared_ptr<SvgAbstractObject>(new SvgGroup);
 		ConvertTraversal traversal; 
-		svg_scene->traverse(VisitorPtr(new ConvertVisitor(m_rootGroup.get())), traversal);
+		svg_scene->traverse(VisitorPtr(new ConvertVisitor((SvgGroup*)m_rootGroup.get())), traversal);
 
+		//removeSingleNodeGrouping(m_rootGroup);
 		updateIndex();
 		updateBound();
 
@@ -339,7 +340,8 @@ namespace svg
 				obj->setSelected(false);
 				break;
 			case svg::SvgManager::SelectInverse:
-				obj->setSelected(!obj->isSelected());
+				if (obj->objectType() != obj->Group)
+					obj->setSelected(!obj->isSelected());
 				break;
 			default:
 				break;
@@ -391,4 +393,116 @@ namespace svg
 		if (thisIt != m_idxMap.end())
 			thisIt->second->setHighlighted(true);
 	}
-}
+
+	bool SvgManager::groupSelected()
+	{
+
+
+		updateIndex();
+		updateBound();
+		return true;
+	}
+
+	void SvgManager::ungroupSelected()
+	{
+		std::set<SvgGroup*> groups;
+		ungroupSelected_collect(m_rootGroup.get(), groups);
+
+		for (auto g : groups)
+		{
+			assert(g->parent()->objectType() == g->Group);
+			SvgGroup* pg = (SvgGroup*)g->parent();
+			for (auto child : g->m_children)
+			{
+				child->setParent(g->parent());
+				child->setSelected(true);
+				pg->m_children.push_back(child);
+			}
+			for (auto it = pg->m_children.begin(); it != pg->m_children.end(); ++it)
+			{
+				if (it->get() == g)
+				{
+					pg->m_children.erase(it);
+					break;
+				}
+			}
+		}
+
+		updateIndex();
+		updateBound();
+	}
+
+	void SvgManager::removeSelected()
+	{
+		removeSelected(m_rootGroup.get());
+		updateIndex();
+		updateBound();
+	}
+
+	void SvgManager::removeSelected(SvgAbstractObject* obj)
+	{
+		if (obj->objectType() == obj->Group)
+		{
+			SvgGroup* g = (SvgGroup*)obj;
+			auto tmp = g->m_children;
+			g->m_children.clear();
+			for (auto iter : tmp)
+			{
+				if (!iter->isSelected())
+					g->m_children.push_back(iter);
+			}
+			for (auto iter : tmp)
+			{
+				removeSelected(iter.get());
+			}
+		}
+	}
+
+	bool SvgManager::groupSelected_findCommonParent(std::shared_ptr<SvgAbstractObject> obj,
+		std::shared_ptr<SvgAbstractObject> objParent,
+		std::shared_ptr<SvgAbstractObject>& commonParent)
+	{
+		if (obj->isSelected() && objParent.get() != nullptr)
+		{
+			if (commonParent.get() == nullptr)
+				commonParent = objParent;
+			else if (commonParent.get() != objParent.get())
+				return false;
+		}
+
+		if (obj->objectType() == obj->Group)
+		{
+			auto g = (SvgGroup*)obj.get();
+			for (auto child : g->m_children)
+			{
+				if (!groupSelected_findCommonParent(child, obj, commonParent))
+					return false;
+			}
+		}
+
+		return true;
+	}
+
+	void SvgManager::ungroupSelected_collect(SvgAbstractObject* obj, std::set<SvgGroup*>& groups)
+	{
+		if (obj->objectType() == obj->Group)
+		{
+			SvgGroup* g = (SvgGroup*)obj;
+			if (g->isSelected() && g->parent())
+			{
+				groups.insert(g);
+			}
+			else
+			{
+				for (auto child : g->m_children)
+					ungroupSelected_collect(child.get(), groups);
+			}
+		}
+	}
+
+	void SvgManager::removeSingleNodeAndEmptyNode(std::shared_ptr<SvgAbstractObject>& obj,
+		std::shared_ptr<SvgAbstractObject> parent)
+	{
+
+	}
+} // namespace svg

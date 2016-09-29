@@ -43,12 +43,24 @@ namespace svg
 
 		// undo highlight for lastid and do highlight for this id
 		void highlightShapeByIndex(int lastId, int thisId);
+
+		// group may fail when the selected have been in different groups
+		bool groupSelected();
+		void ungroupSelected();
+		void removeSelected();
 	protected:
 		void updateIndex(SvgAbstractObject* obj, int &idx);
 		void updateBound(SvgAbstractObject* obj);
+		void removeSelected(SvgAbstractObject* obj);
+		bool groupSelected_findCommonParent(std::shared_ptr<SvgAbstractObject> obj,
+			std::shared_ptr<SvgAbstractObject> objParent,
+			std::shared_ptr<SvgAbstractObject>& commonParent);
+		void ungroupSelected_collect(SvgAbstractObject* obj, std::set<SvgGroup*>& groups);
+		void removeSingleNodeAndEmptyNode(std::shared_ptr<SvgAbstractObject>& obj,
+			std::shared_ptr<SvgAbstractObject> parent);
 	private:
 		Camera* m_renderCam;
-		std::shared_ptr<SvgGroup> m_rootGroup;
+		std::shared_ptr<SvgAbstractObject> m_rootGroup;
 		std::map<int, SvgAbstractObject*> m_idxMap;
 		std::set<SvgAbstractObject*> m_groups_for_selection;
 	};

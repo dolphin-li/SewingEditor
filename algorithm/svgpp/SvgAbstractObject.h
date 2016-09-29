@@ -62,6 +62,8 @@ namespace svg
 		ldp::Float2 getSize()const { return ldp::Float2(width(), height()); }
 		float width()const{ return m_bbox[1] - m_bbox[0]; }
 		float height()const{ return m_bbox[3] - m_bbox[2]; }
+	protected:
+		virtual void renderBounds(bool index_mode);
 	public:
 		static SvgAbstractObject* create(ObjectType type);
 		static void printGLError(const char* label = "");

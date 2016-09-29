@@ -75,7 +75,6 @@ void SvgViewer::initializeGL()
 	// depth fbo
 	QGLFramebufferObjectFormat fmt;
 	fmt.setAttachment(QGLFramebufferObject::CombinedDepthStencil);
-	fmt.setMipmap(true);
 	m_fbo = new QGLFramebufferObject(width(), height(), fmt);
 	if (!m_fbo->isValid())
 		printf("error: invalid depth fbo!\n");
@@ -126,7 +125,6 @@ void SvgViewer::paintGL()
 
 void SvgViewer::renderFbo()
 {
-	ldp::tic();
 	m_fbo->bind();
 
 	glDisable(GL_TEXTURE_2D);
@@ -147,7 +145,6 @@ void SvgViewer::renderFbo()
 
 	m_fbo->release();
 	m_fboImage = m_fbo->toImage();
-	ldp::toc();
 }
 
 void SvgViewer::beginDragBox(QPoint p)

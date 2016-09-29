@@ -35,6 +35,9 @@ public:
     QAction *actionSelect_all;
     QAction *actionSelect_none;
     QAction *actionSelect_inverse;
+    QAction *actionGroup;
+    QAction *actionUngroup;
+    QAction *actionDelete_selected;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     SquareWidget *squareWidget;
@@ -42,6 +45,8 @@ public:
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuSelection;
+    QMenu *menuGroup;
+    QMenu *menuPath;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
     QDockWidget *dockWidgetRight;
@@ -135,6 +140,12 @@ public:
         actionSelect_none->setObjectName(QStringLiteral("actionSelect_none"));
         actionSelect_inverse = new QAction(SewingEditorClass);
         actionSelect_inverse->setObjectName(QStringLiteral("actionSelect_inverse"));
+        actionGroup = new QAction(SewingEditorClass);
+        actionGroup->setObjectName(QStringLiteral("actionGroup"));
+        actionUngroup = new QAction(SewingEditorClass);
+        actionUngroup->setObjectName(QStringLiteral("actionUngroup"));
+        actionDelete_selected = new QAction(SewingEditorClass);
+        actionDelete_selected->setObjectName(QStringLiteral("actionDelete_selected"));
         centralWidget = new QWidget(SewingEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -168,7 +179,7 @@ public:
         palette1.setBrush(QPalette::Disabled, QPalette::Base, brush1);
         palette1.setBrush(QPalette::Disabled, QPalette::Window, brush1);
         menuBar->setPalette(palette1);
-        menuBar->setAutoFillBackground(true);
+        menuBar->setAutoFillBackground(false);
         menuBar->setStyleSheet(QStringLiteral("background-color: rgb(73, 73, 73);"));
         menuBar->setDefaultUp(false);
         menuBar->setNativeMenuBar(false);
@@ -193,6 +204,11 @@ public:
         menuSelection->setObjectName(QStringLiteral("menuSelection"));
         menuSelection->setAutoFillBackground(false);
         menuSelection->setStyleSheet(QStringLiteral("background-color: rgb(150, 150, 150);"));
+        menuGroup = new QMenu(menuBar);
+        menuGroup->setObjectName(QStringLiteral("menuGroup"));
+        menuGroup->setStyleSheet(QStringLiteral("background-color: rgb(150, 150, 150);"));
+        menuPath = new QMenu(menuBar);
+        menuPath->setObjectName(QStringLiteral("menuPath"));
         SewingEditorClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(SewingEditorClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -217,7 +233,7 @@ public:
         SewingEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
         dockWidgetLeft = new QDockWidget(SewingEditorClass);
         dockWidgetLeft->setObjectName(QStringLiteral("dockWidgetLeft"));
-        dockWidgetLeft->setMinimumSize(QSize(30, 80));
+        dockWidgetLeft->setMinimumSize(QSize(40, 80));
         dockWidgetLeft->setMaximumSize(QSize(50, 99999));
         dockWidgetLeft->setFloating(false);
         dockWidgetLeft->setFeatures(QDockWidget::NoDockWidgetFeatures);
@@ -229,11 +245,16 @@ public:
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuSelection->menuAction());
+        menuBar->addAction(menuGroup->menuAction());
+        menuBar->addAction(menuPath->menuAction());
         menuFile->addAction(actionLoad_svg);
         menuFile->addAction(actionSave_svg);
         menuSelection->addAction(actionSelect_all);
         menuSelection->addAction(actionSelect_none);
         menuSelection->addAction(actionSelect_inverse);
+        menuSelection->addAction(actionDelete_selected);
+        menuGroup->addAction(actionGroup);
+        menuGroup->addAction(actionUngroup);
 
         retranslateUi(SewingEditorClass);
 
@@ -248,10 +269,21 @@ public:
         actionSave_svg->setText(QApplication::translate("SewingEditorClass", "save svg", 0));
         actionSave_svg->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+S", 0));
         actionSelect_all->setText(QApplication::translate("SewingEditorClass", "select all", 0));
+        actionSelect_all->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+A", 0));
         actionSelect_none->setText(QApplication::translate("SewingEditorClass", "select none", 0));
+        actionSelect_none->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+D", 0));
         actionSelect_inverse->setText(QApplication::translate("SewingEditorClass", "select inverse", 0));
+        actionSelect_inverse->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+Shift+I", 0));
+        actionGroup->setText(QApplication::translate("SewingEditorClass", "group", 0));
+        actionGroup->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+G", 0));
+        actionUngroup->setText(QApplication::translate("SewingEditorClass", "ungroup", 0));
+        actionUngroup->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+Shift+G", 0));
+        actionDelete_selected->setText(QApplication::translate("SewingEditorClass", "delete selected", 0));
+        actionDelete_selected->setShortcut(QApplication::translate("SewingEditorClass", "Del", 0));
         menuFile->setTitle(QApplication::translate("SewingEditorClass", "file", 0));
         menuSelection->setTitle(QApplication::translate("SewingEditorClass", "selection", 0));
+        menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));
+        menuPath->setTitle(QApplication::translate("SewingEditorClass", "path", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

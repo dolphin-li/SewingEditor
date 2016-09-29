@@ -12,7 +12,6 @@ namespace svg
 
 		virtual void render();
 		virtual void renderId();
-
 	public:
 		std::vector<std::shared_ptr<SvgAbstractObject>> m_children;
 	};

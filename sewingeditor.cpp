@@ -88,3 +88,81 @@ void SewingEditor::on_actionSave_svg_triggered()
 		std::cout << e.what() << std::endl;
 	}
 }
+
+void SewingEditor::on_actionSelect_all_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->selectShapeByIndex(0, svg::SvgManager::SelectAll);
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_actionSelect_none_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->selectShapeByIndex(0, svg::SvgManager::SelectNone);
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_actionSelect_inverse_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->selectShapeByIndex(0, svg::SvgManager::SelectInverse);
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_actionGroup_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->groupSelected();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_actionUngroup_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->ungroupSelected();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_actionDelete_selected_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->removeSelected();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}

@@ -5,7 +5,12 @@
 #include "svgpp\SvgAbstractObject.h"
 ZoomEventHandle::ZoomEventHandle(SvgViewer* v) :AbstractEventHandle(v)
 {
-	
+	m_cursor = QCursor(Qt::CursorShape::SizeAllCursor);
+	QFileInfo info = QFileInfo("icons/zoomInCursor.png");
+	if (info.exists())
+		m_cursor = QCursor(QPixmap(info.absoluteFilePath()), 7, 6);
+	m_iconFile = "icons/zoomArrow.png";
+	m_toolTips = "zooming";
 }
 
 ZoomEventHandle::~ZoomEventHandle()
@@ -16,7 +21,6 @@ ZoomEventHandle::~ZoomEventHandle()
 void ZoomEventHandle::mousePressEvent(QMouseEvent *ev)
 {
 	AbstractEventHandle::mousePressEvent(ev);
-	m_mouse_press_pt = ev->pos();
 	if (m_viewer->buttons() & Qt::LeftButton)
 	{
 		m_viewer->beginDragBox(ev->pos());

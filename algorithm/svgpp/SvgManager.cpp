@@ -331,6 +331,56 @@ namespace svg
 				break;
 			case svg::SvgManager::SelectUnion:
 				if (obj->getId() == id)
+					obj->setSelected(true);
+				break;
+			case svg::SvgManager::SlectionUnionInverse:
+				if (obj->getId() == id)
+					obj->setSelected(!obj->isSelected());
+				break;
+			case svg::SvgManager::SelectAll:
+				obj->setSelected(true);
+				break;
+			case svg::SvgManager::SelectNone:
+				obj->setSelected(false);
+				break;
+			case svg::SvgManager::SelectInverse:
+				if (obj->objectType() != obj->Group)
+					obj->setSelected(!obj->isSelected());
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	void SvgManager::selectShapeByIndex(const std::set<int>& ids, SelectOp op)
+	{
+		bool has_valid = false;
+		for (auto iter : ids)
+		{
+			if (iter >= SvgAbstractObject::INDEX_BEGIN)
+			{
+				has_valid = true;
+				break;
+			}
+		}
+
+		for (auto iter : m_idxMap)
+		{
+			SvgAbstractObject* obj = iter.second;
+			bool found = (ids.find(obj->getId()) != ids.end());
+			switch (op)
+			{
+			case svg::SvgManager::SelectThis:
+				if (has_valid)
+					obj->setSelected(found);
+				break;
+			case svg::SvgManager::SelectUnion:
+				if (found)
+					obj->setSelected(true);
+				break;
+			case svg::SvgManager::SlectionUnionInverse:
+				if (found)
 					obj->setSelected(!obj->isSelected());
 				break;
 			case svg::SvgManager::SelectAll:
@@ -367,6 +417,54 @@ namespace svg
 				break;
 			case svg::SvgManager::SelectUnion:
 				if (ans == target)
+					ans->setSelected(true);
+				break;
+			case svg::SvgManager::SlectionUnionInverse:
+				if (ans == target)
+					ans->setSelected(!ans->isSelected());
+				break;
+			case svg::SvgManager::SelectAll:
+				ans->setSelected(true);
+				break;
+			case svg::SvgManager::SelectNone:
+				ans->setSelected(false);
+				break;
+			case svg::SvgManager::SelectInverse:
+				ans->setSelected(!ans->isSelected());
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	void SvgManager::selectGroupByIndex(const std::set<int>& ids, SelectOp op)
+	{
+		std::set<SvgAbstractObject*> targets;
+		for (auto iter : m_idxMap)
+		{
+			auto it = ids.find(iter.first);
+			if (it != ids.end())
+				targets.insert(iter.second->ancestorAfterRoot());
+		}
+
+		for (auto giter : m_groups_for_selection)
+		{
+			SvgAbstractObject* ans = giter;
+			switch (op)
+			{
+			case svg::SvgManager::SelectThis:
+				if (targets.find(ans) != targets.end())
+					ans->setSelected(true);
+				else
+					ans->setSelected(false);
+				break;
+			case svg::SvgManager::SelectUnion:
+				if (targets.find(ans) != targets.end())
+					ans->setSelected(true);
+				break;
+			case svg::SvgManager::SlectionUnionInverse:
+				if (targets.find(ans) != targets.end())
 					ans->setSelected(!ans->isSelected());
 				break;
 			case svg::SvgManager::SelectAll:

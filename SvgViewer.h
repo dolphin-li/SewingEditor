@@ -27,6 +27,7 @@ public:
 	const QImage& fboImage()const{ return m_fboImage; }
 	AbstractEventHandle::ProcessorType getEventHandleType()const;
 	void setEventHandleType(AbstractEventHandle::ProcessorType type);
+	const AbstractEventHandle* getEventHandle(AbstractEventHandle::ProcessorType type)const;
 
 	void beginDragBox(QPoint p);
 	void endDragBox();

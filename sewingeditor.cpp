@@ -24,9 +24,13 @@ void SewingEditor::initLeftDockActions()
 	ui.dockWidgetLeftContents->layout()->setAlignment(Qt::AlignTop);
 
 	// add buttons
-	addLeftDockWidgetButton(AbstractEventHandle::ProcessorTypeGroup, "icons/groupArrow.png", "group selection");
-	addLeftDockWidgetButton(AbstractEventHandle::ProcessorTypeShape, "icons/shapeArrow.png", "shape selection");
-	addLeftDockWidgetButton(AbstractEventHandle::ProcessorTypeZoom, "icons/zoomArrow.png", "zooming");
+	for (size_t i = (size_t)AbstractEventHandle::ProcessorTypeShape;
+		i < (size_t)AbstractEventHandle::ProcessorTypeEnd; i++)
+	{
+		auto type = AbstractEventHandle::ProcessorType(i);
+		addLeftDockWidgetButton(type, ui.widget->getEventHandle(type)->iconFile(), 
+			ui.widget->getEventHandle(type)->toolTips());
+	}
 
 	// do connections
 	for (auto it : m_leftDockButtons.toStdMap())

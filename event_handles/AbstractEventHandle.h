@@ -1,5 +1,9 @@
 #pragma once
 
+#include <QPoint>
+#include <QCursor>
+#include <QString>
+
 class SvgViewer;
 class QMouseEvent;
 class QWheelEvent;
@@ -21,6 +25,10 @@ public:
 	~AbstractEventHandle();
 	virtual ProcessorType type() { return ProcessorTypeGeneral; }
 	static AbstractEventHandle* create(ProcessorType type, SvgViewer* v);
+	QCursor& cursor(){ return m_cursor; }
+	const QCursor& cursor()const{ return m_cursor; }
+	QString iconFile()const;
+	QString toolTips()const;
 
 	virtual void mousePressEvent(QMouseEvent *);
 	virtual void mouseReleaseEvent(QMouseEvent *);
@@ -32,4 +40,8 @@ public:
 protected:
 	SvgViewer* m_viewer;
 	int m_lastHighlightShapeId;
+	QPoint m_mouse_press_pt;
+	QCursor m_cursor;
+	QString m_iconFile;
+	QString m_toolTips;
 };

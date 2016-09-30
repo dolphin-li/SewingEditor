@@ -12,11 +12,24 @@ AbstractEventHandle::AbstractEventHandle(SvgViewer* v)
 {
 	m_viewer = v;
 	m_lastHighlightShapeId = -1;
+	m_cursor = QCursor(Qt::CursorShape::ArrowCursor);
+	m_iconFile = "";
+	m_toolTips = "general handle";
 }
 
 AbstractEventHandle::~AbstractEventHandle()
 {
 
+}
+
+QString AbstractEventHandle::iconFile()const
+{
+	return m_iconFile;
+}
+
+QString AbstractEventHandle::toolTips()const
+{
+	return m_toolTips;
 }
 
 AbstractEventHandle* AbstractEventHandle::create(ProcessorType type, SvgViewer* v)
@@ -39,7 +52,7 @@ AbstractEventHandle* AbstractEventHandle::create(ProcessorType type, SvgViewer* 
 
 void AbstractEventHandle::mousePressEvent(QMouseEvent *ev)
 {
-
+	m_mouse_press_pt = ev->pos();
 }
 
 void AbstractEventHandle::mouseReleaseEvent(QMouseEvent *ev)

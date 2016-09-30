@@ -5,7 +5,9 @@
 #include "svgpp\SvgAbstractObject.h"
 ShapeEventHandle::ShapeEventHandle(SvgViewer* v) :AbstractEventHandle(v)
 {
-	
+	m_cursor = QCursor(Qt::CursorShape::ArrowCursor);
+	m_iconFile = "icons/shapeArrow.png";
+	m_toolTips = "shape selection";
 }
 
 ShapeEventHandle::~ShapeEventHandle()
@@ -16,6 +18,10 @@ ShapeEventHandle::~ShapeEventHandle()
 void ShapeEventHandle::mousePressEvent(QMouseEvent *ev)
 {
 	AbstractEventHandle::mousePressEvent(ev);
+	if (m_viewer->buttons() & Qt::LeftButton)
+	{
+		m_viewer->beginDragBox(ev->pos());
+	}
 }
 
 void ShapeEventHandle::mouseReleaseEvent(QMouseEvent *ev)
@@ -23,15 +29,40 @@ void ShapeEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 	AbstractEventHandle::mouseReleaseEvent(ev);
 	if (m_viewer->buttons() & Qt::LeftButton)
 	{
-		QRgb cl = m_viewer->fboImage().pixel(ev->pos());
-		ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
-		color /= 255.f;
-		int id = svg::SvgAbstractObject::index_from_color(color);
 		svg::SvgManager::SelectOp op = svg::SvgManager::SelectThis;
-		if (ev->modifiers() & Qt::SHIFT)
-			op = svg::SvgManager::SelectUnion;
-		m_viewer->getSvgManager()->selectShapeByIndex(id, op);
+		if (ev->pos() == m_mouse_press_pt)
+		{
+			if (ev->modifiers() & Qt::SHIFT)
+				op = svg::SvgManager::SlectionUnionInverse;
+			QRgb cl = m_viewer->fboImage().pixel(ev->pos());
+			ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
+			color /= 255.f;
+			int id = svg::SvgAbstractObject::index_from_color(color);
+			m_viewer->getSvgManager()->selectShapeByIndex(id, op);
+		}
+		else
+		{
+			if (ev->modifiers() & Qt::SHIFT)
+				op = svg::SvgManager::SelectUnion;
+			const QImage& I = m_viewer->fboImage();
+			std::set<int> ids;
+			float x0 = std::max(0, std::min(m_mouse_press_pt.x(), ev->pos().x()));
+			float x1 = std::min(I.width()-1, std::max(m_mouse_press_pt.x(), ev->pos().x()));
+			float y0 = std::max(0, std::min(m_mouse_press_pt.y(), ev->pos().y()));
+			float y1 = std::min(I.height()-1, std::max(m_mouse_press_pt.y(), ev->pos().y()));
+			for (int y = y0; y <= y1; y++)
+			for (int x = x0; x <= x1; x++)
+			{
+				QRgb cl = m_viewer->fboImage().pixel(x, y);
+				ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
+				color /= 255.f;
+				int id = svg::SvgAbstractObject::index_from_color(color);
+				ids.insert(id);
+			}
+			m_viewer->getSvgManager()->selectShapeByIndex(ids, op);
+		}
 	}
+	m_viewer->endDragBox();
 }
 
 void ShapeEventHandle::mouseDoubleClickEvent(QMouseEvent *ev)

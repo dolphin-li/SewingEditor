@@ -13,6 +13,7 @@ namespace svg
 		enum SelectOp{
 			SelectThis,
 			SelectUnion,
+			SlectionUnionInverse,
 			SelectAll,
 			SelectNone,
 			SelectInverse,
@@ -37,9 +38,11 @@ namespace svg
 
 		// given an index, select shapes
 		void selectShapeByIndex(int id, SelectOp op = SelectThis);
+		void selectShapeByIndex(const std::set<int>& ids, SelectOp op = SelectThis);
 
 		// given an index, find the largest group that contains this object.
 		void selectGroupByIndex(int id, SelectOp op = SelectThis);
+		void selectGroupByIndex(const std::set<int>& ids, SelectOp op = SelectThis);
 
 		// undo highlight for lastid and do highlight for this id
 		void highlightShapeByIndex(int lastId, int thisId);

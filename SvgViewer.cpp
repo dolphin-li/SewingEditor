@@ -37,23 +37,12 @@ AbstractEventHandle::ProcessorType SvgViewer::getEventHandleType()const
 void SvgViewer::setEventHandleType(AbstractEventHandle::ProcessorType type)
 {
 	m_currentEventHandle = m_eventHandles[size_t(type)].get();
-	switch (m_currentEventHandle->type())
-	{
-	case AbstractEventHandle::ProcessorTypeGeneral:
-		setCursor(Qt::ArrowCursor);
-		break;
-	case AbstractEventHandle::ProcessorTypeShape:
-		setCursor(Qt::CrossCursor);
-		break;
-	case AbstractEventHandle::ProcessorTypeGroup:
-		setCursor(Qt::ArrowCursor);
-		break;
-	case AbstractEventHandle::ProcessorTypeZoom:
-		setCursor(Qt::SizeAllCursor);
-		break;
-	default:
-		break;
-	}
+	setCursor(m_currentEventHandle->cursor());
+}
+
+const AbstractEventHandle* SvgViewer::getEventHandle(AbstractEventHandle::ProcessorType type)const
+{
+	return m_eventHandles[size_t(type)].get();
 }
 
 void SvgViewer::resetCamera()

@@ -26,6 +26,7 @@ namespace svg
 		void load(const char* svg_file);
 		void render();
 		void renderIndex();
+		std::shared_ptr<SvgManager> clone()const;
 
 		int width()const;
 		int height()const;

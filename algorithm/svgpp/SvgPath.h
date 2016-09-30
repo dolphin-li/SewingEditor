@@ -8,11 +8,13 @@ namespace svg
 	{
 	public:
 		SvgPath();
+		SvgPath(bool generate_resource);
 		~SvgPath();
 		ObjectType objectType()const { return ObjectType::Path; }
 
 		virtual void render();
 		virtual void renderId();
+		virtual std::shared_ptr<SvgAbstractObject> clone()const;
 
 		virtual void updateBoundFromGeometry();
 

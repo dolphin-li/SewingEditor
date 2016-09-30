@@ -26,6 +26,8 @@ public:
 	void on_actionFix_grouping_triggered();
 	void on_actionSplit_selected_path_triggered();
 	void on_actionMerge_selected_path_triggered();
+	void on_actionUndo_triggered();
+	void on_actionRedo_triggered();
 	void leftDocButtonsClicked(int i);
 public:
 	void initLeftDockActions();
@@ -35,6 +37,34 @@ private:
 	QSharedPointer<QSignalMapper> m_ldbSignalMapper;
 protected:
 	void addLeftDockWidgetButton(AbstractEventHandle::ProcessorType type, QString iconImage, QString toolTip="");
+
+	//////////////////////////////////////////////////////////////////////
+	// roll back control
+	struct RollBackControl{
+		QString name;
+		std::shared_ptr<svg::SvgManager> data;
+	};
+	enum {
+		MAX_ROLLBACK_STEP = 30,
+	};
+	std::vector<RollBackControl> m_rollBackControls;
+	int m_rollHead;
+	int m_rollPos;
+	int m_rollTail;
+public:
+	void resetRoll();
+	void rollBackTo(int pos);
+	void rollBackward();
+	void rollForward();
+	void pushHistory(QString name);
+	int rollPos()const;
+	int rollNum()const;
+
+	void initHistoryList();
+	void updateHistoryList();
+
+	public slots:
+	void on_listHistory_currentRowChanged(int r);
 };
 
 #endif // SEWINGEDITOR_H

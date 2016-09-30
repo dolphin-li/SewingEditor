@@ -12,6 +12,7 @@ namespace svg
 
 		virtual void render();
 		virtual void renderId();
+		virtual std::shared_ptr<SvgAbstractObject> clone()const;
 	private:
 
 	};

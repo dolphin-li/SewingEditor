@@ -11,7 +11,7 @@ SvgViewer::SvgViewer(QWidget *parent)
 {
 	setMouseTracking(true);
 	m_buttons = Qt::MouseButton::NoButton;
-	m_svgManager= new svg::SvgManager();
+	m_svgManager.reset(new svg::SvgManager());
 	m_isDragBox = false;
 
 	m_eventHandles.resize((size_t)AbstractEventHandle::ProcessorTypeEnd, nullptr);
@@ -26,7 +26,7 @@ SvgViewer::SvgViewer(QWidget *parent)
 
 SvgViewer::~SvgViewer()
 {
-	delete m_svgManager;
+
 }
 
 AbstractEventHandle::ProcessorType SvgViewer::getEventHandleType()const
@@ -86,7 +86,12 @@ void SvgViewer::resizeGL(int w, int h)
 
 svg::SvgManager* SvgViewer::getSvgManager()
 {
-	return m_svgManager;
+	return m_svgManager.get();
+}
+
+void SvgViewer::setSvgManager(std::shared_ptr<svg::SvgManager> manager)
+{
+	m_svgManager = manager;
 }
 
 void SvgViewer::paintGL()
@@ -233,6 +238,11 @@ void SvgViewer::wheelEvent(QWheelEvent*ev)
 	m_currentEventHandle->wheelEvent(ev);
 
 	updateGL();
+}
+
+void SvgViewer::loadSvg(QString name)
+{
+	m_svgManager->load(name.toStdString().c_str());
 }
 
 

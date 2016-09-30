@@ -215,6 +215,16 @@ namespace svg
 
 	}
 
+	std::shared_ptr<SvgManager> SvgManager::clone()const
+	{
+		std::shared_ptr<SvgManager> manager(new SvgManager());
+		manager->m_renderCam = m_renderCam;
+		manager->m_rootGroup = m_rootGroup->clone();
+		manager->updateIndex();
+		manager->updateBound();
+		return manager;
+	}
+
 	void SvgManager::init(Camera* cam)
 	{
 		m_renderCam = cam;

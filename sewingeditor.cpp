@@ -9,6 +9,9 @@ SewingEditor::SewingEditor(QWidget *parent)
 	ui.squareWidget->setChildWidget(ui.widget);
 
 	initLeftDockActions();
+
+	resetRoll();
+	initHistoryList();
 }
 
 SewingEditor::~SewingEditor()
@@ -66,10 +69,11 @@ void SewingEditor::on_actionLoad_svg_triggered()
 		QString name = QFileDialog::getOpenFileName(this, "load svg", "data", "*.svg");
 		if (name.isEmpty())
 			return;
-		ui.widget->getSvgManager()->load(name.toStdString().c_str());
+		ui.widget->loadSvg(name);
 		float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
 		ui.squareWidget->setAspect(asp);
-		ui.squareWidget->resize(ui.squareWidget->size()-QSize(1,1));
+		ui.squareWidget->resize(ui.squareWidget->size() - QSize(1, 1));
+		pushHistory("load svg");
 	}
 	catch (std::exception e)
 	{
@@ -99,6 +103,7 @@ void SewingEditor::on_actionSelect_all_triggered()
 	{
 		ui.widget->getSvgManager()->selectShapeByIndex(0, svg::SvgManager::SelectAll);
 		ui.widget->updateGL();
+		pushHistory("select all");
 	}
 	catch (std::exception e)
 	{
@@ -112,6 +117,7 @@ void SewingEditor::on_actionSelect_none_triggered()
 	{
 		ui.widget->getSvgManager()->selectShapeByIndex(0, svg::SvgManager::SelectNone);
 		ui.widget->updateGL();
+		pushHistory("select none");
 	}
 	catch (std::exception e)
 	{
@@ -125,6 +131,7 @@ void SewingEditor::on_actionSelect_inverse_triggered()
 	{
 		ui.widget->getSvgManager()->selectShapeByIndex(0, svg::SvgManager::SelectInverse);
 		ui.widget->updateGL();
+		pushHistory("select inverse");
 	}
 	catch (std::exception e)
 	{
@@ -138,6 +145,7 @@ void SewingEditor::on_actionSelect_similar_width_triggered()
 	{
 		ui.widget->getSvgManager()->selectPathBySimilarSelectedWidth();
 		ui.widget->updateGL();
+		pushHistory("select similar width");
 	}
 	catch (std::exception e)
 	{
@@ -151,6 +159,7 @@ void SewingEditor::on_actionGroup_triggered()
 	{
 		ui.widget->getSvgManager()->groupSelected();
 		ui.widget->updateGL();
+		pushHistory("group");
 	}
 	catch (std::exception e)
 	{
@@ -164,6 +173,7 @@ void SewingEditor::on_actionFix_grouping_triggered()
 	{
 		ui.widget->getSvgManager()->removeSingleNodeAndEmptyNode();
 		ui.widget->updateGL();
+		pushHistory("fix grouping");
 	}
 	catch (std::exception e)
 	{
@@ -177,6 +187,7 @@ void SewingEditor::on_actionUngroup_triggered()
 	{
 		ui.widget->getSvgManager()->ungroupSelected();
 		ui.widget->updateGL();
+		pushHistory("ungroup");
 	}
 	catch (std::exception e)
 	{
@@ -190,6 +201,7 @@ void SewingEditor::on_actionDelete_selected_triggered()
 	{
 		ui.widget->getSvgManager()->removeSelected();
 		ui.widget->updateGL();
+		pushHistory("delete selected");
 	}
 	catch (std::exception e)
 	{
@@ -203,6 +215,7 @@ void SewingEditor::on_actionSplit_selected_path_triggered()
 	{
 		ui.widget->getSvgManager()->splitSelectedPath();
 		ui.widget->updateGL();
+		pushHistory("split selected path");
 	}
 	catch (std::exception e)
 	{
@@ -216,9 +229,123 @@ void SewingEditor::on_actionMerge_selected_path_triggered()
 	{
 		ui.widget->getSvgManager()->mergeSelectedPath();
 		ui.widget->updateGL();
+		pushHistory("merge selected path");
 	}
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
 	}
+}
+
+void SewingEditor::on_actionUndo_triggered()
+{
+	try
+	{
+		rollBackward();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_actionRedo_triggered()
+{
+	try
+	{
+		rollForward();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+/////////////////////////////////////////////////////////////////
+// roll back control
+void SewingEditor::resetRoll()
+{
+	m_rollBackControls.clear();
+	m_rollBackControls.resize(MAX_ROLLBACK_STEP);
+	m_rollHead = 0;
+	m_rollTail = 0;
+	m_rollPos = m_rollHead - 1;
+}
+
+int SewingEditor::rollPos()const
+{
+	return (m_rollPos - m_rollHead + MAX_ROLLBACK_STEP) % MAX_ROLLBACK_STEP;
+}
+
+int SewingEditor::rollNum()const
+{
+	return (m_rollTail - m_rollHead + MAX_ROLLBACK_STEP) % MAX_ROLLBACK_STEP;
+}
+
+void SewingEditor::rollBackTo(int pos)
+{
+	if (pos < 0 || pos >= rollNum())
+		return;
+
+	m_rollPos = (m_rollHead + pos) % MAX_ROLLBACK_STEP;
+	ui.widget->setSvgManager(m_rollBackControls[m_rollPos].data);
+
+	updateHistoryList();
+}
+
+void SewingEditor::rollBackward()
+{
+	rollBackTo(rollPos() - 1);
+}
+
+void SewingEditor::rollForward()
+{
+	rollBackTo(rollPos() + 1);
+}
+
+void SewingEditor::pushHistory(QString name)
+{
+	m_rollPos = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
+	m_rollBackControls[m_rollPos].name = name;
+	m_rollBackControls[m_rollPos].data = ui.widget->getSvgManager()->clone();
+
+	m_rollTail = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
+	if (m_rollTail == m_rollHead)
+		m_rollHead = (m_rollHead + 1) % MAX_ROLLBACK_STEP;
+
+	updateHistoryList();
+}
+
+void SewingEditor::initHistoryList()
+{
+	ui.listHistory->clear();
+	for (int i = 0; i < MAX_ROLLBACK_STEP; i++)
+	{
+		ui.listHistory->addItem("");
+		ui.listHistory->item(i)->setHidden(true);
+		ui.listHistory->item(i)->setTextColor(Qt::white);
+	}
+}
+
+void SewingEditor::updateHistoryList()
+{
+	for (int i = 0; i < rollNum(); i++)
+	{
+		if (i <= rollPos())
+			ui.listHistory->item(i)->setTextColor(Qt::white);
+		else
+			ui.listHistory->item(i)->setTextColor(Qt::gray);
+		ui.listHistory->item(i)->setText(QString().sprintf("%d: ", i) 
+			+ m_rollBackControls[(m_rollHead+i)%MAX_ROLLBACK_STEP].name);
+		ui.listHistory->item(i)->setHidden(false);
+	}
+	for (int i = rollNum(); i < MAX_ROLLBACK_STEP; i++)
+		ui.listHistory->item(i)->setHidden(true);
+}
+
+void SewingEditor::on_listHistory_currentRowChanged(int r)
+{
+	rollBackTo(r);
 }

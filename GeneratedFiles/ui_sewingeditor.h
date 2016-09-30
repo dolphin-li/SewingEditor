@@ -16,6 +16,7 @@
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -42,6 +43,8 @@ public:
     QAction *actionMerge_selected_path;
     QAction *actionFix_grouping;
     QAction *actionSelect_similar_width;
+    QAction *actionUndo;
+    QAction *actionRedo;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     SquareWidget *squareWidget;
@@ -51,10 +54,13 @@ public:
     QMenu *menuSelection;
     QMenu *menuGroup;
     QMenu *menuPath;
+    QMenu *menuOp;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
     QDockWidget *dockWidgetRight;
     QWidget *dockWidgetRightContents;
+    QGridLayout *gridLayout_2;
+    QListWidget *listHistory;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -158,6 +164,10 @@ public:
         actionFix_grouping->setObjectName(QStringLiteral("actionFix_grouping"));
         actionSelect_similar_width = new QAction(SewingEditorClass);
         actionSelect_similar_width->setObjectName(QStringLiteral("actionSelect_similar_width"));
+        actionUndo = new QAction(SewingEditorClass);
+        actionUndo->setObjectName(QStringLiteral("actionUndo"));
+        actionRedo = new QAction(SewingEditorClass);
+        actionRedo->setObjectName(QStringLiteral("actionRedo"));
         centralWidget = new QWidget(SewingEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -222,6 +232,9 @@ public:
         menuPath = new QMenu(menuBar);
         menuPath->setObjectName(QStringLiteral("menuPath"));
         menuPath->setStyleSheet(QStringLiteral("background-color: rgb(150, 150, 150);"));
+        menuOp = new QMenu(menuBar);
+        menuOp->setObjectName(QStringLiteral("menuOp"));
+        menuOp->setStyleSheet(QStringLiteral("background-color: rgb(150, 150, 150);"));
         SewingEditorClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(SewingEditorClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -237,11 +250,21 @@ public:
         SewingEditorClass->setStatusBar(statusBar);
         dockWidgetRight = new QDockWidget(SewingEditorClass);
         dockWidgetRight->setObjectName(QStringLiteral("dockWidgetRight"));
-        dockWidgetRight->setMinimumSize(QSize(200, 38));
+        dockWidgetRight->setMinimumSize(QSize(200, 113));
         dockWidgetRight->setFeatures(QDockWidget::NoDockWidgetFeatures);
         dockWidgetRight->setAllowedAreas(Qt::RightDockWidgetArea);
         dockWidgetRightContents = new QWidget();
         dockWidgetRightContents->setObjectName(QStringLiteral("dockWidgetRightContents"));
+        gridLayout_2 = new QGridLayout(dockWidgetRightContents);
+        gridLayout_2->setSpacing(6);
+        gridLayout_2->setContentsMargins(11, 11, 11, 11);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        listHistory = new QListWidget(dockWidgetRightContents);
+        listHistory->setObjectName(QStringLiteral("listHistory"));
+        listHistory->setStyleSheet(QStringLiteral("background-color: rgb(73, 73, 73);"));
+
+        gridLayout_2->addWidget(listHistory, 0, 0, 1, 1);
+
         dockWidgetRight->setWidget(dockWidgetRightContents);
         SewingEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
         dockWidgetLeft = new QDockWidget(SewingEditorClass);
@@ -260,6 +283,7 @@ public:
         menuBar->addAction(menuSelection->menuAction());
         menuBar->addAction(menuGroup->menuAction());
         menuBar->addAction(menuPath->menuAction());
+        menuBar->addAction(menuOp->menuAction());
         menuFile->addAction(actionLoad_svg);
         menuFile->addAction(actionSave_svg);
         menuSelection->addAction(actionSelect_all);
@@ -272,6 +296,8 @@ public:
         menuGroup->addAction(actionFix_grouping);
         menuPath->addAction(actionSplit_selected_path);
         menuPath->addAction(actionMerge_selected_path);
+        menuOp->addAction(actionUndo);
+        menuOp->addAction(actionRedo);
 
         retranslateUi(SewingEditorClass);
 
@@ -304,10 +330,15 @@ public:
         actionFix_grouping->setText(QApplication::translate("SewingEditorClass", "fix grouping", 0));
         actionSelect_similar_width->setText(QApplication::translate("SewingEditorClass", "select similar width", 0));
         actionSelect_similar_width->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+W", 0));
+        actionUndo->setText(QApplication::translate("SewingEditorClass", "undo", 0));
+        actionUndo->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+Z", 0));
+        actionRedo->setText(QApplication::translate("SewingEditorClass", "redo", 0));
+        actionRedo->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+Shift+Z", 0));
         menuFile->setTitle(QApplication::translate("SewingEditorClass", "file", 0));
         menuSelection->setTitle(QApplication::translate("SewingEditorClass", "selection", 0));
         menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));
         menuPath->setTitle(QApplication::translate("SewingEditorClass", "path", 0));
+        menuOp->setTitle(QApplication::translate("SewingEditorClass", "op", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

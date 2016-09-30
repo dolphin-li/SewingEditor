@@ -23,11 +23,13 @@ namespace svg
 		typedef std::shared_ptr<FontFace> FontFacePtr;
 	public:
 		SvgText();
+		SvgText(bool generate_resource);
 		~SvgText();
 		ObjectType objectType()const { return ObjectType::Text; }
 
 		virtual void render();
 		virtual void renderId();
+		virtual std::shared_ptr<SvgAbstractObject> clone()const;
 
 		virtual void updateBoundFromGeometry();
 		void updateText();

@@ -789,10 +789,21 @@
     <addaction name="actionSplit_selected_path"/>
     <addaction name="actionMerge_selected_path"/>
    </widget>
+   <widget class="QMenu" name="menuOp">
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(150, 150, 150);</string>
+    </property>
+    <property name="title">
+     <string>op</string>
+    </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSelection"/>
    <addaction name="menuGroup"/>
    <addaction name="menuPath"/>
+   <addaction name="menuOp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="palette">
@@ -847,7 +858,7 @@
    <property name="minimumSize">
     <size>
      <width>200</width>
-     <height>38</height>
+     <height>113</height>
     </size>
    </property>
    <property name="features">
@@ -859,7 +870,17 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetRightContents"/>
+   <widget class="QWidget" name="dockWidgetRightContents">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QListWidget" name="listHistory">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(73, 73, 73);</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLeft">
    <property name="minimumSize">
@@ -982,6 +1003,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Z</string>
    </property>
   </action>
  </widget>

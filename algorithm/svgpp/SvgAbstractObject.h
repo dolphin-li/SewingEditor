@@ -30,6 +30,7 @@ namespace svg
 		virtual ObjectType objectType()const = 0;
 		virtual void render() = 0;
 		virtual void renderId() = 0;
+		virtual std::shared_ptr<SvgAbstractObject> clone()const = 0;
 		void invalid(){ m_invalid = true; } // call me when render context updated.
 
 		void setId(int id) { m_id = id; }

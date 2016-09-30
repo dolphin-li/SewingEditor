@@ -47,6 +47,19 @@ namespace svg
 		m_boxStrokeWidth = 2;
 	}
 
+	SvgPath::SvgPath(bool generate_resouce) :SvgAbstractObject()
+	{
+		m_gl_path_id = 0;
+		m_boxColor = ldp::Float3(1, 0, 1);
+		m_boxStrokeWidth = 2;
+		if (generate_resouce)
+		{
+			m_gl_path_id = glGenPathsNV(1);
+			m_boxColor = ldp::Float3(1, 0, 1);
+			m_boxStrokeWidth = 2;
+		}
+	}
+
 	SvgPath::~SvgPath()
 	{
 		if (m_gl_path_id)
@@ -237,6 +250,29 @@ namespace svg
 		}
 
 		return group;
+	}
+
+	std::shared_ptr<SvgAbstractObject> SvgPath::clone()const
+	{
+		std::shared_ptr<SvgAbstractObject> newT(new SvgPath(false));
+		auto newTptr = (SvgPath*)newT.get();
+
+		newTptr->m_attribute = m_attribute;
+		newTptr->m_bbox = m_bbox;
+		newTptr->m_boxColor = m_boxColor;
+		newTptr->m_boxStrokeWidth = m_boxStrokeWidth;
+		newTptr->m_gl_path_id = m_gl_path_id;
+		newTptr->m_highlighted = m_highlighted;
+		newTptr->m_id = m_id;
+		newTptr->m_invalid = true;
+		newTptr->m_selected = m_selected;
+		newTptr->m_cmds = m_cmds;
+		newTptr->m_coords = m_coords;
+		newTptr->m_pathStyle = m_pathStyle;
+		newTptr->m_segmentPos = m_segmentPos;
+		newTptr->m_gl_fill_rull = m_gl_fill_rull;
+
+		return newT;
 	}
 
 #pragma region --bounds helper

@@ -44,4 +44,18 @@ namespace svg
 
 		setBound(unionBound(box));
 	}
+
+	std::shared_ptr<SvgAbstractObject> SvgGroup::clone()const
+	{
+		std::shared_ptr<SvgAbstractObject> g(new SvgGroup());
+		auto gptr = (SvgGroup*)g.get();
+		gptr->m_children.reserve(m_children.size());
+		for (auto c : m_children)
+		{
+			auto newC = c->clone();
+			newC->setParent(gptr);
+			gptr->m_children.push_back(newC);
+		}
+		return g;
+	}
 }

@@ -145,6 +145,19 @@ void SewingEditor::on_actionGroup_triggered()
 	}
 }
 
+void SewingEditor::on_actionFix_grouping_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->removeSingleNodeAndEmptyNode();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
 void SewingEditor::on_actionUngroup_triggered()
 {
 	try
@@ -163,6 +176,32 @@ void SewingEditor::on_actionDelete_selected_triggered()
 	try
 	{
 		ui.widget->getSvgManager()->removeSelected();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_actionSplit_selected_path_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->splitSelectedPath();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_actionMerge_selected_path_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->mergeSelectedPath();
 		ui.widget->updateGL();
 	}
 	catch (std::exception e)

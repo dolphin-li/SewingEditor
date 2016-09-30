@@ -54,6 +54,7 @@ namespace svg
 
 		ldp::Float4 getBound()const{ return m_bbox; }
 		void setBound(ldp::Float4 b){ m_bbox = b; }
+		virtual void updateBoundFromGeometry(){  }
 		void resetBound(){ m_bbox = ldp::Float4(FLT_MAX, -FLT_MAX, FLT_MAX, -FLT_MAX); }
 		ldp::Float4 unionBound(ldp::Float4 b)const;
 		ldp::Float4 unionBound(ldp::Float2 point)const;
@@ -91,5 +92,7 @@ namespace svg
 		bool m_selected;
 		bool m_highlighted;
 		bool m_invalid;
+		ldp::Float3 m_boxColor;
+		float m_boxStrokeWidth;
 	};
 }

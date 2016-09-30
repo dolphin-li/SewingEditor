@@ -29,6 +29,7 @@ namespace svg
 		virtual void render();
 		virtual void renderId();
 
+		virtual void updateBoundFromGeometry();
 		void updateText();
 	public:
 		std::string m_font;
@@ -39,6 +40,7 @@ namespace svg
 		ldp::Float4 m_bbox_before_transform;
 		std::vector<float> m_hori_shifts;
 		float m_total_advance;
+		FontFacePtr m_font_face;
 		static std::map<std::string, FontFacePtr> m_font_face_map;
 		static FontFacePtr requireFontFace(std::string name);
 	};

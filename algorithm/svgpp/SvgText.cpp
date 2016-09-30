@@ -11,6 +11,8 @@ namespace svg
 		m_font = "Sans";
 		m_text = "No Text";
 		m_total_advance = 0.f;
+		m_boxColor = ldp::Float3(1, 0, 1);
+		m_boxStrokeWidth = 2;
 		updateText();
 	}
 
@@ -137,23 +139,28 @@ namespace svg
 
 	void SvgText::updateText()
 	{
-		FontFacePtr font_face = requireFontFace(m_font);
+		m_font_face = requireFontFace(m_font);
 		m_hori_shifts.resize(m_text.size(), 0.f);
 		if (m_hori_shifts.size() > 1)
 			glGetPathSpacingNV(GL_ACCUM_ADJACENT_PAIRS_NV,
 			m_text.size(), GL_UNSIGNED_BYTE, m_text.c_str(),
-			font_face->glyph_base,
+			m_font_face->glyph_base,
 			1.0, 1.0,
 			GL_TRANSLATE_X_NV,
 			m_hori_shifts.data()+1);
 		m_total_advance = 0.f;
 		if (m_text.size())
 			m_total_advance = m_hori_shifts.back() +
-			font_face->horizontal_advance[GLubyte(m_text.back())];
+			m_font_face->horizontal_advance[GLubyte(m_text.back())];
 
 		// update bound
-		m_bbox_before_transform = m_font_size * ldp::Float4(0, m_total_advance, 
-			font_face->y_min, font_face->y_max);
+		updateBoundFromGeometry();
+	}
+
+	void SvgText::updateBoundFromGeometry()
+	{
+		m_bbox_before_transform = m_font_size * ldp::Float4(0, m_total_advance,
+			m_font_face->y_min, m_font_face->y_max);
 		ldp::Mat3f tM = m_attribute->m_transfrom;
 		float l = m_bbox_before_transform[0];
 		float r = m_bbox_before_transform[1];

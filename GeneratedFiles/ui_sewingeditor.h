@@ -38,6 +38,9 @@ public:
     QAction *actionGroup;
     QAction *actionUngroup;
     QAction *actionDelete_selected;
+    QAction *actionSplit_selected_path;
+    QAction *actionMerge_selected_path;
+    QAction *actionFix_grouping;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     SquareWidget *squareWidget;
@@ -146,6 +149,12 @@ public:
         actionUngroup->setObjectName(QStringLiteral("actionUngroup"));
         actionDelete_selected = new QAction(SewingEditorClass);
         actionDelete_selected->setObjectName(QStringLiteral("actionDelete_selected"));
+        actionSplit_selected_path = new QAction(SewingEditorClass);
+        actionSplit_selected_path->setObjectName(QStringLiteral("actionSplit_selected_path"));
+        actionMerge_selected_path = new QAction(SewingEditorClass);
+        actionMerge_selected_path->setObjectName(QStringLiteral("actionMerge_selected_path"));
+        actionFix_grouping = new QAction(SewingEditorClass);
+        actionFix_grouping->setObjectName(QStringLiteral("actionFix_grouping"));
         centralWidget = new QWidget(SewingEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -209,6 +218,7 @@ public:
         menuGroup->setStyleSheet(QStringLiteral("background-color: rgb(150, 150, 150);"));
         menuPath = new QMenu(menuBar);
         menuPath->setObjectName(QStringLiteral("menuPath"));
+        menuPath->setStyleSheet(QStringLiteral("background-color: rgb(150, 150, 150);"));
         SewingEditorClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(SewingEditorClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -255,6 +265,9 @@ public:
         menuSelection->addAction(actionDelete_selected);
         menuGroup->addAction(actionGroup);
         menuGroup->addAction(actionUngroup);
+        menuGroup->addAction(actionFix_grouping);
+        menuPath->addAction(actionSplit_selected_path);
+        menuPath->addAction(actionMerge_selected_path);
 
         retranslateUi(SewingEditorClass);
 
@@ -280,6 +293,11 @@ public:
         actionUngroup->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+Shift+G", 0));
         actionDelete_selected->setText(QApplication::translate("SewingEditorClass", "delete selected", 0));
         actionDelete_selected->setShortcut(QApplication::translate("SewingEditorClass", "Del", 0));
+        actionSplit_selected_path->setText(QApplication::translate("SewingEditorClass", "split selected path", 0));
+        actionSplit_selected_path->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+Shift+P", 0));
+        actionMerge_selected_path->setText(QApplication::translate("SewingEditorClass", "merge selected path", 0));
+        actionMerge_selected_path->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+P", 0));
+        actionFix_grouping->setText(QApplication::translate("SewingEditorClass", "fix grouping", 0));
         menuFile->setTitle(QApplication::translate("SewingEditorClass", "file", 0));
         menuSelection->setTitle(QApplication::translate("SewingEditorClass", "selection", 0));
         menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));

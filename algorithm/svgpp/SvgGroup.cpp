@@ -7,6 +7,8 @@ namespace svg
 #undef max
 	SvgGroup::SvgGroup()
 	{
+		m_boxColor = ldp::Float3(0.8, 0.6, 0.4);
+		m_boxStrokeWidth = 3;
 	}
 
 	SvgGroup::~SvgGroup()
@@ -28,5 +30,18 @@ namespace svg
 			m_children[i]->renderId();
 		if (ancestorAfterRoot() == this && isSelected())
 			renderBounds(true);
+	}
+
+	void SvgGroup::updateBoundFromGeometry()
+	{
+		ldp::Float4 box(FLT_MAX, -FLT_MAX, FLT_MAX, -FLT_MAX);
+
+		for (auto child : m_children)
+		{
+			child->updateBoundFromGeometry();
+			box = child->unionBound(box);
+		}
+
+		setBound(unionBound(box));
 	}
 }

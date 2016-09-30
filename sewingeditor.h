@@ -22,6 +22,9 @@ public:
 	void on_actionDelete_selected_triggered();
 	void on_actionGroup_triggered();
 	void on_actionUngroup_triggered();
+	void on_actionFix_grouping_triggered();
+	void on_actionSplit_selected_path_triggered();
+	void on_actionMerge_selected_path_triggered();
 	void leftDocButtonsClicked(int i);
 public:
 	void initLeftDockActions();

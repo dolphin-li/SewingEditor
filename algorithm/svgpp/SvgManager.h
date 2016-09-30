@@ -51,9 +51,13 @@ namespace svg
 		bool groupSelected();
 		void ungroupSelected();
 		void removeSelected();
+		void removeSingleNodeAndEmptyNode();
+
+		// path operations
+		void splitSelectedPath(); // split selected, non-closed paths
+		bool mergeSelectedPath(); // merge will fail if the paths have been in different groups
 	protected:
 		void updateIndex(SvgAbstractObject* obj, int &idx);
-		void updateBound(SvgAbstractObject* obj);
 		void removeSelected(SvgAbstractObject* obj);
 		bool groupSelected_findCommonParent(std::shared_ptr<SvgAbstractObject> obj,
 			std::shared_ptr<SvgAbstractObject> objParent,
@@ -61,6 +65,7 @@ namespace svg
 			int& cnt);
 		void ungroupSelected_collect(SvgAbstractObject* obj, std::set<SvgGroup*>& groups);
 		void removeSingleNodeAndEmptyNode(std::shared_ptr<SvgAbstractObject>& obj);
+		void splitPath(std::shared_ptr<SvgAbstractObject>& obj);
 	private:
 		Camera* m_renderCam;
 		std::shared_ptr<SvgAbstractObject> m_rootGroup;

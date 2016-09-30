@@ -19,6 +19,8 @@ namespace svg
 		m_invalid = true;
 		resetBound();
 		m_attribute = std::shared_ptr<SvgAttribute>(new SvgAttribute());
+		m_boxColor = 0.f;
+		m_boxStrokeWidth = 1;
 	}
 
 	SvgAbstractObject::~SvgAbstractObject()
@@ -169,38 +171,14 @@ namespace svg
 			ldp::Float2(m_bbox[0], m_bbox[3])
 		};
 		const float r = sz * std::min(m_bbox[1] - m_bbox[0], m_bbox[3] - m_bbox[2]) * 0.001f;
-		glLineWidth(3 * sz);
+		glLineWidth(m_boxStrokeWidth * sz);
 
 		// main box
 		if (!index_mode)
-			glColor4f(1, 0, 1, 1);
+			glColor4f(m_boxColor[0], m_boxColor[1], m_boxColor[2], 1);
 		glBegin(GL_LINE_LOOP);
 		for (int k = 0; k < 4; k++)
 			glVertex2fv(p[k].ptr());
-		glEnd();
-
-		// corners
-		if (!index_mode)
-			glColor4f(1, 0, 1, 1);
-		for (int k = 0; k < 4; k++)
-		{
-			glBegin(GL_LINE_LOOP);
-			glVertex2f(p[k][0] - r, p[k][1] - r);
-			glVertex2f(p[k][0] + r, p[k][1] - r);
-			glVertex2f(p[k][0] + r, p[k][1] + r);
-			glVertex2f(p[k][0] - r, p[k][1] + r);
-			glEnd();
-		}
-		if (!index_mode)
-			glColor4f(1, 1, 1, 1);
-		glBegin(GL_QUADS);
-		for (int k = 0; k < 4; k++)
-		{
-			glVertex2f(p[k][0] - r, p[k][1] - r);
-			glVertex2f(p[k][0] + r, p[k][1] - r);
-			glVertex2f(p[k][0] + r, p[k][1] + r);
-			glVertex2f(p[k][0] - r, p[k][1] + r);
-		}
 		glEnd();
 
 		glPopAttrib();

@@ -776,11 +776,17 @@
     </property>
     <addaction name="actionGroup"/>
     <addaction name="actionUngroup"/>
+    <addaction name="actionFix_grouping"/>
    </widget>
    <widget class="QMenu" name="menuPath">
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(150, 150, 150);</string>
+    </property>
     <property name="title">
      <string>path</string>
     </property>
+    <addaction name="actionSplit_selected_path"/>
+    <addaction name="actionMerge_selected_path"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSelection"/>
@@ -946,6 +952,27 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+  </action>
+  <action name="actionSplit_selected_path">
+   <property name="text">
+    <string>split selected path</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+P</string>
+   </property>
+  </action>
+  <action name="actionMerge_selected_path">
+   <property name="text">
+    <string>merge selected path</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionFix_grouping">
+   <property name="text">
+    <string>fix grouping</string>
    </property>
   </action>
  </widget>

@@ -230,10 +230,7 @@ namespace svg
 		ConvertTraversal traversal; 
 		svg_scene->traverse(VisitorPtr(new ConvertVisitor((SvgGroup*)m_rootGroup.get())), traversal);
 
-		removeSingleNodeAndEmptyNode(m_rootGroup);
-		updateIndex();
-		updateBound();
-
+		removeSingleNodeAndEmptyNode();
 		if (m_renderCam)
 		{
 			ldp::Float4 b = m_rootGroup->getBound();
@@ -282,24 +279,7 @@ namespace svg
 
 	void SvgManager::updateBound()
 	{
-		updateBound(m_rootGroup.get());
-	}
-
-	void SvgManager::updateBound(SvgAbstractObject* obj)
-	{
-		ldp::Float4 box(FLT_MAX, -FLT_MAX, FLT_MAX, -FLT_MAX);
-
-		if (obj->objectType() == SvgAbstractObject::Group)
-		{
-			SvgGroup* g = (SvgGroup*)obj;
-			for (auto child : g->m_children)
-			{
-				updateBound(child.get());
-				box = child->unionBound(box);
-			}
-		}
-
-		obj->setBound(obj->unionBound(box));
+		m_rootGroup->updateBoundFromGeometry();
 	}
 
 	void SvgManager::render()
@@ -566,6 +546,13 @@ namespace svg
 		updateBound();
 	}
 
+	void SvgManager::removeSingleNodeAndEmptyNode()
+	{
+		removeSingleNodeAndEmptyNode(m_rootGroup);
+		updateIndex();
+		updateBound();
+	}
+
 	void SvgManager::removeSelected()
 	{
 		removeSelected(m_rootGroup.get());
@@ -669,6 +656,97 @@ namespace svg
 			for (auto c : tmp)
 			if (c->getId() != obj->INDEX_BEGIN - 1)
 				objGroup->m_children.push_back(c);
+		}
+	}
+
+	void SvgManager::splitSelectedPath()
+	{
+		splitPath(m_rootGroup);
+		updateIndex();
+		updateBound();
+	}
+
+	bool SvgManager::mergeSelectedPath()
+	{
+		std::shared_ptr<SvgAbstractObject> commonParent;
+		int cnt = 0;
+		bool ret = groupSelected_findCommonParent(m_rootGroup,
+			std::shared_ptr<SvgAbstractObject>(), commonParent, cnt);
+		if (commonParent.get() == nullptr)
+			return true;
+		if (ret == false)
+		{
+			printf("error in grouping: all selected must be not in different groups previously!\n");
+			return false;
+		}
+		assert(commonParent->objectType() == SvgAbstractObject::Group);
+
+		auto parentPtr = (SvgGroup*)commonParent.get();
+		auto tmpChildren = parentPtr->m_children;
+		parentPtr->m_children.clear();
+		std::shared_ptr<SvgAbstractObject> path;
+		for (auto c : tmpChildren)
+		{
+			if (c->objectType() != SvgAbstractObject::Path || !c->isSelected())
+				parentPtr->m_children.push_back(c);
+			else
+			{
+				if (path.get() == nullptr)
+					path = c;
+				else
+				{
+					auto pathPtr = (SvgPath*)path.get();
+					auto curPtr = (SvgPath*)c.get();
+
+					// cmds
+					pathPtr->m_cmds.insert(pathPtr->m_cmds.end(), 
+						curPtr->m_cmds.begin(), curPtr->m_cmds.end());
+
+					// pos
+					size_t bg = pathPtr->m_segmentPos.size();
+					pathPtr->m_segmentPos.insert(pathPtr->m_segmentPos.end(),
+						curPtr->m_segmentPos.begin(), curPtr->m_segmentPos.end());
+					for (size_t i = bg; i < pathPtr->m_segmentPos.size(); i++)
+						pathPtr->m_segmentPos[i] += pathPtr->m_coords.size();
+
+					// coords
+					pathPtr->m_coords.insert(pathPtr->m_coords.end(),
+						curPtr->m_coords.begin(), curPtr->m_coords.end());
+				}
+			}
+		}// auto c : tmpChildren
+
+		if (path.get() == nullptr)
+			return true;
+
+		path->invalid();
+		parentPtr->m_children.push_back(path);
+		if (parentPtr->m_children.size() == 1)
+			removeSingleNodeAndEmptyNode(commonParent);
+		updateIndex();
+		updateBound();
+
+		return true;
+	}
+
+	void SvgManager::splitPath(std::shared_ptr<SvgAbstractObject>& obj)
+	{
+		if (obj->objectType() == obj->Group)
+		{
+			SvgGroup* g = (SvgGroup*)obj.get();
+			for (auto& c : g->m_children)
+				splitPath(c);
+		}
+		else if (obj->objectType() == obj->Path && obj->isSelected())
+		{
+			SvgPath* p = (SvgPath*)obj.get();
+			auto newGroup = p->splitToSegments();
+			if (newGroup.get())
+			{
+				newGroup->setParent(obj->parent());
+				newGroup->setSelected(obj->isSelected());
+				obj = newGroup;
+			}
 		}
 	}
 } // namespace svg

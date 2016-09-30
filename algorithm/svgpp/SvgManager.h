@@ -40,6 +40,9 @@ namespace svg
 		void selectShapeByIndex(int id, SelectOp op = SelectThis);
 		void selectShapeByIndex(const std::set<int>& ids, SelectOp op = SelectThis);
 
+		void selectPathBySimilarSelectedWidth();
+		void selectPathByWidths(const std::set<float>& widths);
+
 		// given an index, find the largest group that contains this object.
 		void selectGroupByIndex(int id, SelectOp op = SelectThis);
 		void selectGroupByIndex(const std::set<int>& ids, SelectOp op = SelectThis);

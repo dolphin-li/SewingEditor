@@ -132,6 +132,19 @@ void SewingEditor::on_actionSelect_inverse_triggered()
 	}
 }
 
+void SewingEditor::on_actionSelect_similar_width_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->selectPathBySimilarSelectedWidth();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
 void SewingEditor::on_actionGroup_triggered()
 {
 	try

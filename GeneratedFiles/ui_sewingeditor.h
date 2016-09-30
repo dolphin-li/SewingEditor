@@ -41,6 +41,7 @@ public:
     QAction *actionSplit_selected_path;
     QAction *actionMerge_selected_path;
     QAction *actionFix_grouping;
+    QAction *actionSelect_similar_width;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     SquareWidget *squareWidget;
@@ -155,6 +156,8 @@ public:
         actionMerge_selected_path->setObjectName(QStringLiteral("actionMerge_selected_path"));
         actionFix_grouping = new QAction(SewingEditorClass);
         actionFix_grouping->setObjectName(QStringLiteral("actionFix_grouping"));
+        actionSelect_similar_width = new QAction(SewingEditorClass);
+        actionSelect_similar_width->setObjectName(QStringLiteral("actionSelect_similar_width"));
         centralWidget = new QWidget(SewingEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -263,6 +266,7 @@ public:
         menuSelection->addAction(actionSelect_none);
         menuSelection->addAction(actionSelect_inverse);
         menuSelection->addAction(actionDelete_selected);
+        menuSelection->addAction(actionSelect_similar_width);
         menuGroup->addAction(actionGroup);
         menuGroup->addAction(actionUngroup);
         menuGroup->addAction(actionFix_grouping);
@@ -298,6 +302,8 @@ public:
         actionMerge_selected_path->setText(QApplication::translate("SewingEditorClass", "merge selected path", 0));
         actionMerge_selected_path->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+P", 0));
         actionFix_grouping->setText(QApplication::translate("SewingEditorClass", "fix grouping", 0));
+        actionSelect_similar_width->setText(QApplication::translate("SewingEditorClass", "select similar width", 0));
+        actionSelect_similar_width->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+W", 0));
         menuFile->setTitle(QApplication::translate("SewingEditorClass", "file", 0));
         menuSelection->setTitle(QApplication::translate("SewingEditorClass", "selection", 0));
         menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));

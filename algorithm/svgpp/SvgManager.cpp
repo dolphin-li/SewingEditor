@@ -749,4 +749,32 @@ namespace svg
 			}
 		}
 	}
+
+	void SvgManager::selectPathBySimilarSelectedWidth()
+	{
+		std::set<float> widths;
+		for (auto iter : m_idxMap)
+		{
+			if (iter.second->objectType() == SvgAbstractObject::Path && iter.second->isSelected())
+			{
+				auto p = (SvgPath*)iter.second;
+				widths.insert(p->m_pathStyle.stroke_width);
+			}
+		}
+
+		if (widths.size())
+			selectPathByWidths(widths);
+	}
+
+	void SvgManager::selectPathByWidths(const std::set<float>& widths)
+	{
+		for (auto iter : m_idxMap)
+		{
+			if (iter.second->objectType() == SvgAbstractObject::Path)
+			{
+				auto p = (SvgPath*)iter.second;
+				p->setSelected(widths.find(p->m_pathStyle.stroke_width) != widths.end());
+			}
+		}
+	}
 } // namespace svg

@@ -19,6 +19,7 @@ public:
 	void on_actionSelect_all_triggered();
 	void on_actionSelect_none_triggered();
 	void on_actionSelect_inverse_triggered();
+	void on_actionSelect_similar_width_triggered();
 	void on_actionDelete_selected_triggered();
 	void on_actionGroup_triggered();
 	void on_actionUngroup_triggered();

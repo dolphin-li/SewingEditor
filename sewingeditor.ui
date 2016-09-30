@@ -766,6 +766,7 @@
     <addaction name="actionSelect_none"/>
     <addaction name="actionSelect_inverse"/>
     <addaction name="actionDelete_selected"/>
+    <addaction name="actionSelect_similar_width"/>
    </widget>
    <widget class="QMenu" name="menuGroup">
     <property name="styleSheet">
@@ -973,6 +974,14 @@
   <action name="actionFix_grouping">
    <property name="text">
     <string>fix grouping</string>
+   </property>
+  </action>
+  <action name="actionSelect_similar_width">
+   <property name="text">
+    <string>select similar width</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
   </action>
  </widget>

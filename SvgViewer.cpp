@@ -45,6 +45,11 @@ const AbstractEventHandle* SvgViewer::getEventHandle(AbstractEventHandle::Proces
 	return m_eventHandles[size_t(type)].get();
 }
 
+AbstractEventHandle* SvgViewer::getEventHandle(AbstractEventHandle::ProcessorType type)
+{
+	return m_eventHandles[size_t(type)].get();
+}
+
 void SvgViewer::resetCamera()
 {
 	m_camera.setViewPort(0, width(), 0, height());

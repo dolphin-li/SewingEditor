@@ -45,11 +45,22 @@ namespace svg
 		setBound(unionBound(box));
 	}
 
+	void SvgGroup::copyTo(SvgAbstractObject* obj)const
+	{
+		SvgAbstractObject::copyTo(obj);
+		if (obj->objectType() == SvgAbstractObject::Group)
+		{
+			auto g = (SvgGroup*)obj;
+			g->m_children = m_children;
+		}
+	}
+
 	std::shared_ptr<SvgAbstractObject> SvgGroup::clone()const
 	{
 		std::shared_ptr<SvgAbstractObject> g(new SvgGroup());
 		auto gptr = (SvgGroup*)g.get();
-		gptr->m_children.reserve(m_children.size());
+		copyTo(gptr);
+		gptr->m_children.clear();
 		for (auto c : m_children)
 		{
 			auto newC = c->clone();

@@ -1,3 +1,4 @@
+#include "SewingEditor.h"
 #include "GroupEventHandle.h"
 #include <QEvent>
 #include "SvgViewer.h"
@@ -42,6 +43,8 @@ void GroupEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 			if (ev->modifiers() & Qt::SHIFT)
 				op = svg::SvgManager::SlectionUnionInverse;
 			m_viewer->getSvgManager()->selectGroupByIndex(id, op);
+			if (m_mainUI && id)
+				m_mainUI->pushHistory(QString().sprintf("select a group: %d", id));
 		}
 		else
 		{
@@ -63,6 +66,17 @@ void GroupEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 				ids.insert(id);
 			}
 			m_viewer->getSvgManager()->selectGroupByIndex(ids, op);
+			if (m_mainUI && ids.size())
+			{
+				int id = 0;
+				for (auto c : ids)
+				if (c)
+				{
+					id = c;
+					break;
+				}
+				m_mainUI->pushHistory(QString().sprintf("select groups: %d, ...", id));
+			}
 		}
 	}
 	m_viewer->endDragBox();

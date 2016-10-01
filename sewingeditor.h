@@ -45,7 +45,7 @@ protected:
 		std::shared_ptr<svg::SvgManager> data;
 	};
 	enum {
-		MAX_ROLLBACK_STEP = 30,
+		MAX_ROLLBACK_STEP = 100,
 	};
 	std::vector<RollBackControl> m_rollBackControls;
 	int m_rollHead;

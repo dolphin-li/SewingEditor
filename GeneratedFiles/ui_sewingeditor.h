@@ -15,6 +15,7 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
@@ -61,6 +62,7 @@ public:
     QWidget *dockWidgetRightContents;
     QGridLayout *gridLayout_2;
     QListWidget *listHistory;
+    QGroupBox *gbParam;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -250,7 +252,7 @@ public:
         SewingEditorClass->setStatusBar(statusBar);
         dockWidgetRight = new QDockWidget(SewingEditorClass);
         dockWidgetRight->setObjectName(QStringLiteral("dockWidgetRight"));
-        dockWidgetRight->setMinimumSize(QSize(200, 113));
+        dockWidgetRight->setMinimumSize(QSize(200, 419));
         dockWidgetRight->setFeatures(QDockWidget::NoDockWidgetFeatures);
         dockWidgetRight->setAllowedAreas(Qt::RightDockWidgetArea);
         dockWidgetRightContents = new QWidget();
@@ -264,6 +266,12 @@ public:
         listHistory->setStyleSheet(QStringLiteral("background-color: rgb(73, 73, 73);"));
 
         gridLayout_2->addWidget(listHistory, 0, 0, 1, 1);
+
+        gbParam = new QGroupBox(dockWidgetRightContents);
+        gbParam->setObjectName(QStringLiteral("gbParam"));
+        gbParam->setMinimumSize(QSize(0, 300));
+
+        gridLayout_2->addWidget(gbParam, 1, 0, 1, 1);
 
         dockWidgetRight->setWidget(dockWidgetRightContents);
         SewingEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
@@ -339,6 +347,7 @@ public:
         menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));
         menuPath->setTitle(QApplication::translate("SewingEditorClass", "path", 0));
         menuOp->setTitle(QApplication::translate("SewingEditorClass", "op", 0));
+        gbParam->setTitle(QApplication::translate("SewingEditorClass", "param", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

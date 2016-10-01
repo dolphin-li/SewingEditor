@@ -8,7 +8,8 @@ class SvgViewer;
 class QMouseEvent;
 class QWheelEvent;
 class QKeyEvent;
-
+class SewingEditor;
+typedef SewingEditor MainUI;
 class AbstractEventHandle
 {
 public:
@@ -23,6 +24,7 @@ public:
 public:
 	AbstractEventHandle(SvgViewer* v);
 	~AbstractEventHandle();
+	void setMainUI(MainUI* ui);
 	virtual ProcessorType type() { return ProcessorTypeGeneral; }
 	static AbstractEventHandle* create(ProcessorType type, SvgViewer* v);
 	QCursor& cursor(){ return m_cursor; }
@@ -44,4 +46,6 @@ protected:
 	QCursor m_cursor;
 	QString m_iconFile;
 	QString m_toolTips;
+
+	MainUI* m_mainUI;
 };

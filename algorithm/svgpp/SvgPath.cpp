@@ -40,35 +40,33 @@ namespace svg
 		}
 	}
 
-	SvgPath::SvgPath() :SvgAbstractObject()
+	SvgPath::GLPathResource::GLPathResource()
 	{
-		m_gl_path_id = glGenPathsNV(1);
-		m_boxColor = ldp::Float3(1, 0, 1);
-		m_boxStrokeWidth = 2;
+		id = glGenPathsNV(1);
+		assert(id);
 	}
 
-	SvgPath::SvgPath(bool generate_resouce) :SvgAbstractObject()
+	SvgPath::GLPathResource::~GLPathResource()
 	{
-		m_gl_path_id = 0;
+		if (id)
+			glDeletePathsNV(id, 1);
+		id = 0;
+	}
+
+	SvgPath::SvgPath() :SvgAbstractObject()
+	{
+		m_gl_path_res.reset(new GLPathResource());
 		m_boxColor = ldp::Float3(1, 0, 1);
 		m_boxStrokeWidth = 2;
-		if (generate_resouce)
-		{
-			m_gl_path_id = glGenPathsNV(1);
-			m_boxColor = ldp::Float3(1, 0, 1);
-			m_boxStrokeWidth = 2;
-		}
 	}
 
 	SvgPath::~SvgPath()
 	{
-		if (m_gl_path_id)
-			glDeletePathsNV(m_gl_path_id, 1);
 	}
 
 	void SvgPath::render()
 	{
-		assert(m_gl_path_id);
+		assert(m_gl_path_res->id);
 
 		bool ancestorSelected = false;
 		if (ancestorAfterRoot())
@@ -87,14 +85,14 @@ namespace svg
 		}// end if invalid
 
 		configNvParams();
-		glStencilStrokePathNV(m_gl_path_id, 1, ~0);
-		glCoverStrokePathNV(m_gl_path_id, GL_BOUNDING_BOX_NV);	
+		glStencilStrokePathNV(m_gl_path_res->id, 1, ~0);
+		glCoverStrokePathNV(m_gl_path_res->id, GL_BOUNDING_BOX_NV);	
 		renderSelection();
 	}
 
 	void SvgPath::renderId()
 	{
-		assert(m_gl_path_id);
+		assert(m_gl_path_res->id);
 		glColor4fv(color_from_index(m_id).ptr());
 
 		if (m_invalid)
@@ -104,33 +102,33 @@ namespace svg
 		}// end if invalid
 
 		configNvParams();
-		glStencilStrokePathNV(m_gl_path_id, 1, ~0);
-		glCoverStrokePathNV(m_gl_path_id, GL_BOUNDING_BOX_NV);
+		glStencilStrokePathNV(m_gl_path_res->id, 1, ~0);
+		glCoverStrokePathNV(m_gl_path_res->id, GL_BOUNDING_BOX_NV);
 	}
 
 	void SvgPath::cacheNvPaths()
 	{
-		glPathCommandsNV(m_gl_path_id,
+		glPathCommandsNV(m_gl_path_res->id,
 			GLsizei(m_cmds.size()), &m_cmds[0],
 			GLsizei(m_coords.size()), GL_FLOAT, &m_coords[0]);
 	}
 
 	void SvgPath::configNvParams()
 	{
-		glPathParameteriNV(m_gl_path_id, GL_PATH_JOIN_STYLE_NV, lineJoinConverter(this));
-		glPathParameteriNV(m_gl_path_id, GL_PATH_END_CAPS_NV, lineCapConverter(this));
-		glPathParameterfNV(m_gl_path_id, GL_PATH_STROKE_WIDTH_NV, m_pathStyle.stroke_width);
-		glPathParameterfNV(m_gl_path_id, GL_PATH_MITER_LIMIT_NV, m_pathStyle.miter_limit);
+		glPathParameteriNV(m_gl_path_res->id, GL_PATH_JOIN_STYLE_NV, lineJoinConverter(this));
+		glPathParameteriNV(m_gl_path_res->id, GL_PATH_END_CAPS_NV, lineCapConverter(this));
+		glPathParameterfNV(m_gl_path_res->id, GL_PATH_STROKE_WIDTH_NV, m_pathStyle.stroke_width);
+		glPathParameterfNV(m_gl_path_res->id, GL_PATH_MITER_LIMIT_NV, m_pathStyle.miter_limit);
 		if (m_pathStyle.dash_array.size())
 		{
-			glPathDashArrayNV(m_gl_path_id, GLsizei(m_pathStyle.dash_array.size()), &m_pathStyle.dash_array[0]);
-			glPathParameteriNV(m_gl_path_id, GL_PATH_DASH_CAPS_NV, lineCapConverter(this));
-			glPathParameterfNV(m_gl_path_id, GL_PATH_DASH_OFFSET_NV, m_pathStyle.dash_offset);
-			glPathParameteriNV(m_gl_path_id, GL_PATH_DASH_OFFSET_RESET_NV, m_pathStyle.dash_phase);
+			glPathDashArrayNV(m_gl_path_res->id, GLsizei(m_pathStyle.dash_array.size()), &m_pathStyle.dash_array[0]);
+			glPathParameteriNV(m_gl_path_res->id, GL_PATH_DASH_CAPS_NV, lineCapConverter(this));
+			glPathParameterfNV(m_gl_path_res->id, GL_PATH_DASH_OFFSET_NV, m_pathStyle.dash_offset);
+			glPathParameteriNV(m_gl_path_res->id, GL_PATH_DASH_OFFSET_RESET_NV, m_pathStyle.dash_phase);
 		}
 		else
 		{
-			glPathDashArrayNV(m_gl_path_id, 0, NULL);
+			glPathDashArrayNV(m_gl_path_res->id, 0, NULL);
 		}
 	}
 
@@ -252,25 +250,27 @@ namespace svg
 		return group;
 	}
 
+	void SvgPath::copyTo(SvgAbstractObject* obj)const
+	{
+		SvgAbstractObject::copyTo(obj);
+		if (obj->objectType() == SvgAbstractObject::Path)
+		{
+			auto newTptr = (SvgPath*)obj;
+			newTptr->m_gl_path_res = m_gl_path_res;
+			newTptr->m_cmds = m_cmds;
+			newTptr->m_coords = m_coords;
+			newTptr->m_pathStyle = m_pathStyle;
+			newTptr->m_segmentPos = m_segmentPos;
+			newTptr->m_gl_fill_rull = m_gl_fill_rull;
+		}
+	}
+
 	std::shared_ptr<SvgAbstractObject> SvgPath::clone()const
 	{
-		std::shared_ptr<SvgAbstractObject> newT(new SvgPath(false));
+		std::shared_ptr<SvgAbstractObject> newT(new SvgPath());
 		auto newTptr = (SvgPath*)newT.get();
 
-		newTptr->m_attribute = m_attribute;
-		newTptr->m_bbox = m_bbox;
-		newTptr->m_boxColor = m_boxColor;
-		newTptr->m_boxStrokeWidth = m_boxStrokeWidth;
-		newTptr->m_gl_path_id = m_gl_path_id;
-		newTptr->m_highlighted = m_highlighted;
-		newTptr->m_id = m_id;
-		newTptr->m_invalid = true;
-		newTptr->m_selected = m_selected;
-		newTptr->m_cmds = m_cmds;
-		newTptr->m_coords = m_coords;
-		newTptr->m_pathStyle = m_pathStyle;
-		newTptr->m_segmentPos = m_segmentPos;
-		newTptr->m_gl_fill_rull = m_gl_fill_rull;
+		copyTo(newTptr);
 
 		return newT;
 	}

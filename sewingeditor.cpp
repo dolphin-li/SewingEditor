@@ -35,6 +35,14 @@ void SewingEditor::initLeftDockActions()
 			ui.widget->getEventHandle(type)->toolTips());
 	}
 
+	// relate to main ui
+	for (size_t i = (size_t)AbstractEventHandle::ProcessorTypeGeneral;
+		i < (size_t)AbstractEventHandle::ProcessorTypeEnd; i++)
+	{
+		auto type = AbstractEventHandle::ProcessorType(i);
+		ui.widget->getEventHandle(type)->setMainUI(this);
+	}
+
 	// do connections
 	for (auto it : m_leftDockButtons.toStdMap())
 	{
@@ -70,10 +78,11 @@ void SewingEditor::on_actionLoad_svg_triggered()
 		if (name.isEmpty())
 			return;
 		ui.widget->loadSvg(name);
+		pushHistory("load svg");
 		float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
 		ui.squareWidget->setAspect(asp);
 		ui.squareWidget->resize(ui.squareWidget->size() - QSize(1, 1));
-		pushHistory("load svg");
+		ui.widget->updateGL();
 	}
 	catch (std::exception e)
 	{
@@ -242,7 +251,6 @@ void SewingEditor::on_actionUndo_triggered()
 	try
 	{
 		rollBackward();
-		ui.widget->updateGL();
 	}
 	catch (std::exception e)
 	{
@@ -255,7 +263,6 @@ void SewingEditor::on_actionRedo_triggered()
 	try
 	{
 		rollForward();
-		ui.widget->updateGL();
 	}
 	catch (std::exception e)
 	{
@@ -290,8 +297,8 @@ void SewingEditor::rollBackTo(int pos)
 		return;
 
 	m_rollPos = (m_rollHead + pos) % MAX_ROLLBACK_STEP;
-	ui.widget->setSvgManager(m_rollBackControls[m_rollPos].data);
-
+	ui.widget->setSvgManager(m_rollBackControls[m_rollPos].data->clone());
+	ui.widget->updateGL();
 	updateHistoryList();
 }
 
@@ -337,7 +344,7 @@ void SewingEditor::updateHistoryList()
 			ui.listHistory->item(i)->setTextColor(Qt::white);
 		else
 			ui.listHistory->item(i)->setTextColor(Qt::gray);
-		ui.listHistory->item(i)->setText(QString().sprintf("%d: ", i) 
+		ui.listHistory->item(i)->setText(QString().sprintf("%d: ", m_rollHead+i) 
 			+ m_rollBackControls[(m_rollHead+i)%MAX_ROLLBACK_STEP].name);
 		ui.listHistory->item(i)->setHidden(false);
 	}

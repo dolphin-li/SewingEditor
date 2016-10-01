@@ -1,4 +1,5 @@
 #include <QEvent>
+#include "SewingEditor.h"
 #include "SvgViewer.h"
 #include "svgpp\SvgManager.h"
 #include "svgpp\SvgAbstractObject.h"
@@ -11,6 +12,7 @@
 AbstractEventHandle::AbstractEventHandle(SvgViewer* v)
 {
 	m_viewer = v;
+	m_mainUI = nullptr;
 	m_lastHighlightShapeId = -1;
 	m_cursor = QCursor(Qt::CursorShape::ArrowCursor);
 	m_iconFile = "";
@@ -20,6 +22,11 @@ AbstractEventHandle::AbstractEventHandle(SvgViewer* v)
 AbstractEventHandle::~AbstractEventHandle()
 {
 
+}
+
+void AbstractEventHandle::setMainUI(MainUI* ui)
+{
+	m_mainUI = ui;
 }
 
 QString AbstractEventHandle::iconFile()const

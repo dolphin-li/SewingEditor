@@ -30,13 +30,13 @@ namespace svg
 		virtual void render();
 		virtual void renderId();
 		virtual std::shared_ptr<SvgAbstractObject> clone()const;
+		virtual void copyTo(SvgAbstractObject* obj)const;
 
 		virtual void updateBoundFromGeometry();
 		void updateText();
 	public:
 		std::string m_font;
 		std::string m_text;
-		GLuint m_gl_path_id;
 		float m_font_size;
 	private:
 		ldp::Float4 m_bbox_before_transform;

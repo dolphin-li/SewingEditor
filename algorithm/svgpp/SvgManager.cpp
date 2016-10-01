@@ -23,16 +23,14 @@ namespace svg
 	{
 		Path *p;
 
-		GLuint &path;
 		GLenum &fill_rule;
 
 		vector<GLubyte> cmds;
 		vector<GLfloat> coords;
 		vector<int> cmdPos;
 
-		ConvertPathProcessor(Path *p_, GLuint &path_, GLenum &fill_rule_)
+		ConvertPathProcessor(Path *p_, GLenum &fill_rule_)
 			: p(p_)
-			, path(path_)
 			, fill_rule(fill_rule_)
 			, cmds(p->cmd.size())
 			, coords(p->coord.size())
@@ -114,12 +112,6 @@ namespace svg
 			cmdPos.push_back(coords.size());
 		}
 		void endPath(PathPtr p) {
-			if (!path) {
-				path = glGenPathsNV(1);
-			}
-			//glPathCommandsNV(path,
-			//	GLsizei(cmds.size()), &cmds[0],
-			//	GLsizei(coords.size()), GL_FLOAT, &coords[0]);
 		}
 	};
 
@@ -135,8 +127,7 @@ namespace svg
 		{
 			SvgPath* path = new SvgPath();
 			path->m_pathStyle = shape->getPath()->style;
-			ConvertPathProcessor processor(shape->getPath().get(), path->m_gl_path_id, 
-				path->m_gl_fill_rull);
+			ConvertPathProcessor processor(shape->getPath().get(), path->m_gl_fill_rull);
 			shape->getPath()->processSegments(processor);
 			path->m_cmds.insert(path->m_cmds.end(), processor.cmds.begin(), processor.cmds.end());
 			path->m_segmentPos.insert(path->m_segmentPos.end(), processor.cmdPos.begin(), processor.cmdPos.end());
@@ -159,8 +150,6 @@ namespace svg
 			t->m_font = text->font_family;
 			t->m_text = text->text;
 			t->m_font_size = text->font_size;
-			if (!t->m_gl_path_id)
-				t->m_gl_path_id = glGenPathsNV(1);
 			t->updateText();
 			t->setParent(m_group);
 			m_group->m_children.push_back(std::shared_ptr<SvgText>(t));
@@ -207,7 +196,7 @@ namespace svg
 
 	SvgManager::SvgManager()
 	{
-
+		m_renderCam = nullptr;
 	}
 
 	SvgManager::~SvgManager()
@@ -219,7 +208,8 @@ namespace svg
 	{
 		std::shared_ptr<SvgManager> manager(new SvgManager());
 		manager->m_renderCam = m_renderCam;
-		manager->m_rootGroup = m_rootGroup->clone();
+		if (m_rootGroup.get())
+			manager->m_rootGroup = m_rootGroup->clone();
 		manager->updateIndex();
 		manager->updateBound();
 		return manager;
@@ -272,6 +262,8 @@ namespace svg
 
 	void SvgManager::updateIndex(SvgAbstractObject* obj, int& idx)
 	{
+		if (obj == nullptr)
+			return;
 		SvgAbstractObject* ogp = obj->ancestorAfterRoot();
 		if(ogp)
 			m_groups_for_selection.insert(ogp);
@@ -289,6 +281,8 @@ namespace svg
 
 	void SvgManager::updateBound()
 	{
+		if (m_rootGroup.get() == nullptr)
+			return;
 		m_rootGroup->updateBoundFromGeometry();
 	}
 
@@ -484,6 +478,8 @@ namespace svg
 
 	bool SvgManager::groupSelected()
 	{
+		if (m_rootGroup.get() == nullptr)
+			return true;
 		std::shared_ptr<SvgAbstractObject> commonParent;
 		int cnt = 0;
 		bool ret = groupSelected_findCommonParent(m_rootGroup, 
@@ -529,6 +525,8 @@ namespace svg
 
 	void SvgManager::ungroupSelected()
 	{
+		if (m_rootGroup.get() == nullptr)
+			return;
 		std::set<SvgGroup*> groups;
 		ungroupSelected_collect(m_rootGroup.get(), groups);
 
@@ -558,6 +556,8 @@ namespace svg
 
 	void SvgManager::removeSingleNodeAndEmptyNode()
 	{
+		if (m_rootGroup.get() == nullptr)
+			return;
 		removeSingleNodeAndEmptyNode(m_rootGroup);
 		updateIndex();
 		updateBound();
@@ -565,6 +565,8 @@ namespace svg
 
 	void SvgManager::removeSelected()
 	{
+		if (m_rootGroup.get() == nullptr)
+			return;
 		removeSelected(m_rootGroup.get());
 		updateIndex();
 		updateBound();
@@ -572,6 +574,8 @@ namespace svg
 
 	void SvgManager::removeSelected(SvgAbstractObject* obj)
 	{
+		if (obj == nullptr)
+			return;
 		if (obj->objectType() == obj->Group)
 		{
 			SvgGroup* g = (SvgGroup*)obj;
@@ -595,6 +599,8 @@ namespace svg
 		std::shared_ptr<SvgAbstractObject>& commonParent,
 		int& cnt)
 	{
+		if (obj.get() == nullptr)
+			return true;
 		if (obj->isSelected() && objParent.get() != nullptr)
 		{
 			if (commonParent.get() == nullptr)
@@ -623,6 +629,8 @@ namespace svg
 
 	void SvgManager::ungroupSelected_collect(SvgAbstractObject* obj, std::set<SvgGroup*>& groups)
 	{
+		if (obj == nullptr)
+			return;
 		if (obj->objectType() == obj->Group)
 		{
 			SvgGroup* g = (SvgGroup*)obj;
@@ -640,6 +648,8 @@ namespace svg
 
 	void SvgManager::removeSingleNodeAndEmptyNode(std::shared_ptr<SvgAbstractObject>& obj)
 	{
+		if (obj == nullptr)
+			return;
 		if (obj->objectType() != obj->Group)
 			return;
 		auto objGroup = (SvgGroup*)obj.get();
@@ -671,6 +681,8 @@ namespace svg
 
 	void SvgManager::splitSelectedPath()
 	{
+		if (m_rootGroup.get() == nullptr)
+			return;
 		splitPath(m_rootGroup);
 		updateIndex();
 		updateBound();
@@ -678,6 +690,8 @@ namespace svg
 
 	bool SvgManager::mergeSelectedPath()
 	{
+		if (m_rootGroup.get() == nullptr)
+			return true;
 		std::shared_ptr<SvgAbstractObject> commonParent;
 		int cnt = 0;
 		bool ret = groupSelected_findCommonParent(m_rootGroup,
@@ -741,6 +755,8 @@ namespace svg
 
 	void SvgManager::splitPath(std::shared_ptr<SvgAbstractObject>& obj)
 	{
+		if (obj.get() == nullptr)
+			return;
 		if (obj->objectType() == obj->Group)
 		{
 			SvgGroup* g = (SvgGroup*)obj.get();

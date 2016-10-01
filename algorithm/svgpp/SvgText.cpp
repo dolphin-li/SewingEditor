@@ -6,7 +6,6 @@ namespace svg
 {
 	SvgText::SvgText() : SvgAbstractObject()
 	{
-		m_gl_path_id = glGenPathsNV(1);
 		m_font_size = 1;
 		m_font = "Sans";
 		m_text = "No Text";
@@ -17,33 +16,8 @@ namespace svg
 		updateText();
 	}
 
-	SvgText::SvgText(bool generate_resource) : SvgAbstractObject()
-	{
-		m_gl_path_id = 0;
-		m_font_size = 1;
-		m_font = "Sans";
-		m_text = "No Text";
-		m_total_advance = 0.f;
-		m_boxColor = ldp::Float3(1, 0, 1);
-		m_boxStrokeWidth = 2;
-		m_font_face = nullptr;
-		if (generate_resource)
-		{
-			m_gl_path_id = glGenPathsNV(1);
-			m_font_size = 1;
-			m_font = "Sans";
-			m_text = "No Text";
-			m_total_advance = 0.f;
-			m_boxColor = ldp::Float3(1, 0, 1);
-			m_boxStrokeWidth = 2;
-			updateText();
-		}
-	}
-
 	SvgText::~SvgText()
 	{
-		if (m_gl_path_id)
-			glDeletePathsNV(m_gl_path_id, 1);
 	}
 
 	void SvgText::render()
@@ -212,29 +186,28 @@ namespace svg
 		return font;
 	}
 
+	void SvgText::copyTo(SvgAbstractObject* obj)const
+	{
+		SvgAbstractObject::copyTo(obj);
+		if (obj->objectType() == SvgAbstractObject::Text)
+		{
+			auto newTptr = (SvgText*)obj;
+			newTptr->m_bbox_before_transform = m_bbox_before_transform;
+			newTptr->m_font = m_font;
+			newTptr->m_font_face = m_font_face;
+			newTptr->m_font_size = m_font_size;
+			newTptr->m_hori_shifts = m_hori_shifts;
+			newTptr->m_text = m_text;
+			newTptr->m_total_advance = m_total_advance;
+		}
+	}
+
 	std::shared_ptr<SvgAbstractObject> SvgText::clone()const
 	{
 		// to save memory, we assume text are not edited, thus no new resources needed.
-		std::shared_ptr<SvgAbstractObject> newT(new SvgText(false));
+		std::shared_ptr<SvgAbstractObject> newT(new SvgText());
 		auto newTptr = (SvgText*)newT.get();
-
-		newTptr->m_attribute = m_attribute;
-		newTptr->m_bbox = m_bbox;
-		newTptr->m_bbox_before_transform = m_bbox_before_transform;
-		newTptr->m_boxColor = m_boxColor;
-		newTptr->m_boxStrokeWidth = m_boxStrokeWidth;
-		newTptr->m_font = m_font;
-		newTptr->m_font_face = m_font_face;
-		newTptr->m_font_size = m_font_size;
-		newTptr->m_gl_path_id = m_gl_path_id;
-		newTptr->m_highlighted = m_highlighted;
-		newTptr->m_hori_shifts = m_hori_shifts;
-		newTptr->m_id = m_id;
-		newTptr->m_invalid = true;
-		newTptr->m_selected = m_selected;
-		newTptr->m_text = m_text;
-		newTptr->m_total_advance = m_total_advance;
-
+		copyTo(newTptr);	
 		return newT;
 	}
 

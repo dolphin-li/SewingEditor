@@ -8,13 +8,13 @@ namespace svg
 	{
 	public:
 		SvgPath();
-		SvgPath(bool generate_resource);
 		~SvgPath();
 		ObjectType objectType()const { return ObjectType::Path; }
 
 		virtual void render();
 		virtual void renderId();
 		virtual std::shared_ptr<SvgAbstractObject> clone()const;
+		virtual void copyTo(SvgAbstractObject* obj)const;
 
 		virtual void updateBoundFromGeometry();
 
@@ -30,8 +30,15 @@ namespace svg
 		std::vector<GLubyte> m_cmds;
 		std::vector<int> m_segmentPos;
 		std::vector<GLfloat> m_coords;
-		GLuint m_gl_path_id;
 		GLenum m_gl_fill_rull;
 		PathStyle m_pathStyle;
+
+	public:
+		struct GLPathResource{
+			GLuint id;
+			GLPathResource();
+			~GLPathResource();
+		};
+		std::shared_ptr<GLPathResource> m_gl_path_res;
 	};
 }

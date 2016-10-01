@@ -27,6 +27,19 @@ namespace svg
 	{
 	}
 
+	void SvgAbstractObject::copyTo(SvgAbstractObject* obj)const
+	{
+		obj->m_id = m_id;
+		obj->m_parent = m_parent;
+		obj->m_selected = m_selected;
+		obj->m_highlighted = m_highlighted;
+		obj->m_invalid = true; // always require valid
+		obj->m_bbox = m_bbox;
+		obj->m_attribute = m_attribute;
+		obj->m_boxColor = m_boxColor;
+		obj->m_boxStrokeWidth = m_boxStrokeWidth;
+	}
+
 	SvgAbstractObject* SvgAbstractObject::create(ObjectType type)
 	{
 		switch (type)

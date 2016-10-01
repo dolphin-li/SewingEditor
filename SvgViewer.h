@@ -31,6 +31,7 @@ public:
 	AbstractEventHandle::ProcessorType getEventHandleType()const;
 	void setEventHandleType(AbstractEventHandle::ProcessorType type);
 	const AbstractEventHandle* getEventHandle(AbstractEventHandle::ProcessorType type)const;
+	 AbstractEventHandle* getEventHandle(AbstractEventHandle::ProcessorType type);
 
 	void beginDragBox(QPoint p);
 	void endDragBox();

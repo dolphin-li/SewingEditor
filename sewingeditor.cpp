@@ -8,6 +8,9 @@ SewingEditor::SewingEditor(QWidget *parent)
 
 	ui.squareWidget->setChildWidget(ui.widget);
 
+	new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(showFullScreen()));
+	new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(showNormal()));
+
 	initLeftDockActions();
 
 	resetRoll();

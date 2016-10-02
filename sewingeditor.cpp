@@ -270,6 +270,20 @@ void SewingEditor::on_actionRedo_triggered()
 	}
 }
 
+void SewingEditor::on_pbSelectConnected_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->selectPathConnected();
+		ui.widget->updateGL();
+		pushHistory("select path connected");
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
 /////////////////////////////////////////////////////////////////
 // roll back control
 void SewingEditor::resetRoll()

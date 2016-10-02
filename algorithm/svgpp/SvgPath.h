@@ -15,6 +15,11 @@ namespace svg
 		virtual void renderId();
 		virtual std::shared_ptr<SvgAbstractObject> clone()const;
 		virtual void copyTo(SvgAbstractObject* obj)const;
+		virtual ldp::Float2 getStartPoint()const;
+		virtual ldp::Float2 getEndPoint()const;
+
+		// the path is closed or open
+		bool isClosed()const;
 
 		virtual void updateBoundFromGeometry();
 
@@ -22,6 +27,10 @@ namespace svg
 		// if there is only one segment, we do not split and return an nullptr
 		// else we return grouped splittings
 		std::shared_ptr<SvgAbstractObject> splitToSegments()const;
+
+		// make the segments in paths ordered
+		// if some segments are connected, we simplify it by removing 'M' commond
+		void makeOrderedAndSimpify();
 	protected:
 		void cacheNvPaths();
 		void renderSelection();

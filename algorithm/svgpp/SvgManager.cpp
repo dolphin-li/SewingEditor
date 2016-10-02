@@ -803,4 +803,30 @@ namespace svg
 			}
 		}
 	}
+
+	void SvgManager::selectPathConnected()
+	{
+		if (m_rootGroup.get() == nullptr)
+			return;
+		
+		std::set<ldp::Float2> endPoints;
+		for (auto iter : m_idxMap)
+		{
+			if (iter.second->isSelected() && iter.second->objectType() == SvgAbstractObject::Path)
+			{
+				endPoints.insert(iter.second->getStartPoint());
+				endPoints.insert(iter.second->getEndPoint());
+			}
+		}
+		for (auto iter : m_idxMap)
+		{
+			if (iter.second->isSelected() && iter.second->objectType() == SvgAbstractObject::Path)
+			{
+				ldp::Float2 s = iter.second->getStartPoint();
+				ldp::Float2 e = iter.second->getEndPoint();
+				if (endPoints.find(s) != endPoints.end() || endPoints.find(e) != endPoints.end())
+					iter.second->setSelected(true);
+			}
+		}
+	}
 } // namespace svg

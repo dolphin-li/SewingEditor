@@ -44,6 +44,8 @@ namespace svg
 		void selectPathBySimilarSelectedWidth();
 		void selectPathByWidths(const std::set<float>& widths);
 
+		void selectPathConnected();
+
 		// given an index, find the largest group that contains this object.
 		void selectGroupByIndex(int id, SelectOp op = SelectThis);
 		void selectGroupByIndex(const std::set<int>& ids, SelectOp op = SelectThis);

@@ -146,10 +146,12 @@ namespace svg
 			glPushAttrib(GL_ALL_ATTRIB_BITS);
 			glDisable(GL_STENCIL_TEST);
 			glBegin(GL_LINES);
-			for (int i = 0; i < (int)m_segmentPos.size() - 1; i++)
+			for (int i = 0; i < (int)m_segmentPos.size(); i++)
 			{
 				int bg = m_segmentPos[i];
-				int ed = m_segmentPos[i + 1];
+				int ed = m_coords.size();
+				if (i < (int)m_segmentPos.size() - 1)
+					ed = m_segmentPos[i + 1];
 				for (int j = bg; j < ed - 1; j += 2)
 				{
 					ldp::Float2 c(m_coords[j], m_coords[j + 1]);
@@ -169,10 +171,12 @@ namespace svg
 			glEnd();
 			glBegin(GL_QUADS);
 			glColor3f(1, 1, 1);
-			for (int i = 0; i < (int)m_segmentPos.size() - 1; i++)
+			for (int i = 0; i < (int)m_segmentPos.size(); i++)
 			{
 				int bg = m_segmentPos[i];
-				int ed = m_segmentPos[i + 1];
+				int ed = m_coords.size();
+				if (i < (int)m_segmentPos.size() - 1)
+					ed = m_segmentPos[i + 1];
 				for (int j = bg; j < ed - 1; j += 2)
 				{
 					ldp::Float2 c(m_coords[j], m_coords[j + 1]);
@@ -194,7 +198,7 @@ namespace svg
 			return group;
 
 		// we DONOT process closed path, such as a circle
-		if (m_cmds.back() == GL_CLOSE_PATH_NV)
+		if (isClosed())
 			return group;
 
 		// find the position of 'M'
@@ -273,6 +277,37 @@ namespace svg
 		copyTo(newTptr);
 
 		return newT;
+	}
+
+	bool SvgPath::isClosed()const
+	{
+		if (m_cmds.size() == 0)
+			return false;
+		return m_cmds.back() == GL_CLOSE_PATH_NV;
+	}
+
+	ldp::Float2 SvgPath::getStartPoint()const
+	{
+		if (m_cmds.size() == 0)
+			return std::numeric_limits<float>::quiet_NaN();
+		assert(m_cmds[0] == GL_MOVE_TO_NV);
+		return ldp::Float2(m_coords[0], m_coords[1]);
+	}
+
+	ldp::Float2 SvgPath::getEndPoint()const
+	{
+		if (m_cmds.size() == 0)
+			return std::numeric_limits<float>::quiet_NaN();
+		if (isClosed())
+			return getStartPoint();
+		return ldp::Float2(m_coords[m_coords.size() - 2], m_coords[m_coords.size() - 1]);
+	}
+
+	void SvgPath::makeOrderedAndSimpify()
+	{
+		// closed path must be itself ordered
+		if (isClosed())
+			return;
 	}
 
 #pragma region --bounds helper

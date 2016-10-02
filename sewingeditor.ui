@@ -655,27 +655,27 @@
        <colorrole role="Button">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
-          <red>150</red>
-          <green>150</green>
-          <blue>150</blue>
+          <red>73</red>
+          <green>73</green>
+          <blue>73</blue>
          </color>
         </brush>
        </colorrole>
        <colorrole role="Base">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
-          <red>150</red>
-          <green>150</green>
-          <blue>150</blue>
+          <red>73</red>
+          <green>73</green>
+          <blue>73</blue>
          </color>
         </brush>
        </colorrole>
        <colorrole role="Window">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
-          <red>150</red>
-          <green>150</green>
-          <blue>150</blue>
+          <red>73</red>
+          <green>73</green>
+          <blue>73</blue>
          </color>
         </brush>
        </colorrole>
@@ -684,27 +684,27 @@
        <colorrole role="Button">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
-          <red>150</red>
-          <green>150</green>
-          <blue>150</blue>
+          <red>73</red>
+          <green>73</green>
+          <blue>73</blue>
          </color>
         </brush>
        </colorrole>
        <colorrole role="Base">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
-          <red>150</red>
-          <green>150</green>
-          <blue>150</blue>
+          <red>73</red>
+          <green>73</green>
+          <blue>73</blue>
          </color>
         </brush>
        </colorrole>
        <colorrole role="Window">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
-          <red>150</red>
-          <green>150</green>
-          <blue>150</blue>
+          <red>73</red>
+          <green>73</green>
+          <blue>73</blue>
          </color>
         </brush>
        </colorrole>
@@ -713,27 +713,27 @@
        <colorrole role="Button">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
-          <red>150</red>
-          <green>150</green>
-          <blue>150</blue>
+          <red>73</red>
+          <green>73</green>
+          <blue>73</blue>
          </color>
         </brush>
        </colorrole>
        <colorrole role="Base">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
-          <red>150</red>
-          <green>150</green>
-          <blue>150</blue>
+          <red>73</red>
+          <green>73</green>
+          <blue>73</blue>
          </color>
         </brush>
        </colorrole>
        <colorrole role="Window">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
-          <red>150</red>
-          <green>150</green>
-          <blue>150</blue>
+          <red>73</red>
+          <green>73</green>
+          <blue>73</blue>
          </color>
         </brush>
        </colorrole>
@@ -744,7 +744,7 @@
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(150,150, 150);</string>
+     <string notr="true"/>
     </property>
     <property name="title">
      <string>file</string>
@@ -757,7 +757,7 @@
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(150, 150, 150);</string>
+     <string notr="true"/>
     </property>
     <property name="title">
      <string>selection</string>
@@ -770,7 +770,7 @@
    </widget>
    <widget class="QMenu" name="menuGroup">
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(150, 150, 150);</string>
+     <string notr="true"/>
     </property>
     <property name="title">
      <string>group</string>
@@ -781,7 +781,7 @@
    </widget>
    <widget class="QMenu" name="menuPath">
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(150, 150, 150);</string>
+     <string notr="true"/>
     </property>
     <property name="title">
      <string>path</string>
@@ -791,7 +791,7 @@
    </widget>
    <widget class="QMenu" name="menuOp">
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(150, 150, 150);</string>
+     <string notr="true"/>
     </property>
     <property name="title">
      <string>op</string>
@@ -875,7 +875,7 @@
      <item row="0" column="0">
       <widget class="QListWidget" name="listHistory">
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(73, 73, 73);</string>
+        <string notr="true"/>
        </property>
       </widget>
      </item>
@@ -890,6 +890,19 @@
        <property name="title">
         <string>param</string>
        </property>
+       <widget class="QPushButton" name="pbSelectConnected">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>30</y>
+          <width>91</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>select connected</string>
+        </property>
+       </widget>
       </widget>
      </item>
     </layout>
@@ -1032,6 +1045,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+Z</string>
+   </property>
+  </action>
+  <action name="actionSelect_connected">
+   <property name="text">
+    <string>select connected</string>
    </property>
   </action>
  </widget>

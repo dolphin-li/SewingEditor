@@ -21,6 +21,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
@@ -46,6 +47,7 @@ public:
     QAction *actionSelect_similar_width;
     QAction *actionUndo;
     QAction *actionRedo;
+    QAction *actionSelect_connected;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     SquareWidget *squareWidget;
@@ -63,6 +65,7 @@ public:
     QGridLayout *gridLayout_2;
     QListWidget *listHistory;
     QGroupBox *gbParam;
+    QPushButton *pbSelectConnected;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -170,6 +173,8 @@ public:
         actionUndo->setObjectName(QStringLiteral("actionUndo"));
         actionRedo = new QAction(SewingEditorClass);
         actionRedo->setObjectName(QStringLiteral("actionRedo"));
+        actionSelect_connected = new QAction(SewingEditorClass);
+        actionSelect_connected->setObjectName(QStringLiteral("actionSelect_connected"));
         centralWidget = new QWidget(SewingEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -210,33 +215,31 @@ public:
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         QPalette palette2;
-        QBrush brush8(QColor(150, 150, 150, 255));
-        brush8.setStyle(Qt::SolidPattern);
-        palette2.setBrush(QPalette::Active, QPalette::Button, brush8);
-        palette2.setBrush(QPalette::Active, QPalette::Base, brush8);
-        palette2.setBrush(QPalette::Active, QPalette::Window, brush8);
-        palette2.setBrush(QPalette::Inactive, QPalette::Button, brush8);
-        palette2.setBrush(QPalette::Inactive, QPalette::Base, brush8);
-        palette2.setBrush(QPalette::Inactive, QPalette::Window, brush8);
-        palette2.setBrush(QPalette::Disabled, QPalette::Button, brush8);
-        palette2.setBrush(QPalette::Disabled, QPalette::Base, brush8);
-        palette2.setBrush(QPalette::Disabled, QPalette::Window, brush8);
+        palette2.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette2.setBrush(QPalette::Active, QPalette::Base, brush1);
+        palette2.setBrush(QPalette::Active, QPalette::Window, brush1);
+        palette2.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette2.setBrush(QPalette::Inactive, QPalette::Base, brush1);
+        palette2.setBrush(QPalette::Inactive, QPalette::Window, brush1);
+        palette2.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        palette2.setBrush(QPalette::Disabled, QPalette::Base, brush1);
+        palette2.setBrush(QPalette::Disabled, QPalette::Window, brush1);
         menuFile->setPalette(palette2);
         menuFile->setAutoFillBackground(false);
-        menuFile->setStyleSheet(QStringLiteral("background-color: rgb(150,150, 150);"));
+        menuFile->setStyleSheet(QStringLiteral(""));
         menuSelection = new QMenu(menuBar);
         menuSelection->setObjectName(QStringLiteral("menuSelection"));
         menuSelection->setAutoFillBackground(false);
-        menuSelection->setStyleSheet(QStringLiteral("background-color: rgb(150, 150, 150);"));
+        menuSelection->setStyleSheet(QStringLiteral(""));
         menuGroup = new QMenu(menuBar);
         menuGroup->setObjectName(QStringLiteral("menuGroup"));
-        menuGroup->setStyleSheet(QStringLiteral("background-color: rgb(150, 150, 150);"));
+        menuGroup->setStyleSheet(QStringLiteral(""));
         menuPath = new QMenu(menuBar);
         menuPath->setObjectName(QStringLiteral("menuPath"));
-        menuPath->setStyleSheet(QStringLiteral("background-color: rgb(150, 150, 150);"));
+        menuPath->setStyleSheet(QStringLiteral(""));
         menuOp = new QMenu(menuBar);
         menuOp->setObjectName(QStringLiteral("menuOp"));
-        menuOp->setStyleSheet(QStringLiteral("background-color: rgb(150, 150, 150);"));
+        menuOp->setStyleSheet(QStringLiteral(""));
         SewingEditorClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(SewingEditorClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -263,13 +266,16 @@ public:
         gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
         listHistory = new QListWidget(dockWidgetRightContents);
         listHistory->setObjectName(QStringLiteral("listHistory"));
-        listHistory->setStyleSheet(QStringLiteral("background-color: rgb(73, 73, 73);"));
+        listHistory->setStyleSheet(QStringLiteral(""));
 
         gridLayout_2->addWidget(listHistory, 0, 0, 1, 1);
 
         gbParam = new QGroupBox(dockWidgetRightContents);
         gbParam->setObjectName(QStringLiteral("gbParam"));
         gbParam->setMinimumSize(QSize(0, 300));
+        pbSelectConnected = new QPushButton(gbParam);
+        pbSelectConnected->setObjectName(QStringLiteral("pbSelectConnected"));
+        pbSelectConnected->setGeometry(QRect(20, 30, 91, 23));
 
         gridLayout_2->addWidget(gbParam, 1, 0, 1, 1);
 
@@ -342,12 +348,14 @@ public:
         actionUndo->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+Z", 0));
         actionRedo->setText(QApplication::translate("SewingEditorClass", "redo", 0));
         actionRedo->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+Shift+Z", 0));
+        actionSelect_connected->setText(QApplication::translate("SewingEditorClass", "select connected", 0));
         menuFile->setTitle(QApplication::translate("SewingEditorClass", "file", 0));
         menuSelection->setTitle(QApplication::translate("SewingEditorClass", "selection", 0));
         menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));
         menuPath->setTitle(QApplication::translate("SewingEditorClass", "path", 0));
         menuOp->setTitle(QApplication::translate("SewingEditorClass", "op", 0));
         gbParam->setTitle(QApplication::translate("SewingEditorClass", "param", 0));
+        pbSelectConnected->setText(QApplication::translate("SewingEditorClass", "select connected", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

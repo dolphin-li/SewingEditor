@@ -63,6 +63,8 @@ namespace svg
 		ldp::Float4 intersectBound(ldp::Float4 b)const;
 		ldp::Float2 getOrigion()const{ return ldp::Float2(m_bbox[0], m_bbox[1]); }
 		ldp::Float2 getSize()const { return ldp::Float2(width(), height()); }
+		virtual ldp::Float2 getStartPoint()const{ return std::numeric_limits<float>::quiet_NaN(); }
+		virtual ldp::Float2 getEndPoint()const{ return std::numeric_limits<float>::quiet_NaN(); }
 		float width()const{ return m_bbox[1] - m_bbox[0]; }
 		float height()const{ return m_bbox[3] - m_bbox[2]; }
 	protected:

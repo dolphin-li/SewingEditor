@@ -31,6 +31,7 @@ namespace svg
 		std::shared_ptr<SvgAbstractObject> splitToDifferentShapes()const;
 
 		// extract path from cmdsBegin(include) to cmdsEnd(exclude)
+		// to_single_segment will convert 'M-L-L-L' to 'M-L M-L M-L'
 		std::shared_ptr<SvgAbstractObject> subPath(int cmdsBegin, int cmdsEnd,
 			bool to_single_segment = false)const;
 		std::shared_ptr<SvgAbstractObject> subPath(const std::vector<int>& cmdsBegins,
@@ -41,10 +42,12 @@ namespace svg
 		void configNvParams();
 	public:
 		std::vector<GLubyte> m_cmds;
-		std::vector<int> m_segmentPos;
 		std::vector<GLfloat> m_coords;
 		GLenum m_gl_fill_rull;
 		PathStyle m_pathStyle;
+
+		// return number of coordinates associate with a cmd
+		static int numCoords(GLuint cmd);
 
 	public:
 		struct GLPathResource{

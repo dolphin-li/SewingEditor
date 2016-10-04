@@ -155,13 +155,11 @@ namespace svg
 			glPushAttrib(GL_ALL_ATTRIB_BITS);
 			glDisable(GL_STENCIL_TEST);
 			glBegin(GL_LINES);
-			for (int i = 0; i < (int)m_segmentPos.size(); i++)
+			int posBegin = 0;
+			for (size_t i = 0; i < m_cmds.size(); i++)
 			{
-				int bg = m_segmentPos[i];
-				int ed = m_coords.size();
-				if (i < (int)m_segmentPos.size() - 1)
-					ed = m_segmentPos[i + 1];
-				for (int j = bg; j < ed - 1; j += 2)
+				int posEnd = posBegin + numCoords(m_cmds[i]);
+				for (int j = posBegin; j < posEnd - 1; j += 2)
 				{
 					ldp::Float2 c(m_coords[j], m_coords[j + 1]);
 					glVertex2f(c[0] - sz, c[1] - sz);
@@ -176,17 +174,16 @@ namespace svg
 					glVertex2f(c[0] + sz, c[1] + sz);
 					glVertex2f(c[0] - sz, c[1] + sz);
 				}
+				posBegin = posEnd;
 			}
 			glEnd();
 			glBegin(GL_QUADS);
 			glColor3f(1, 1, 1);
-			for (int i = 0; i < (int)m_segmentPos.size(); i++)
+			posBegin = 0;
+			for (size_t i = 0; i < m_cmds.size(); i++)
 			{
-				int bg = m_segmentPos[i];
-				int ed = m_coords.size();
-				if (i < (int)m_segmentPos.size() - 1)
-					ed = m_segmentPos[i + 1];
-				for (int j = bg; j < ed - 1; j += 2)
+				int posEnd = posBegin + numCoords(m_cmds[i]);
+				for (int j = posBegin; j < posEnd - 1; j += 2)
 				{
 					ldp::Float2 c(m_coords[j], m_coords[j + 1]);
 					glVertex2f(c[0] - sz, c[1] - sz);
@@ -194,6 +191,7 @@ namespace svg
 					glVertex2f(c[0] + sz, c[1] + sz);
 					glVertex2f(c[0] - sz, c[1] + sz);
 				}
+				posBegin = posEnd;
 			}
 			glEnd();
 			glPopAttrib();
@@ -318,32 +316,33 @@ namespace svg
 		subPath->m_gl_fill_rull = m_gl_fill_rull;
 		subPath->m_pathStyle = m_pathStyle;
 
-		// cmds
-		for (size_t i = 0; i < cmdsBegins.size(); i++)
+		std::vector<int> coordPoses(m_cmds.size() + 1, 0);
+		for (size_t i = 0; i < m_cmds.size(); i++)
+			coordPoses[i + 1] = coordPoses[i] + numCoords(m_cmds[i]);
+		assert(coordPoses.back() == m_coords.size());
+
+		for (size_t i_pos = 0; i_pos < cmdsBegins.size(); i_pos++)
 		{
-			int posOfM_Begin = cmdsBegins[i];
-			int posOfM_End = cmdsEnds[i];
+			int posOfM_Begin = cmdsBegins[i_pos];
+			int posOfM_End = cmdsEnds[i_pos];
 
-			// cmds
-			subPath->m_cmds.insert(subPath->m_cmds.end(),
-				m_cmds.begin() + posOfM_Begin, m_cmds.begin() + posOfM_End);
+			// if not convert to single-segments
+			if (!to_single_segment)
+			{
+				// cmds
+				subPath->m_cmds.insert(subPath->m_cmds.end(),
+					m_cmds.begin() + posOfM_Begin, m_cmds.begin() + posOfM_End);
 
-			// pos
-			size_t subMpos_Begin = subPath->m_segmentPos.size();
-			subPath->m_segmentPos.insert(subPath->m_segmentPos.end(),
-				m_segmentPos.begin() + posOfM_Begin, m_segmentPos.begin() + posOfM_End);
-			for (size_t sub_i = subMpos_Begin; sub_i < subPath->m_segmentPos.size(); sub_i++)
-				subPath->m_segmentPos[sub_i] = subPath->m_segmentPos[sub_i] 
-				- m_segmentPos[posOfM_Begin] + subPath->m_coords.size();
-
-			// coords
-			int cb = m_segmentPos[posOfM_Begin];
-			int ce = m_coords.size();
-			if (posOfM_End < m_segmentPos.size())
-				ce = m_segmentPos[posOfM_End];
-			subPath->m_coords.insert(subPath->m_coords.end(),
-				m_coords.begin() + cb, m_coords.begin() + ce);
-		}
+				// coords
+				int cb = coordPoses[posOfM_Begin];
+				int ce = coordPoses[posOfM_End];
+				subPath->m_coords.insert(subPath->m_coords.end(),
+					m_coords.begin() + cb, m_coords.begin() + ce);
+			}//
+			else
+			{
+			}// else convert to single-segments
+		}// i_pos
 
 		// bounds
 		subPath->updateBoundFromGeometry();
@@ -361,7 +360,6 @@ namespace svg
 			newTptr->m_cmds = m_cmds;
 			newTptr->m_coords = m_coords;
 			newTptr->m_pathStyle = m_pathStyle;
-			newTptr->m_segmentPos = m_segmentPos;
 			newTptr->m_gl_fill_rull = m_gl_fill_rull;
 			newTptr->m_pathShape = m_pathShape;
 		}
@@ -929,12 +927,9 @@ namespace svg
 		ldp::Float2 last_p;
 		ldp::Float2 p[4];
 		EndPointArc arc;
-		for (int i_pos = 0; i_pos < m_segmentPos.size(); i_pos++)
+		int posBegin = 0;
+		for (int i_pos = 0; i_pos < m_cmds.size(); i_pos++)
 		{
-			int posBegin = m_segmentPos[i_pos];
-			int posEnd = m_coords.size();
-			if(i_pos + 1 < m_segmentPos.size())
-				posEnd = m_segmentPos[i_pos + 1];
 			switch (m_cmds[i_pos])
 			{
 			case GL_MOVE_TO_NV:
@@ -1004,6 +999,7 @@ namespace svg
 			default:
 				break;
 			}
+			posBegin += numCoords(m_cmds[i_pos]);
 		}
 
 		m_bbox = processor.bbox;
@@ -1011,5 +1007,26 @@ namespace svg
 		m_bbox[1] += m_pathStyle.stroke_width;
 		m_bbox[2] -= m_pathStyle.stroke_width;
 		m_bbox[3] += m_pathStyle.stroke_width;
+	}
+
+	static std::vector<int> createCoordCmdMap()
+	{
+		std::vector<int> a;
+		a.resize(100, 0);
+		a[GL_MOVE_TO_NV] = 2;
+		a[GL_LINE_TO_NV] = 2;
+		a[GL_QUADRATIC_CURVE_TO_NV] = 4;
+		a[GL_CUBIC_CURVE_TO_NV] = 6;
+		a[GL_LARGE_CCW_ARC_TO_NV] = 5;
+		a[GL_LARGE_CW_ARC_TO_NV] = 5;
+		a[GL_SMALL_CCW_ARC_TO_NV] = 5;
+		a[GL_SMALL_CW_ARC_TO_NV] = 5;
+		return a;
+	}
+
+	int SvgPath::numCoords(GLuint cmd)
+	{
+		static std::vector<int> ary = createCoordCmdMap();
+		return ary[cmd];
 	}
 }

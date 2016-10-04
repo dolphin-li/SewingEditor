@@ -130,7 +130,6 @@ namespace svg
 			ConvertPathProcessor processor(shape->getPath().get(), path->m_gl_fill_rull);
 			shape->getPath()->processSegments(processor);
 			path->m_cmds.insert(path->m_cmds.end(), processor.cmds.begin(), processor.cmds.end());
-			path->m_segmentPos.insert(path->m_segmentPos.end(), processor.cmdPos.begin(), processor.cmdPos.end());
 			path->m_coords.insert(path->m_coords.end(), processor.coords.begin(), processor.coords.end());
 			Cg::float4 bd = shape->getPath()->getBounds();
 			path->setBound(ldp::Float4(bd.x, bd.z, bd.y, bd.w));
@@ -725,13 +724,6 @@ namespace svg
 					// cmds
 					pathPtr->m_cmds.insert(pathPtr->m_cmds.end(), 
 						curPtr->m_cmds.begin(), curPtr->m_cmds.end());
-
-					// pos
-					size_t bg = pathPtr->m_segmentPos.size();
-					pathPtr->m_segmentPos.insert(pathPtr->m_segmentPos.end(),
-						curPtr->m_segmentPos.begin(), curPtr->m_segmentPos.end());
-					for (size_t i = bg; i < pathPtr->m_segmentPos.size(); i++)
-						pathPtr->m_segmentPos[i] += pathPtr->m_coords.size();
 
 					// coords
 					pathPtr->m_coords.insert(pathPtr->m_coords.end(),

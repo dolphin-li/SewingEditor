@@ -2,10 +2,12 @@
 #include "SvgPath.h"
 #include "SvgAttribute.h"
 #include "SvgGroup.h"
+#include "kdtree\PointTree.h"
 namespace svg
 {
 #undef min
 #undef max
+
 	static GLenum lineJoinConverter(const SvgPath *path)
 	{
 		switch (path->m_pathStyle.line_join) {
@@ -58,15 +60,18 @@ namespace svg
 		m_gl_path_res.reset(new GLPathResource());
 		m_boxColor = ldp::Float3(1, 0, 1);
 		m_boxStrokeWidth = 2;
-		m_pathShape = Unknown;
+		m_pathShape = ShapeUnknown;
 	}
 
 	SvgPath::~SvgPath()
 	{
 	}
 
-	void SvgPath::render()
+	void SvgPath::render(PathUnitShapes shapeToRender)
 	{
+		if ((m_pathShape & shapeToRender) == 0)
+			return;
+
 		assert(m_gl_path_res->id);
 
 		bool ancestorSelected = false;
@@ -91,8 +96,11 @@ namespace svg
 		renderSelection();
 	}
 
-	void SvgPath::renderId()
+	void SvgPath::renderId(PathUnitShapes shapeToRender)
 	{
+		if ((m_pathShape & shapeToRender) == 0)
+			return;
+
 		assert(m_gl_path_res->id);
 		glColor4fv(color_from_index(m_id).ptr());
 
@@ -244,7 +252,8 @@ namespace svg
 		group.reset(new SvgGroup);
 		SvgGroup* groupPtr = (SvgGroup*)group.get();
 
-		// TO DO
+		// 1. extract cubics and mixed paths, these are relatively more simple. ---------------------------
+		std::vector<int> poseOfMOfSegmentsBegin, poseOfMOfSegmentsEnd;
 		for (int i_posM = 0; i_posM < (int)posOfM.size() - 1; i_posM++)
 		{
 			int posOfM_Begin = posOfM[i_posM];
@@ -257,11 +266,56 @@ namespace svg
 				nLines += (m_cmds[c] == GL_LINE_TO_NV);
 			}
 
+			// if all cubics, just return a single shape
+			// HACK-assumption: in burdastyle data, only circles are consisted by full of cubics.
 			if (nCubics == posOfM_End - posOfM_Begin - 1)
 			{
-
+				auto child = subPath(posOfM_Begin, posOfM_End);
+				child->setParent(groupPtr);
+				ldp::Float2 bg(m_coords[m_segmentPos[posOfM_Begin]], m_coords[m_segmentPos[posOfM_Begin + 1]]);
+				ldp::Float2 ed(m_coords[m_segmentPos[posOfM_End - 2]], m_coords[m_segmentPos[posOfM_End - 1]]);
+				((SvgPath*)child.get())->m_pathShape = ShapeCircle;
+				groupPtr->m_children.push_back(child);
 			}
-		}
+
+			// not full of lines, a mixed shape, we assert it as unknown
+			if (nLines < posOfM_End - posOfM_Begin - 1)
+			{
+				auto child = subPath(posOfM_Begin, posOfM_End);
+				child->setParent(groupPtr);
+				((SvgPath*)child.get())->m_pathShape = ShapeUnknown;
+				groupPtr->m_children.push_back(child);
+			}
+			// full of lines, we need to estimate its shape further
+			else
+			{
+				poseOfMOfSegmentsBegin.push_back(posOfM_Begin);
+				poseOfMOfSegmentsEnd.push_back(posOfM_End);
+			}
+		} // for i_posM
+
+		// 2. decide the shape of all segments... a terrible work...---------------------------
+		typedef ldp::kdtree::PointTree<float, 2> Tree;
+		typedef Tree::Point Point;
+		std::vector<Point> points;
+		Tree tree;
+		points.reserve(m_coords.size());
+		for (size_t i_M = 0; i_M < poseOfMOfSegmentsBegin.size(); i_M++)
+		{
+			int bg = poseOfMOfSegmentsBegin[i_M], ed = poseOfMOfSegmentsEnd[i_M];
+			int coords_bg = m_segmentPos[bg], coords_ed = m_coords.size();
+			if (ed < m_segmentPos.size())
+				coords_ed = m_segmentPos[ed];
+			assert((coords_ed - coords_bg) % 2 == 0);
+			for (int c = coords_bg; c < coords_ed; c += 2)
+			{
+				Point p;
+				p.idx = i_M;
+				p.p = ldp::Float2(m_coords[c], m_coords[c + 1]);
+				points.push_back(p);
+			}
+		} // i_M
+		tree.build(points);
 
 		return group;
 	}

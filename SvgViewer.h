@@ -25,6 +25,8 @@ public:
 	void resetCamera();
 	svg::SvgManager* getSvgManager();
 	void setSvgManager(std::shared_ptr<svg::SvgManager> manager);
+	void setSvgShapeToRender(int shapes){ m_svgShapeToRender = shapes; }
+	int getSvgShapeToRender()const{ return m_svgShapeToRender; }
 	Qt::MouseButtons buttons()const{ return m_buttons; }
 	QPoint lastMousePos()const{ return m_lastPos; }
 	const QImage& fboImage()const{ return m_fboImage; }
@@ -54,6 +56,7 @@ protected:
 	QImage m_fboImage;
 
 	std::shared_ptr<svg::SvgManager> m_svgManager;
+	int m_svgShapeToRender;
 
 	bool m_isDragBox;
 	QPoint m_dragBoxBegin;

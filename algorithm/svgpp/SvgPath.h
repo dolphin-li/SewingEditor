@@ -7,24 +7,12 @@ namespace svg
 	class SvgPath : public SvgAbstractObject
 	{
 	public:
-		// NOTE: this are paths specific for burdastyle generated garments.
-		enum PathUnitShapes
-		{
-			Unknown = 0x0,
-			Solid = 0x01, // solid lines
-			Dash = 0x02, // '-----'
-			LongShort = 0x04, // '_-_-_-'
-			Cross = 0x08, // '-x-x-x'
-			Quad = 0x10, // '-q-q-q', where 'q' means a quad
-			Circle = 0x20, // 'o'
-		};
-	public:
 		SvgPath();
 		~SvgPath();
 		ObjectType objectType()const { return ObjectType::Path; }
 
-		virtual void render();
-		virtual void renderId();
+		virtual void render(PathUnitShapes shapeToRender = ShapeAll);
+		virtual void renderId(PathUnitShapes shapeToRender = ShapeAll);
 		virtual std::shared_ptr<SvgAbstractObject> clone()const;
 		virtual void copyTo(SvgAbstractObject* obj)const;
 		virtual ldp::Float2 getStartPoint()const;
@@ -56,7 +44,6 @@ namespace svg
 		std::vector<GLfloat> m_coords;
 		GLenum m_gl_fill_rull;
 		PathStyle m_pathStyle;
-		PathUnitShapes m_pathShape;
 
 	public:
 		struct GLPathResource{

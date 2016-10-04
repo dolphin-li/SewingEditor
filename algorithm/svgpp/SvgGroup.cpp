@@ -15,19 +15,19 @@ namespace svg
 	{
 	}
 
-	void SvgGroup::render()
+	void SvgGroup::render(PathUnitShapes shapeToRender)
 	{
 		if (ancestorAfterRoot() == this && isSelected())
 			renderBounds(false);
 
 		for (size_t i = 0; i < m_children.size(); i++)
-			m_children[i]->render();
+			m_children[i]->render(shapeToRender);
 	}
 
-	void SvgGroup::renderId()
+	void SvgGroup::renderId(PathUnitShapes shapeToRender)
 	{
 		for (size_t i = 0; i < m_children.size(); i++)
-			m_children[i]->renderId();
+			m_children[i]->renderId(shapeToRender);
 		if (ancestorAfterRoot() == this && isSelected())
 			renderBounds(true);
 	}

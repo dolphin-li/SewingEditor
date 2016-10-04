@@ -31,6 +31,7 @@ public:
 	void on_pbSelectConnected_clicked();
 	void on_pbSelectSimilarShape_clicked();
 	void on_pbSelectClosed_clicked();
+	void on_pbSplitByShape_clicked();
 	void leftDocButtonsClicked(int i);
 public:
 	void initLeftDockActions();
@@ -41,7 +42,16 @@ private:
 protected:
 	void addLeftDockWidgetButton(AbstractEventHandle::ProcessorType type, QString iconImage, QString toolTip="");
 
-	//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+	// layer control
+	QMap<QString, int> m_layerMap;
+public:
+	void initLayerList();
+	void updateLayerList();
+	public slots:
+	void on_listLayers_itemSelectionChanged();
+protected:
+//////////////////////////////////////////////////////////////////////////
 	// roll back control
 	struct RollBackControl{
 		QString name;

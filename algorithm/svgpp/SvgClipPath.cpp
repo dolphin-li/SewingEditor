@@ -10,12 +10,12 @@ namespace svg
 	{
 	}
 
-	void SvgClipPath::render()
+	void SvgClipPath::render(PathUnitShapes shape)
 	{
 
 	}
 
-	void SvgClipPath::renderId()
+	void SvgClipPath::renderId(PathUnitShapes shape)
 	{
 
 	}

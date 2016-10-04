@@ -10,8 +10,8 @@ namespace svg
 		~SvgClipPath();
 		ObjectType objectType()const { return ObjectType::ClipPath; }
 
-		virtual void render();
-		virtual void renderId();
+		virtual void render(PathUnitShapes shape = ShapeAll);
+		virtual void renderId(PathUnitShapes shape = ShapeAll);
 		virtual std::shared_ptr<SvgAbstractObject> clone()const;
 		virtual void copyTo(SvgAbstractObject* obj)const{}
 	private:

@@ -64,11 +64,12 @@ public:
     QWidget *dockWidgetRightContents;
     QGridLayout *gridLayout_2;
     QListWidget *listHistory;
-    QGroupBox *gbLayers;
+    QListWidget *listLayers;
     QGroupBox *gbParam;
     QPushButton *pbSelectConnected;
     QPushButton *pbSelectSimilarShape;
     QPushButton *pbSelectClosed;
+    QPushButton *pbSplitByShape;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -273,11 +274,14 @@ public:
 
         gridLayout_2->addWidget(listHistory, 0, 0, 1, 1);
 
-        gbLayers = new QGroupBox(dockWidgetRightContents);
-        gbLayers->setObjectName(QStringLiteral("gbLayers"));
-        gbLayers->setMinimumSize(QSize(0, 150));
+        listLayers = new QListWidget(dockWidgetRightContents);
+        listLayers->setObjectName(QStringLiteral("listLayers"));
+        listLayers->setStyleSheet(QStringLiteral(""));
+        listLayers->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        listLayers->setGridSize(QSize(50, 20));
+        listLayers->setViewMode(QListView::ListMode);
 
-        gridLayout_2->addWidget(gbLayers, 1, 0, 1, 1);
+        gridLayout_2->addWidget(listLayers, 1, 0, 1, 1);
 
         gbParam = new QGroupBox(dockWidgetRightContents);
         gbParam->setObjectName(QStringLiteral("gbParam"));
@@ -291,6 +295,9 @@ public:
         pbSelectClosed = new QPushButton(gbParam);
         pbSelectClosed->setObjectName(QStringLiteral("pbSelectClosed"));
         pbSelectClosed->setGeometry(QRect(20, 90, 111, 23));
+        pbSplitByShape = new QPushButton(gbParam);
+        pbSplitByShape->setObjectName(QStringLiteral("pbSplitByShape"));
+        pbSplitByShape->setGeometry(QRect(20, 120, 111, 23));
 
         gridLayout_2->addWidget(gbParam, 2, 0, 1, 1);
 
@@ -369,11 +376,11 @@ public:
         menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));
         menuPath->setTitle(QApplication::translate("SewingEditorClass", "path", 0));
         menuOp->setTitle(QApplication::translate("SewingEditorClass", "op", 0));
-        gbLayers->setTitle(QApplication::translate("SewingEditorClass", "layers", 0));
         gbParam->setTitle(QApplication::translate("SewingEditorClass", "param", 0));
         pbSelectConnected->setText(QApplication::translate("SewingEditorClass", "select connected", 0));
         pbSelectSimilarShape->setText(QApplication::translate("SewingEditorClass", "select similar shape", 0));
         pbSelectClosed->setText(QApplication::translate("SewingEditorClass", "select closed", 0));
+        pbSplitByShape->setText(QApplication::translate("SewingEditorClass", "split by shape", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

@@ -1,6 +1,7 @@
 #include "SvgManager.h"
 #include "sewingeditor.h"
 #include "global_data_holder.h"
+#include "svgpp\SvgAbstractObject.h"
 SewingEditor::SewingEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -12,6 +13,7 @@ SewingEditor::SewingEditor(QWidget *parent)
 	new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(showNormal()));
 
 	initLeftDockActions();
+	initLayerList();
 
 	resetRoll();
 	initHistoryList();
@@ -307,7 +309,21 @@ void SewingEditor::on_pbSelectClosed_clicked()
 	{
 		ui.widget->getSvgManager()->selectPathClosed();
 		ui.widget->updateGL();
-		pushHistory("select path connected");
+		pushHistory("select path closed");
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_pbSplitByShape_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->splitSelectedPathByShape();
+		ui.widget->updateGL();
+		pushHistory("split path by shape");
 	}
 	catch (std::exception e)
 	{
@@ -401,3 +417,36 @@ void SewingEditor::on_listHistory_currentRowChanged(int r)
 {
 	rollBackTo(r);
 }
+
+//////////////////////////////////////////////////////////////////////////
+// layer control
+void SewingEditor::initLayerList()
+{
+	m_layerMap.insert("unknown", svg::SvgAbstractObject::ShapeUnknown);
+	m_layerMap.insert("solid", svg::SvgAbstractObject::ShapeSolid);
+	m_layerMap.insert("dash", svg::SvgAbstractObject::ShapeDash);
+	m_layerMap.insert("long-short", svg::SvgAbstractObject::ShapeLongShort);
+	m_layerMap.insert("cross", svg::SvgAbstractObject::ShapeCross);
+	m_layerMap.insert("quad", svg::SvgAbstractObject::ShapeQuad);
+	m_layerMap.insert("circle", svg::SvgAbstractObject::ShapeCircle);
+	m_layerMap.insert("text", svg::SvgAbstractObject::ShapeText);
+	ui.listLayers->clear();
+	for (auto iter : m_layerMap.toStdMap())
+	{
+		ui.listLayers->addItem(iter.first);
+	}
+	ui.listLayers->selectAll();
+}
+
+void SewingEditor::on_listLayers_itemSelectionChanged()
+{
+	auto items = ui.listLayers->selectedItems();
+	int shape = 0;
+	for (auto item : items)
+	{
+		shape |= m_layerMap[item->text()];
+	}
+	ui.widget->setSvgShapeToRender(shape);
+	ui.widget->updateGL();
+}
+

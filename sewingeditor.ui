@@ -880,15 +880,21 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QGroupBox" name="gbLayers">
-       <property name="minimumSize">
+      <widget class="QListWidget" name="listLayers">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+       <property name="gridSize">
         <size>
-         <width>0</width>
-         <height>150</height>
+         <width>50</width>
+         <height>20</height>
         </size>
        </property>
-       <property name="title">
-        <string>layers</string>
+       <property name="viewMode">
+        <enum>QListView::ListMode</enum>
        </property>
       </widget>
      </item>
@@ -940,6 +946,19 @@
         </property>
         <property name="text">
          <string>select closed</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pbSplitByShape">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>120</y>
+          <width>111</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>split by shape</string>
         </property>
        </widget>
       </widget>

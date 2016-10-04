@@ -286,20 +286,20 @@ namespace svg
 		m_rootGroup->updateBoundFromGeometry();
 	}
 
-	void SvgManager::render()
+	void SvgManager::render(int shapes)
 	{
 		if (m_rootGroup.get() == nullptr)
 			return;
 
-		m_rootGroup->render();
+		m_rootGroup->render((SvgAbstractObject::PathUnitShapes)shapes);
 	}
 
-	void SvgManager::renderIndex()
+	void SvgManager::renderIndex(int shapes)
 	{
 		if (m_rootGroup.get() == nullptr)
 			return;
 
-		m_rootGroup->renderId();
+		m_rootGroup->renderId((SvgAbstractObject::PathUnitShapes)shapes);
 	}
 
 	void SvgManager::selectShapeByIndex(int id, SelectOp op)

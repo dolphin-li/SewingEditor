@@ -21,6 +21,7 @@ namespace svg
 		m_attribute = std::shared_ptr<SvgAttribute>(new SvgAttribute());
 		m_boxColor = 0.f;
 		m_boxStrokeWidth = 1;
+		m_pathShape = ShapeUnknown;
 	}
 
 	SvgAbstractObject::~SvgAbstractObject()

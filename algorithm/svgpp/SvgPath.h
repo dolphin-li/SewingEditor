@@ -31,9 +31,10 @@ namespace svg
 		std::shared_ptr<SvgAbstractObject> splitToDifferentShapes()const;
 
 		// extract path from cmdsBegin(include) to cmdsEnd(exclude)
-		std::shared_ptr<SvgAbstractObject> subPath(int cmdsBegin, int cmdsEnd)const;
-		// cmdsPoses: the last element is excluded
-		std::shared_ptr<SvgAbstractObject> subPath(const std::vector<int>& cmdsPoses)const;
+		std::shared_ptr<SvgAbstractObject> subPath(int cmdsBegin, int cmdsEnd,
+			bool to_single_segment = false)const;
+		std::shared_ptr<SvgAbstractObject> subPath(const std::vector<int>& cmdsBegins,
+			const std::vector<int>& cmdsEnds, bool to_single_segment = false)const;
 	protected:
 		void cacheNvPaths();
 		void renderSelection();

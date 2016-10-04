@@ -250,7 +250,7 @@ namespace svg
 		SvgGroup* groupPtr = (SvgGroup*)group.get();
 
 		// 1. extract cubics and mixed paths, these are relatively more simple. ---------------------------
-		std::vector<int> poseOfMOfSegmentsBegin, poseOfMOfSegmentsEnd;
+		std::vector<int> poseOfM_segs_begin, poseOfM_segs_end;
 		for (int i_posM = 0; i_posM < (int)posOfM.size() - 1; i_posM++)
 		{
 			int posOfM_Begin = posOfM[i_posM];
@@ -271,8 +271,6 @@ namespace svg
 			{
 				auto child = subPath(posOfM_Begin, posOfM_End);
 				child->setParent(groupPtr);
-				ldp::Float2 bg(m_coords[m_segmentPos[posOfM_Begin]], m_coords[m_segmentPos[posOfM_Begin + 1]]);
-				ldp::Float2 ed(m_coords[m_segmentPos[posOfM_End - 2]], m_coords[m_segmentPos[posOfM_End - 1]]);
 				((SvgPath*)child.get())->m_pathShape = ShapeCircle;
 				groupPtr->m_children.push_back(child);
 			}
@@ -288,46 +286,30 @@ namespace svg
 			// full of lines, we need to estimate its shape further
 			else
 			{
-				poseOfMOfSegmentsBegin.push_back(posOfM_Begin);
-				poseOfMOfSegmentsEnd.push_back(posOfM_End);
+				poseOfM_segs_begin.push_back(posOfM_Begin);
+				poseOfM_segs_end.push_back(posOfM_End);
 			}
 		} // for i_posM
 
-		// 2. decide the shape of all segments... a terrible work...---------------------------
-		typedef ldp::kdtree::PointTree<float, 2> Tree;
-		typedef Tree::Point Point;
-		std::vector<Point> points;
-		Tree tree;
-		points.reserve(m_coords.size());
-		for (size_t i_M = 0; i_M < poseOfMOfSegmentsBegin.size(); i_M++)
-		{
-			int bg = poseOfMOfSegmentsBegin[i_M], ed = poseOfMOfSegmentsEnd[i_M];
-			int coords_bg = m_segmentPos[bg], coords_ed = m_coords.size();
-			if (ed < m_segmentPos.size())
-				coords_ed = m_segmentPos[ed];
-			assert((coords_ed - coords_bg) % 2 == 0);
-			for (int c = coords_bg; c < coords_ed; c += 2)
-			{
-				Point p;
-				p.idx = i_M;
-				p.p = ldp::Float2(m_coords[c], m_coords[c + 1]);
-				points.push_back(p);
-			}
-		} // i_M
-		tree.build(points);
+		auto segPath = subPath(poseOfM_segs_begin, poseOfM_segs_end, true);
+		segPath->setParent(groupPtr);
+		((SvgPath*)segPath.get())->m_pathShape = ShapeText;
+		groupPtr->m_children.push_back(segPath);
 
 		return group;
 	}
 
-	std::shared_ptr<SvgAbstractObject> SvgPath::subPath(int cmdsBegin, int cmdsEnd)const
+	std::shared_ptr<SvgAbstractObject> SvgPath::subPath(int cmdsBegin, int cmdsEnd,
+		bool to_single_segment)const
 	{
-		std::vector<int> tmp;
-		for (int i = cmdsBegin; i <= cmdsEnd; i++)
-			tmp.push_back(i);
-		return subPath(tmp);
+		std::vector<int> sb(1), se(1);
+		sb[0] = cmdsBegin;
+		se[0] = cmdsEnd;
+		return subPath(sb, se, to_single_segment);
 	}
 
-	std::shared_ptr<SvgAbstractObject> SvgPath::subPath(const std::vector<int>& cmdsPoses)const
+	std::shared_ptr<SvgAbstractObject> SvgPath::subPath(const std::vector<int>& cmdsBegins,
+		const std::vector<int>& cmdsEnds, bool to_single_segment)const
 	{
 		SvgPath* subPath = new SvgPath();
 		*subPath->attribute() = *attribute();
@@ -337,18 +319,28 @@ namespace svg
 		subPath->m_pathStyle = m_pathStyle;
 
 		// cmds
-		for (int i = 0; i < (int)cmdsPoses.size() - 1; i++)
+		for (size_t i = 0; i < cmdsBegins.size(); i++)
 		{
-			int idx = cmdsPoses[i];
-			int next_idx = cmdsPoses[i + 1];
+			int posOfM_Begin = cmdsBegins[i];
+			int posOfM_End = cmdsEnds[i];
 
-			subPath->m_cmds.push_back(m_cmds[idx]);
-			subPath->m_segmentPos.push_back(subPath->m_coords.size());
+			// cmds
+			subPath->m_cmds.insert(subPath->m_cmds.end(),
+				m_cmds.begin() + posOfM_Begin, m_cmds.begin() + posOfM_End);
 
-			int cb = m_segmentPos[idx];
+			// pos
+			size_t subMpos_Begin = subPath->m_segmentPos.size();
+			subPath->m_segmentPos.insert(subPath->m_segmentPos.end(),
+				m_segmentPos.begin() + posOfM_Begin, m_segmentPos.begin() + posOfM_End);
+			for (size_t sub_i = subMpos_Begin; sub_i < subPath->m_segmentPos.size(); sub_i++)
+				subPath->m_segmentPos[sub_i] = subPath->m_segmentPos[sub_i] 
+				- m_segmentPos[posOfM_Begin] + subPath->m_coords.size();
+
+			// coords
+			int cb = m_segmentPos[posOfM_Begin];
 			int ce = m_coords.size();
-			if (next_idx < m_cmds.size())
-				ce = m_segmentPos[next_idx];
+			if (posOfM_End < m_segmentPos.size())
+				ce = m_segmentPos[posOfM_End];
 			subPath->m_coords.insert(subPath->m_coords.end(),
 				m_coords.begin() + cb, m_coords.begin() + ce);
 		}

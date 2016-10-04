@@ -48,6 +48,7 @@ namespace svg
 		void invalid(){ m_invalid = true; } // call me when render context updated.
 		virtual void copyTo(SvgAbstractObject* obj)const;
 		virtual PathUnitShapes shapeType()const{ return m_pathShape; }
+		bool isVisible(PathUnitShapes shapeToRender)const;
 
 		void setId(int id) { m_id = id; }
 		int getId()const { return m_id; }

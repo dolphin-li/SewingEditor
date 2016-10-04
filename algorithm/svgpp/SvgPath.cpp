@@ -69,7 +69,7 @@ namespace svg
 
 	void SvgPath::render(PathUnitShapes shapeToRender)
 	{
-		if ((m_pathShape & shapeToRender) == 0)
+		if (!isVisible(shapeToRender))
 			return;
 
 		assert(m_gl_path_res->id);
@@ -98,7 +98,7 @@ namespace svg
 
 	void SvgPath::renderId(PathUnitShapes shapeToRender)
 	{
-		if ((m_pathShape & shapeToRender) == 0)
+		if (!isVisible(shapeToRender))
 			return;
 
 		assert(m_gl_path_res->id);
@@ -246,9 +246,6 @@ namespace svg
 		}
 		posOfM.push_back(m_cmds.size());
 
-		if (posOfM.size() <= 2)
-			return group;
-
 		group.reset(new SvgGroup);
 		SvgGroup* groupPtr = (SvgGroup*)group.get();
 
@@ -262,7 +259,9 @@ namespace svg
 			int nCubics = 0, nLines = 0;
 			for (int c = posOfM_Begin + 1; c < posOfM_End; c++)
 			{
-				nCubics += (m_cmds[c] == GL_CUBIC_CURVE_TO_NV);
+				nCubics += (m_cmds[c] == GL_CUBIC_CURVE_TO_NV || m_cmds[c] == GL_LARGE_CCW_ARC_TO_NV
+					|| m_cmds[c] == GL_LARGE_CW_ARC_TO_NV || m_cmds[c] == GL_SMALL_CCW_ARC_TO_NV
+					|| m_cmds[c] == GL_SMALL_CW_ARC_TO_NV);
 				nLines += (m_cmds[c] == GL_LINE_TO_NV);
 			}
 

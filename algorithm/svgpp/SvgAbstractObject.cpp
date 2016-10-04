@@ -124,6 +124,13 @@ namespace svg
 		return p;
 	}
 
+	bool SvgAbstractObject::isVisible(PathUnitShapes shapeToRender)const
+	{
+		if ((m_pathShape & shapeToRender) == 0)
+			return false;
+		return true;
+	}
+
 	ldp::Float4 SvgAbstractObject::unionBound(ldp::Float4 b)const
 	{
 		ldp::Float4 out;

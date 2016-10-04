@@ -23,7 +23,7 @@ namespace svg
 
 	void SvgText::render(PathUnitShapes shapeToRender)
 	{
-		if ((m_pathShape & shapeToRender) == 0)
+		if (!isVisible(shapeToRender))
 			return;
 		if (m_invalid)
 		{
@@ -89,7 +89,7 @@ namespace svg
 
 	void SvgText::renderId(PathUnitShapes shapeToRender)
 	{
-		if ((m_pathShape & shapeToRender) == 0)
+		if (!isVisible(shapeToRender))
 			return;
 		glPushMatrix();
 

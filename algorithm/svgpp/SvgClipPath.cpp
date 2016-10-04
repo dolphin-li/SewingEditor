@@ -12,11 +12,14 @@ namespace svg
 
 	void SvgClipPath::render(PathUnitShapes shape)
 	{
-
+		if (!isVisible(shape))
+			return;
 	}
 
 	void SvgClipPath::renderId(PathUnitShapes shape)
 	{
+		if (!isVisible(shape))
+			return;
 
 	}
 

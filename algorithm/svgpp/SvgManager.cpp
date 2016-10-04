@@ -753,6 +753,15 @@ namespace svg
 		return true;
 	}
 
+	void SvgManager::splitSelectedPathByShape()
+	{
+		if (m_rootGroup.get() == nullptr)
+			return;
+		splitPathByShape(m_rootGroup);
+		updateIndex();
+		updateBound();
+	}
+
 	void SvgManager::splitPath(std::shared_ptr<SvgAbstractObject>& obj)
 	{
 		if (obj.get() == nullptr)
@@ -767,6 +776,29 @@ namespace svg
 		{
 			SvgPath* p = (SvgPath*)obj.get();
 			auto newGroup = p->splitToSegments();
+			if (newGroup.get())
+			{
+				newGroup->setParent(obj->parent());
+				newGroup->setSelected(obj->isSelected());
+				obj = newGroup;
+			}
+		}
+	}
+
+	void SvgManager::splitPathByShape(std::shared_ptr<SvgAbstractObject>& obj)
+	{
+		if (obj.get() == nullptr)
+			return;
+		if (obj->objectType() == obj->Group)
+		{
+			SvgGroup* g = (SvgGroup*)obj.get();
+			for (auto& c : g->m_children)
+				splitPathByShape(c);
+		}
+		else if (obj->objectType() == obj->Path && obj->isSelected())
+		{
+			SvgPath* p = (SvgPath*)obj.get();
+			auto newGroup = p->splitToDifferentShapes();
 			if (newGroup.get())
 			{
 				newGroup->setParent(obj->parent());
@@ -809,23 +841,26 @@ namespace svg
 		if (m_rootGroup.get() == nullptr)
 			return;
 		
-		std::set<ldp::Float2> endPoints;
+		// TO DO
+	}
+
+	void SvgManager::selectPathSimilarShape()
+	{
+		if (m_rootGroup.get() == nullptr)
+			return;
+
+		// TO DO
+	}
+
+	void SvgManager::selectPathClosed()
+	{
 		for (auto iter : m_idxMap)
 		{
-			if (iter.second->isSelected() && iter.second->objectType() == SvgAbstractObject::Path)
+			if (iter.second->objectType() == SvgAbstractObject::Path)
 			{
-				endPoints.insert(iter.second->getStartPoint());
-				endPoints.insert(iter.second->getEndPoint());
-			}
-		}
-		for (auto iter : m_idxMap)
-		{
-			if (iter.second->isSelected() && iter.second->objectType() == SvgAbstractObject::Path)
-			{
-				ldp::Float2 s = iter.second->getStartPoint();
-				ldp::Float2 e = iter.second->getEndPoint();
-				if (endPoints.find(s) != endPoints.end() || endPoints.find(e) != endPoints.end())
-					iter.second->setSelected(true);
+				SvgPath* p = (SvgPath*)iter.second;
+				if (p->isClosed())
+					p->setSelected(true);
 			}
 		}
 	}

@@ -44,7 +44,12 @@ namespace svg
 		void selectPathBySimilarSelectedWidth();
 		void selectPathByWidths(const std::set<float>& widths);
 
+		// not finished
 		void selectPathConnected();
+		// not finished
+		void selectPathSimilarShape();
+
+		void selectPathClosed();
 
 		// given an index, find the largest group that contains this object.
 		void selectGroupByIndex(int id, SelectOp op = SelectThis);
@@ -62,6 +67,9 @@ namespace svg
 		// path operations
 		void splitSelectedPath(); // split selected, non-closed paths
 		bool mergeSelectedPath(); // merge will fail if the paths have been in different groups
+
+		// for burdastyle data, see SvgPath::PathUnitShapes
+		void splitSelectedPathByShape();
 	protected:
 		void updateIndex(SvgAbstractObject* obj, int &idx);
 		void removeSelected(SvgAbstractObject* obj);
@@ -72,6 +80,7 @@ namespace svg
 		void ungroupSelected_collect(SvgAbstractObject* obj, std::set<SvgGroup*>& groups);
 		void removeSingleNodeAndEmptyNode(std::shared_ptr<SvgAbstractObject>& obj);
 		void splitPath(std::shared_ptr<SvgAbstractObject>& obj);
+		void splitPathByShape(std::shared_ptr<SvgAbstractObject>& obj);
 	private:
 		Camera* m_renderCam;
 		std::shared_ptr<SvgAbstractObject> m_rootGroup;

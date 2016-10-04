@@ -14,6 +14,7 @@ AbstractEventHandle::AbstractEventHandle(SvgViewer* v)
 	m_viewer = v;
 	m_mainUI = nullptr;
 	m_lastHighlightShapeId = -1;
+	m_currentSelectedId = -1;
 	m_cursor = QCursor(Qt::CursorShape::ArrowCursor);
 	m_iconFile = "";
 	m_toolTips = "general handle";

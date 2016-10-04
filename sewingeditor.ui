@@ -858,7 +858,7 @@
    <property name="minimumSize">
     <size>
      <width>200</width>
-     <height>419</height>
+     <height>575</height>
     </size>
    </property>
    <property name="features">
@@ -880,6 +880,19 @@
       </widget>
      </item>
      <item row="1" column="0">
+      <widget class="QGroupBox" name="gbLayers">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>150</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>layers</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
       <widget class="QGroupBox" name="gbParam">
        <property name="minimumSize">
         <size>
@@ -901,6 +914,32 @@
         </property>
         <property name="text">
          <string>select connected</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pbSelectSimilarShape">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>60</y>
+          <width>111</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>select similar shape</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pbSelectClosed">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>90</y>
+          <width>111</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>select closed</string>
         </property>
        </widget>
       </widget>

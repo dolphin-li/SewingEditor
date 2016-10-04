@@ -58,6 +58,7 @@ namespace svg
 		m_gl_path_res.reset(new GLPathResource());
 		m_boxColor = ldp::Float3(1, 0, 1);
 		m_boxStrokeWidth = 2;
+		m_pathShape = Unknown;
 	}
 
 	SvgPath::~SvgPath()
@@ -109,8 +110,8 @@ namespace svg
 	void SvgPath::cacheNvPaths()
 	{
 		glPathCommandsNV(m_gl_path_res->id,
-			GLsizei(m_cmds.size()), &m_cmds[0],
-			GLsizei(m_coords.size()), GL_FLOAT, &m_coords[0]);
+			GLsizei(m_cmds.size()), m_cmds.data(),
+			GLsizei(m_coords.size()), GL_FLOAT, m_coords.data());
 	}
 
 	void SvgPath::configNvParams()
@@ -197,10 +198,6 @@ namespace svg
 		if (m_cmds.size() == 0)
 			return group;
 
-		// we DONOT process closed path, such as a circle
-		if (isClosed())
-			return group;
-
 		// find the position of 'M'
 		std::vector<int> posOfM;
 		for (size_t i = 0; i < m_cmds.size(); i++)
@@ -218,40 +215,95 @@ namespace svg
 
 		for (int i = 0; i < (int)posOfM.size() - 1; i++)
 		{
-			int posOfM_Begin = posOfM[i];
-			int posOfM_End = posOfM[i + 1];
-			SvgPath* subPath = new SvgPath();
-			*subPath->attribute() = *attribute();
-			subPath->setHighlighted(false);
-			subPath->setSelected(m_selected);
-			subPath->setParent(groupPtr);
-			subPath->m_gl_fill_rull = m_gl_fill_rull;
-			subPath->m_pathStyle = m_pathStyle;
-			groupPtr->m_children.push_back(std::shared_ptr<SvgAbstractObject>(subPath));
-
-			// cmds
-			subPath->m_cmds.insert(subPath->m_cmds.end(), 
-				m_cmds.begin() + posOfM_Begin, m_cmds.begin() + posOfM_End);
-
-			// pos
-			subPath->m_segmentPos.insert(subPath->m_segmentPos.end(),
-				m_segmentPos.begin() + posOfM_Begin, m_segmentPos.begin() + posOfM_End);
-			for (auto& v : subPath->m_segmentPos)
-				v -= m_segmentPos[posOfM_Begin];
-
-			// coords
-			int cb = m_segmentPos[posOfM_Begin];
-			int ce = m_coords.size();
-			if (posOfM_End < m_segmentPos.size())
-				ce = m_segmentPos[posOfM_End];
-			subPath->m_coords.insert(subPath->m_coords.end(),
-				m_coords.begin() + cb, m_coords.begin() + ce);
-
-			// bounds
-			subPath->updateBoundFromGeometry();
+			std::shared_ptr<SvgAbstractObject> sp = subPath(posOfM[i], posOfM[i + 1]);
+			groupPtr->m_children.push_back(sp);
+			sp->setParent(groupPtr);
 		}
 
 		return group;
+	}
+
+	std::shared_ptr<SvgAbstractObject> SvgPath::splitToDifferentShapes()const
+	{
+		std::shared_ptr<SvgAbstractObject> group;
+		if (m_cmds.size() == 0)
+			return group;
+
+		// find the position of 'M'
+		std::vector<int> posOfM;
+		for (size_t i = 0; i < m_cmds.size(); i++)
+		{
+			if (m_cmds[i] == GL_MOVE_TO_NV)
+				posOfM.push_back(i);
+		}
+		posOfM.push_back(m_cmds.size());
+
+		if (posOfM.size() <= 2)
+			return group;
+
+		group.reset(new SvgGroup);
+		SvgGroup* groupPtr = (SvgGroup*)group.get();
+
+		// TO DO
+		for (int i_posM = 0; i_posM < (int)posOfM.size() - 1; i_posM++)
+		{
+			int posOfM_Begin = posOfM[i_posM];
+			int posOfM_End = posOfM[i_posM + 1];
+
+			int nCubics = 0, nLines = 0;
+			for (int c = posOfM_Begin + 1; c < posOfM_End; c++)
+			{
+				nCubics += (m_cmds[c] == GL_CUBIC_CURVE_TO_NV);
+				nLines += (m_cmds[c] == GL_LINE_TO_NV);
+			}
+
+			if (nCubics == posOfM_End - posOfM_Begin - 1)
+			{
+
+			}
+		}
+
+		return group;
+	}
+
+	std::shared_ptr<SvgAbstractObject> SvgPath::subPath(int cmdsBegin, int cmdsEnd)const
+	{
+		std::vector<int> tmp;
+		for (int i = cmdsBegin; i <= cmdsEnd; i++)
+			tmp.push_back(i);
+		return subPath(tmp);
+	}
+
+	std::shared_ptr<SvgAbstractObject> SvgPath::subPath(const std::vector<int>& cmdsPoses)const
+	{
+		SvgPath* subPath = new SvgPath();
+		*subPath->attribute() = *attribute();
+		subPath->setHighlighted(false);
+		subPath->setSelected(m_selected);
+		subPath->m_gl_fill_rull = m_gl_fill_rull;
+		subPath->m_pathStyle = m_pathStyle;
+
+		// cmds
+		for (int i = 0; i < (int)cmdsPoses.size() - 1; i++)
+		{
+			int idx = cmdsPoses[i];
+			int next_idx = cmdsPoses[i + 1];
+
+			subPath->m_cmds.push_back(m_cmds[idx]);
+			subPath->m_segmentPos.push_back(subPath->m_coords.size());
+
+			int cb = m_segmentPos[idx];
+			int ce = m_coords.size();
+			if (next_idx < m_cmds.size())
+				ce = m_segmentPos[next_idx];
+			subPath->m_coords.insert(subPath->m_coords.end(),
+				m_coords.begin() + cb, m_coords.begin() + ce);
+		}
+
+		// bounds
+		subPath->updateBoundFromGeometry();
+
+		return std::shared_ptr<SvgAbstractObject>(subPath);
 	}
 
 	void SvgPath::copyTo(SvgAbstractObject* obj)const
@@ -266,6 +318,7 @@ namespace svg
 			newTptr->m_pathStyle = m_pathStyle;
 			newTptr->m_segmentPos = m_segmentPos;
 			newTptr->m_gl_fill_rull = m_gl_fill_rull;
+			newTptr->m_pathShape = m_pathShape;
 		}
 	}
 
@@ -301,13 +354,6 @@ namespace svg
 		if (isClosed())
 			return getStartPoint();
 		return ldp::Float2(m_coords[m_coords.size() - 2], m_coords[m_coords.size() - 1]);
-	}
-
-	void SvgPath::makeOrderedAndSimpify()
-	{
-		// closed path must be itself ordered
-		if (isClosed())
-			return;
 	}
 
 #pragma region --bounds helper

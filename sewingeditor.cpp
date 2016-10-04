@@ -287,6 +287,34 @@ void SewingEditor::on_pbSelectConnected_clicked()
 	}
 }
 
+void SewingEditor::on_pbSelectSimilarShape_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->selectPathSimilarShape();
+		ui.widget->updateGL();
+		pushHistory("select path connected");
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_pbSelectClosed_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->selectPathClosed();
+		ui.widget->updateGL();
+		pushHistory("select path connected");
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
 /////////////////////////////////////////////////////////////////
 // roll back control
 void SewingEditor::resetRoll()

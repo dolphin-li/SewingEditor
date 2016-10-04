@@ -40,6 +40,7 @@ void GroupEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 			ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
 			color /= 255.f;
 			int id = svg::SvgAbstractObject::index_from_color(color);
+			m_currentSelectedId = id;
 			if (ev->modifiers() & Qt::SHIFT)
 				op = svg::SvgManager::SlectionUnionInverse;
 			m_viewer->getSvgManager()->selectGroupByIndex(id, op);
@@ -75,6 +76,7 @@ void GroupEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 					id = c;
 					break;
 				}
+				m_currentSelectedId = id;
 				m_mainUI->pushHistory(QString().sprintf("select groups: %d, ...", id));
 			}
 		}
@@ -100,6 +102,37 @@ void GroupEventHandle::wheelEvent(QWheelEvent *ev)
 void GroupEventHandle::keyPressEvent(QKeyEvent *ev)
 {
 	AbstractEventHandle::keyPressEvent(ev);
+
+	AbstractEventHandle::keyPressEvent(ev);
+	svg::SvgManager::SelectOp op = svg::SvgManager::SelectThis;
+	switch (ev->key())
+	{
+	default:
+		break;
+	case Qt::Key_Plus:
+		if (m_currentSelectedId > 0)
+		{
+			m_currentSelectedId++;
+			if (ev->modifiers() & Qt::SHIFT)
+				op = svg::SvgManager::SlectionUnionInverse;
+			m_viewer->getSvgManager()->selectGroupByIndex(m_currentSelectedId, op);
+			if (m_mainUI && m_currentSelectedId)
+				m_mainUI->pushHistory(QString().sprintf("select a shape: %d", m_currentSelectedId));
+		}
+		break;
+	case Qt::Key_Minus:
+		if (m_currentSelectedId > 0)
+		{
+			m_currentSelectedId--;
+			if (ev->modifiers() & Qt::SHIFT)
+				op = svg::SvgManager::SlectionUnionInverse;
+			m_viewer->getSvgManager()->selectGroupByIndex(m_currentSelectedId, op);
+			if (m_mainUI && m_currentSelectedId)
+				m_mainUI->pushHistory(QString().sprintf("select a shape: %d", m_currentSelectedId));
+		}
+	}
+
+	m_viewer->updateGL();
 }
 
 void GroupEventHandle::keyReleaseEvent(QKeyEvent *ev)

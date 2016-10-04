@@ -42,6 +42,7 @@ public:
 protected:
 	SvgViewer* m_viewer;
 	int m_lastHighlightShapeId;
+	int m_currentSelectedId;
 	QPoint m_mouse_press_pt;
 	QCursor m_cursor;
 	QString m_iconFile;

@@ -64,8 +64,11 @@ public:
     QWidget *dockWidgetRightContents;
     QGridLayout *gridLayout_2;
     QListWidget *listHistory;
+    QGroupBox *gbLayers;
     QGroupBox *gbParam;
     QPushButton *pbSelectConnected;
+    QPushButton *pbSelectSimilarShape;
+    QPushButton *pbSelectClosed;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -255,7 +258,7 @@ public:
         SewingEditorClass->setStatusBar(statusBar);
         dockWidgetRight = new QDockWidget(SewingEditorClass);
         dockWidgetRight->setObjectName(QStringLiteral("dockWidgetRight"));
-        dockWidgetRight->setMinimumSize(QSize(200, 419));
+        dockWidgetRight->setMinimumSize(QSize(200, 575));
         dockWidgetRight->setFeatures(QDockWidget::NoDockWidgetFeatures);
         dockWidgetRight->setAllowedAreas(Qt::RightDockWidgetArea);
         dockWidgetRightContents = new QWidget();
@@ -270,14 +273,26 @@ public:
 
         gridLayout_2->addWidget(listHistory, 0, 0, 1, 1);
 
+        gbLayers = new QGroupBox(dockWidgetRightContents);
+        gbLayers->setObjectName(QStringLiteral("gbLayers"));
+        gbLayers->setMinimumSize(QSize(0, 150));
+
+        gridLayout_2->addWidget(gbLayers, 1, 0, 1, 1);
+
         gbParam = new QGroupBox(dockWidgetRightContents);
         gbParam->setObjectName(QStringLiteral("gbParam"));
         gbParam->setMinimumSize(QSize(0, 300));
         pbSelectConnected = new QPushButton(gbParam);
         pbSelectConnected->setObjectName(QStringLiteral("pbSelectConnected"));
         pbSelectConnected->setGeometry(QRect(20, 30, 91, 23));
+        pbSelectSimilarShape = new QPushButton(gbParam);
+        pbSelectSimilarShape->setObjectName(QStringLiteral("pbSelectSimilarShape"));
+        pbSelectSimilarShape->setGeometry(QRect(20, 60, 111, 23));
+        pbSelectClosed = new QPushButton(gbParam);
+        pbSelectClosed->setObjectName(QStringLiteral("pbSelectClosed"));
+        pbSelectClosed->setGeometry(QRect(20, 90, 111, 23));
 
-        gridLayout_2->addWidget(gbParam, 1, 0, 1, 1);
+        gridLayout_2->addWidget(gbParam, 2, 0, 1, 1);
 
         dockWidgetRight->setWidget(dockWidgetRightContents);
         SewingEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
@@ -354,8 +369,11 @@ public:
         menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));
         menuPath->setTitle(QApplication::translate("SewingEditorClass", "path", 0));
         menuOp->setTitle(QApplication::translate("SewingEditorClass", "op", 0));
+        gbLayers->setTitle(QApplication::translate("SewingEditorClass", "layers", 0));
         gbParam->setTitle(QApplication::translate("SewingEditorClass", "param", 0));
         pbSelectConnected->setText(QApplication::translate("SewingEditorClass", "select connected", 0));
+        pbSelectSimilarShape->setText(QApplication::translate("SewingEditorClass", "select similar shape", 0));
+        pbSelectClosed->setText(QApplication::translate("SewingEditorClass", "select closed", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

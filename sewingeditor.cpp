@@ -395,6 +395,7 @@ void SewingEditor::initHistoryList()
 		ui.listHistory->item(i)->setHidden(true);
 		ui.listHistory->item(i)->setTextColor(Qt::white);
 	}
+	ui.listHistory->setCurrentRow(MAX_ROLLBACK_STEP - 1);
 }
 
 void SewingEditor::updateHistoryList()

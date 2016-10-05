@@ -64,6 +64,7 @@ protected:
 	int m_rollHead;
 	int m_rollPos;
 	int m_rollTail;
+	bool m_disableCurrentRowChanged;
 public:
 	void resetRoll();
 	void rollBackTo(int pos);

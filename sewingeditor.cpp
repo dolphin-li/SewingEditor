@@ -340,6 +340,7 @@ void SewingEditor::resetRoll()
 	m_rollHead = 0;
 	m_rollTail = 0;
 	m_rollPos = m_rollHead - 1;
+	m_disableCurrentRowChanged = false;
 }
 
 int SewingEditor::rollPos()const
@@ -382,7 +383,9 @@ void SewingEditor::pushHistory(QString name)
 	m_rollTail = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
 	if (m_rollTail == m_rollHead)
 		m_rollHead = (m_rollHead + 1) % MAX_ROLLBACK_STEP;
-
+	m_disableCurrentRowChanged = true;
+	ui.listHistory->setCurrentRow(rollPos());
+	m_disableCurrentRowChanged = false;
 	updateHistoryList();
 }
 
@@ -416,7 +419,8 @@ void SewingEditor::updateHistoryList()
 
 void SewingEditor::on_listHistory_currentRowChanged(int r)
 {
-	rollBackTo(r);
+	if (!m_disableCurrentRowChanged)
+		rollBackTo(r);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -425,7 +429,8 @@ void SewingEditor::initLayerList()
 {
 	m_layerMap.insert("unknown", svg::SvgAbstractObject::ShapeUnknown);
 	m_layerMap.insert("solid", svg::SvgAbstractObject::ShapeSolid);
-	m_layerMap.insert("dash", svg::SvgAbstractObject::ShapeDash);
+	m_layerMap.insert("tiny-dash", svg::SvgAbstractObject::ShapeTinyDash);
+	m_layerMap.insert("mid-dash", svg::SvgAbstractObject::ShapeMidDash);
 	m_layerMap.insert("long-short", svg::SvgAbstractObject::ShapeLongShort);
 	m_layerMap.insert("cross", svg::SvgAbstractObject::ShapeCross);
 	m_layerMap.insert("quad", svg::SvgAbstractObject::ShapeQuad);

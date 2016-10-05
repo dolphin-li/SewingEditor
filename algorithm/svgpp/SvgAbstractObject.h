@@ -29,12 +29,13 @@ namespace svg
 		{
 			ShapeUnknown = 0x01,
 			ShapeSolid = 0x02, // solid lines
-			ShapeDash = 0x04, // '-----'
-			ShapeLongShort = 0x08, // '_-_-_-'
-			ShapeCross = 0x10, // '-x-x-x'
-			ShapeQuad = 0x20, // '-q-q-q', where 'q' means a quad
-			ShapeCircle = 0x40, // 'o'
-			ShapeText = 0x80, // in fact Text, not path
+			ShapeTinyDash = 0x04, // '-----'
+			ShapeMidDash = 0x08, // '-----'
+			ShapeLongShort = 0x10, // '_-_-_-'
+			ShapeCross = 0x20, // '-x-x-x'
+			ShapeQuad = 0x40, // '-q-q-q', where 'q' means a quad
+			ShapeCircle = 0x80, // 'o'
+			ShapeText = 0x100, // in fact Text, not path
 			ShapeAll = 0xffffffff,
 		};
 	public:

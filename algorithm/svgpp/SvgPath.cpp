@@ -7,11 +7,24 @@ namespace svg
 {
 #undef min
 #undef max
-
+	const static float SEG_BREAK_DISTANCE_THRE = 20.f;
+	const static float SOLID_PATTERN_STROKE_WIDTH = 2.835f;
 	const static float CROSS_PATTERN_MIDPOINT_AB_DIST_THRE = 0.2;
 	const static float CROSS_PATTERN_MIDPOINT_C_DIST_THRE = 0.5;
 	const static float CROSS_PATTERN_COSANGLE_THRE = cos(60.f*ldp::PI_S / 180.f);
 	const static float QUAD_PATTERN_CONTACT_DIST_THRE = 0.2;
+	const static float TINYDASH_PATTERN_MEAN_LENGTH = 1.7;
+	const static float TINYDASH_PATTERN_THRE_LENGTH = 0.5;
+	const static float TINYDASH_PATTERN_THRE_STD = 0.5;
+	const static float TINYDASH_PATTERN_SPACE_MEAN_LENGTH = 2.55;
+	const static float TINYDASH_PATTERN_SPACE_THRE_LENGTH = 0.5;
+	const static int TINYDASH_PATTERN_MIN_SEGS_NUM = 5;
+	const static float MIDDASH_PATTERN_MEAN_LENGTH = 4.3;
+	const static float MIDDASH_PATTERN_THRE_LENGTH = 0.8;
+	const static float MIDDASH_PATTERN_THRE_STD = 0.8;
+	const static float MIDDASH_PATTERN_SPACE_MEAN_LENGTH = 4.3;
+	const static float MIDDASH_PATTERN_SPACE_THRE_LENGTH = 0.8;
+	const static int MIDDASH_PATTERN_MIN_SEGS_NUM = 3;
 
 	static GLenum lineJoinConverter(const SvgPath *path)
 	{
@@ -296,32 +309,80 @@ namespace svg
 		// 2.1 
 		std::vector<int> cross_posOfM_begin, cross_posOfM_end;
 		std::vector<int> quad_posOfM_begin, quad_posOfM_end;
+		std::vector<int> solid_posOfM_begin, solid_posOfM_end;
+		std::vector<int> tinyDash_posOfM_begin, tinyDash_posOfM_end;
+		std::vector<int> midDash_posOfM_begin, midDash_posOfM_end;
 		for (size_t i = 0; i < segPathPtr->m_cmds.size(); )
 		{
+			int nCmdLength = 0;
 			if (segPathPtr->isOrderedSegmentsQuadPattern(i))
 			{
 				quad_posOfM_begin.push_back(i);
 				quad_posOfM_end.push_back(i + 10);
 				i += 10;
-				continue;
 			}
-			if (segPathPtr->isOrderedSegmentsCrossPattern(i))
+			else if (segPathPtr->isOrderedSegmentsCrossPattern(i))
 			{
 				cross_posOfM_begin.push_back(i);
 				cross_posOfM_end.push_back(i + 6);
 				i += 6;
-				continue;
 			}
-			i += 2;
+			else if (segPathPtr->isOrderedSolidPattern(i))
+			{
+				solid_posOfM_begin.push_back(i);
+				solid_posOfM_end.push_back(i + 2);
+				i += 2;
+			}
+			else if (segPathPtr->isOrderedTinyDashPattern(i, nCmdLength))
+			{
+				tinyDash_posOfM_begin.push_back(i);
+				tinyDash_posOfM_end.push_back(i + nCmdLength);
+				i += nCmdLength;
+			}
+			else if (segPathPtr->isOrderedMidDashPattern(i, nCmdLength))
+			{
+				midDash_posOfM_begin.push_back(i);
+				midDash_posOfM_end.push_back(i + nCmdLength);
+				i += nCmdLength;
+			}
+			else
+				i += 2;
 		}
-		auto crossPath = segPathPtr->subPath(cross_posOfM_begin, cross_posOfM_end, false);
-		((SvgPath*)crossPath.get())->m_pathShape = PathUnitShapes::ShapeCross;
-		crossPath->setParent(groupPtr);
-		groupPtr->m_children.push_back(crossPath);
-		auto quadPath = segPathPtr->subPath(quad_posOfM_begin, quad_posOfM_end, false);
-		((SvgPath*)quadPath.get())->m_pathShape = PathUnitShapes::ShapeQuad;
-		quadPath->setParent(groupPtr);
-		groupPtr->m_children.push_back(quadPath);
+		if (cross_posOfM_begin.size())
+		{
+			auto tmpPath = segPathPtr->subPath(cross_posOfM_begin, cross_posOfM_end, false);
+			((SvgPath*)tmpPath.get())->m_pathShape = PathUnitShapes::ShapeCross;
+			tmpPath->setParent(groupPtr);
+			groupPtr->m_children.push_back(tmpPath);
+		}
+		if (quad_posOfM_begin.size())
+		{
+			auto tmpPath = segPathPtr->subPath(quad_posOfM_begin, quad_posOfM_end, false);
+			((SvgPath*)tmpPath.get())->m_pathShape = PathUnitShapes::ShapeQuad;
+			tmpPath->setParent(groupPtr);
+			groupPtr->m_children.push_back(tmpPath);
+		}
+		if (solid_posOfM_begin.size())
+		{
+			auto tmpPath = segPathPtr->subPath(solid_posOfM_begin, solid_posOfM_end, false);
+			((SvgPath*)tmpPath.get())->m_pathShape = PathUnitShapes::ShapeSolid;
+			tmpPath->setParent(groupPtr);
+			groupPtr->m_children.push_back(tmpPath);
+		}
+		if (tinyDash_posOfM_begin.size())
+		{
+			auto tmpPath = segPathPtr->subPath(tinyDash_posOfM_begin, tinyDash_posOfM_end, false);
+			((SvgPath*)tmpPath.get())->m_pathShape = PathUnitShapes::ShapeTinyDash;
+			tmpPath->setParent(groupPtr);
+			groupPtr->m_children.push_back(tmpPath);
+		}
+		if (midDash_posOfM_begin.size())
+		{
+			auto tmpPath = segPathPtr->subPath(midDash_posOfM_begin, midDash_posOfM_end, false);
+			((SvgPath*)tmpPath.get())->m_pathShape = PathUnitShapes::ShapeMidDash;
+			tmpPath->setParent(groupPtr);
+			groupPtr->m_children.push_back(tmpPath);
+		}
 		return group;
 	}
 
@@ -446,6 +507,25 @@ namespace svg
 		return false;
 	}
 
+	inline float seg_min_distance(ldp::Float2 a0, ldp::Float2 a1,
+		ldp::Float2 b0, ldp::Float2 b1)
+	{
+		float d1 = (a0 - b0).length();
+		float d2 = (a0 - b1).length();
+		float d3 = (a1 - b0).length();
+		float d4 = (a1 - b1).length();
+		return std::min(std::min(d1, d2), std::min(d3, d4));
+	}
+	inline float seg_max_distance(ldp::Float2 a0, ldp::Float2 a1,
+		ldp::Float2 b0, ldp::Float2 b1)
+	{
+		float d1 = (a0 - b0).length();
+		float d2 = (a0 - b1).length();
+		float d3 = (a1 - b0).length();
+		float d4 = (a1 - b1).length();
+		return std::max(std::max(d1, d2), std::max(d3, d4));
+	}
+
 	inline int num_contact_segs(const ldp::Float2* pts, const int nSegments, int id)
 	{
 		const ldp::Float2 *p = pts + id*2;
@@ -489,6 +569,123 @@ namespace svg
 			return true;
 
 		return false;
+	}
+
+	bool SvgPath::isOrderedSolidPattern(int cmdPos)const
+	{
+		return abs(m_pathStyle.stroke_width - SOLID_PATTERN_STROKE_WIDTH) < std::numeric_limits<float>::epsilon();
+	}
+
+	bool SvgPath::isOrderedTinyDashPattern(int cmdPos, int& nCmdLength)const
+	{
+		if (m_cmds.size() <= 1)
+			return false;
+
+		nCmdLength = 0;
+		std::vector<ldp::Float2> segs;
+		float avgSegLength = 0.f;
+		float avgSegLength2 = 0.f;
+		float avgSegSpace = 0.f;
+		assert((m_cmds.size()-cmdPos) % 2 == 0);
+		ldp::Float2 lastPM, lastPL;
+		float lastLen = 0;
+		int numSegs = 0, numSpaces = 0;
+		for (size_t k = cmdPos; k < m_cmds.size(); k+=2)
+		{
+			ldp::Float2 pM(m_coords[k * 2], m_coords[k * 2 + 1]);
+			ldp::Float2 pL(m_coords[k * 2 + 2], m_coords[k * 2 + 3]);
+			float len = (pM - pL).length();
+			if (segs.size())
+			{
+				float dmin = seg_min_distance(pM, pL, lastPM, lastPL);
+				float dmax = seg_max_distance(pM, pL, lastPM, lastPL);
+				if (dmin > SEG_BREAK_DISTANCE_THRE || dmax < 0.5*(lastLen + len))
+					break;
+				avgSegSpace += dmin;
+				numSpaces++;
+			}
+			avgSegLength += len;
+			avgSegLength2 += len * len;
+			numSegs++;
+			segs.push_back(pM);
+			segs.push_back(pL);
+			lastPM = pM;
+			lastPL = pL;
+			lastLen = len;
+			nCmdLength+=2;
+		}
+
+		if (numSegs < TINYDASH_PATTERN_MIN_SEGS_NUM)
+			return false;
+
+		avgSegLength /= numSegs;
+		avgSegLength2 /= numSegs;
+		avgSegSpace /= numSpaces;
+
+		float stdLen = sqrt(avgSegLength2 - avgSegLength*avgSegLength);
+		if (stdLen > TINYDASH_PATTERN_THRE_STD)
+			return false;
+		if (abs(avgSegLength - TINYDASH_PATTERN_MEAN_LENGTH) > TINYDASH_PATTERN_THRE_LENGTH)
+			return false;
+		if (abs(avgSegSpace - TINYDASH_PATTERN_SPACE_MEAN_LENGTH) > TINYDASH_PATTERN_SPACE_THRE_LENGTH)
+			return false;
+		return true;
+	}
+
+	bool SvgPath::isOrderedMidDashPattern(int cmdPos, int& nCmdLength)const
+	{
+		if (m_cmds.size() <= 1)
+			return false;
+
+		nCmdLength = 0;
+		std::vector<ldp::Float2> segs;
+		float avgSegLength2 = 0.f;
+		float avgSegLength = 0.f;
+		float avgSegSpace = 0.f;
+		assert((m_cmds.size() - cmdPos) % 2 == 0);
+		ldp::Float2 lastPM, lastPL;
+		float lastLen = 0;
+		int numSegs = 0, numSpaces = 0;
+		for (size_t k = cmdPos; k < m_cmds.size(); k += 2)
+		{
+			ldp::Float2 pM(m_coords[k * 2], m_coords[k * 2 + 1]);
+			ldp::Float2 pL(m_coords[k * 2 + 2], m_coords[k * 2 + 3]);
+			float len = (pM - pL).length();
+			if (segs.size())
+			{
+				float dmin = seg_min_distance(pM, pL, lastPM, lastPL);
+				float dmax = seg_max_distance(pM, pL, lastPM, lastPL);
+				if (dmin > SEG_BREAK_DISTANCE_THRE || dmax < 0.5f * (len + lastLen))
+					break;
+				avgSegSpace += dmin;
+				numSpaces++;
+			}
+			avgSegLength += len;
+			avgSegLength2 += len*len;
+			numSegs++;
+			segs.push_back(pM);
+			segs.push_back(pL);
+			lastPM = pM;
+			lastPL = pL;
+			lastLen = len;
+			nCmdLength += 2;
+		}
+
+		if (numSegs < MIDDASH_PATTERN_MIN_SEGS_NUM)
+			return false;
+
+		avgSegLength2 /= numSegs;
+		avgSegLength /= numSegs;
+		avgSegSpace /= numSpaces;
+
+		float stdLen = sqrt(avgSegLength2 - avgSegLength*avgSegLength);
+		if (stdLen > MIDDASH_PATTERN_THRE_STD)
+			return false;
+		if (abs(avgSegLength - MIDDASH_PATTERN_MEAN_LENGTH) > MIDDASH_PATTERN_THRE_LENGTH)
+			return false;
+		if (abs(avgSegSpace - MIDDASH_PATTERN_SPACE_MEAN_LENGTH) > MIDDASH_PATTERN_SPACE_THRE_LENGTH)
+			return false;
+		return true;
 	}
 
 	void SvgPath::copyTo(SvgAbstractObject* obj)const

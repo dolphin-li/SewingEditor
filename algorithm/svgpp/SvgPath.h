@@ -45,6 +45,9 @@ namespace svg
 		// then we decide whether the segments, from a given cmd postion, is the given pattern
 		bool isOrderedSegmentsCrossPattern(int cmdPos)const;
 		bool isOrderedSegmentsQuadPattern(int cmdPos)const;
+		bool isOrderedSolidPattern(int cmdPos)const;
+		bool isOrderedTinyDashPattern(int cmdPos, int& nCmdLength)const;
+		bool isOrderedMidDashPattern(int cmdPos, int& nCmdLength)const;
 	public:
 		std::vector<GLubyte> m_cmds;
 		std::vector<GLfloat> m_coords;

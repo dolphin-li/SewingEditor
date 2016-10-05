@@ -8,6 +8,10 @@ namespace svg
 #undef min
 #undef max
 
+	const static float CROSS_PATTERN_MIDPOINT_AB_DIST_THRE = 0.2;
+	const static float CROSS_PATTERN_MIDPOINT_C_DIST_THRE = 0.5;
+	const static float CROSS_PATTERN_COSANGLE_THRE = cos(60.f*ldp::PI_S / 180.f);
+
 	static GLenum lineJoinConverter(const SvgPath *path)
 	{
 		switch (path->m_pathStyle.line_join) {
@@ -234,26 +238,21 @@ namespace svg
 		std::shared_ptr<SvgAbstractObject> group;
 		if (m_cmds.size() == 0)
 			return group;
-
-		// find the position of 'M'
-		std::vector<int> posOfM;
-		for (size_t i = 0; i < m_cmds.size(); i++)
-		{
-			if (m_cmds[i] == GL_MOVE_TO_NV)
-				posOfM.push_back(i);
-		}
-		posOfM.push_back(m_cmds.size());
-
 		group.reset(new SvgGroup);
 		SvgGroup* groupPtr = (SvgGroup*)group.get();
 
 		// 1. extract cubics and mixed paths, these are relatively more simple. ---------------------------
+		// find the position of 'M'
+		std::vector<int> posOfM;
+		for (size_t i = 0; i < m_cmds.size(); i++)
+		if (m_cmds[i] == GL_MOVE_TO_NV)
+			posOfM.push_back(i);
+		posOfM.push_back(m_cmds.size());
 		std::vector<int> poseOfM_segs_begin, poseOfM_segs_end;
 		for (int i_posM = 0; i_posM < (int)posOfM.size() - 1; i_posM++)
 		{
 			int posOfM_Begin = posOfM[i_posM];
 			int posOfM_End = posOfM[i_posM + 1];
-
 			int nCubics = 0, nLines = 0;
 			for (int c = posOfM_Begin + 1; c < posOfM_End; c++)
 			{
@@ -289,11 +288,27 @@ namespace svg
 			}
 		} // for i_posM
 
+		// 2. we convert those straight lines to individual segments and then process
 		auto segPath = subPath(poseOfM_segs_begin, poseOfM_segs_end, true);
-		segPath->setParent(groupPtr);
-		((SvgPath*)segPath.get())->m_pathShape = ShapeText;
-		groupPtr->m_children.push_back(segPath);
+		auto segPathPtr = (SvgPath*)segPath.get();
 
+		// 2.1 
+		std::vector<int> cross_posOfM_begin, cross_posOfM_end;
+		for (size_t i = 0; i < segPathPtr->m_cmds.size(); )
+		{
+			if (segPathPtr->isOrderedSegmentsCrossPattern(i))
+			{
+				cross_posOfM_begin.push_back(i);
+				cross_posOfM_end.push_back(i + 6);
+				i += 6;
+				continue;
+			}
+			i += 2;
+		}
+		auto crossPath = segPathPtr->subPath(cross_posOfM_begin, cross_posOfM_end, false);
+		((SvgPath*)crossPath.get())->m_pathShape = PathUnitShapes::ShapeCross;
+		crossPath->setParent(groupPtr);
+		groupPtr->m_children.push_back(crossPath);
 		return group;
 	}
 
@@ -341,6 +356,20 @@ namespace svg
 			}//
 			else
 			{
+				ldp::Float2 lastCoord(m_coords[coordPoses[posOfM_Begin]],
+					m_coords[coordPoses[posOfM_Begin] + 1]);
+				for (int i_cmd = posOfM_Begin + 1; i_cmd < posOfM_End; i_cmd++)
+				{
+					subPath->m_cmds.push_back(GL_MOVE_TO_NV);
+					subPath->m_coords.push_back(lastCoord[0]);
+					subPath->m_coords.push_back(lastCoord[1]);
+					subPath->m_cmds.push_back(m_cmds[i_cmd]);
+					int cb = coordPoses[i_cmd];
+					int ce = coordPoses[i_cmd + 1];
+					subPath->m_coords.insert(subPath->m_coords.end(),
+						m_coords.begin() + cb, m_coords.begin() + ce);
+					lastCoord = ldp::Float2(m_coords[ce - 2], m_coords[ce - 1]);
+				}
 			}// else convert to single-segments
 		}// i_pos
 
@@ -348,6 +377,60 @@ namespace svg
 		subPath->updateBoundFromGeometry();
 
 		return std::shared_ptr<SvgAbstractObject>(subPath);
+	}
+
+	inline bool is_crossed_segs(ldp::Float2 a[2], ldp::Float2 b[2], ldp::Float2 c[2])
+	{
+		ldp::Float2 md_a = (a[0] + a[1]) / 2.f;
+		ldp::Float2 md_b = (b[0] + b[1]) / 2.f;
+		ldp::Float2 dir_a = a[1] - a[0];
+		ldp::Float2 dir_b = b[1] - b[0];
+		float len_a = dir_a.length();
+		float len_b = dir_b.length();
+		dir_a /= len_a;
+		dir_b /= len_b;
+		if ((md_a - md_b).length() > CROSS_PATTERN_MIDPOINT_AB_DIST_THRE * len_a
+			|| len_a - len_b > CROSS_PATTERN_MIDPOINT_AB_DIST_THRE * len_a)
+			return false;
+		if (fabs(dir_a.dot(dir_b)) > CROSS_PATTERN_COSANGLE_THRE)
+			return false;
+		ldp::Float2 md_c = (c[0] + c[1]) / 2.f;
+		ldp::Float2 dir_c = c[1] - c[0];
+		float len_c = dir_c.length();
+		dir_c /= len_c;
+		float dist_c0a = (md_a - c[1]).length();
+		float dist_c1a = (md_a - c[0]).length();
+		if (std::min(dist_c1a, dist_c0a) > CROSS_PATTERN_MIDPOINT_C_DIST_THRE * len_c
+			|| std::max(dist_c1a, dist_c0a) < len_c)
+			return false;
+		return true;
+	}
+
+	bool SvgPath::isOrderedSegmentsCrossPattern(int cmdPos)const
+	{
+		const static int nSegments = 3;
+		const static int nCmds = nSegments * 2;
+		if (cmdPos + nSegments * 2 > m_cmds.size())
+			return false;
+
+		ldp::Float2 segs[nSegments][2];
+		for (int k = 0; k < nCmds; k++)
+			segs[k/2][k%2] = ldp::Float2(m_coords[(cmdPos+k)*2], m_coords[(cmdPos+k)*2+1]);
+		
+		const static ldp::Int3 orders[nSegments] = {
+			ldp::Int3(0, 1, 2),
+			ldp::Int3(0, 2, 1),
+			ldp::Int3(1, 2, 0)
+		};
+
+		for (int k = 0; k < nSegments; k++)
+		{
+			const ldp::Int3& od = orders[k];
+			if (is_crossed_segs(segs[od[0]], segs[od[1]], segs[od[2]]))
+				return true;
+		}
+
+		return false;
 	}
 
 	void SvgPath::copyTo(SvgAbstractObject* obj)const

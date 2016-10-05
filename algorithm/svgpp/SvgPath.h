@@ -44,6 +44,7 @@ namespace svg
 		// assume m_cmds and m_coords are all 'M-L-M-L...' types and ordered
 		// then we decide whether the segments, from a given cmd postion, is the given pattern
 		bool isOrderedSegmentsCrossPattern(int cmdPos)const;
+		bool isOrderedSegmentsQuadPattern(int cmdPos)const;
 	public:
 		std::vector<GLubyte> m_cmds;
 		std::vector<GLfloat> m_coords;

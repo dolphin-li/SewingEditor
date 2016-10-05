@@ -11,6 +11,7 @@ namespace svg
 	const static float CROSS_PATTERN_MIDPOINT_AB_DIST_THRE = 0.2;
 	const static float CROSS_PATTERN_MIDPOINT_C_DIST_THRE = 0.5;
 	const static float CROSS_PATTERN_COSANGLE_THRE = cos(60.f*ldp::PI_S / 180.f);
+	const static float QUAD_PATTERN_CONTACT_DIST_THRE = 0.2;
 
 	static GLenum lineJoinConverter(const SvgPath *path)
 	{
@@ -294,8 +295,16 @@ namespace svg
 
 		// 2.1 
 		std::vector<int> cross_posOfM_begin, cross_posOfM_end;
+		std::vector<int> quad_posOfM_begin, quad_posOfM_end;
 		for (size_t i = 0; i < segPathPtr->m_cmds.size(); )
 		{
+			if (segPathPtr->isOrderedSegmentsQuadPattern(i))
+			{
+				quad_posOfM_begin.push_back(i);
+				quad_posOfM_end.push_back(i + 10);
+				i += 10;
+				continue;
+			}
 			if (segPathPtr->isOrderedSegmentsCrossPattern(i))
 			{
 				cross_posOfM_begin.push_back(i);
@@ -309,6 +318,10 @@ namespace svg
 		((SvgPath*)crossPath.get())->m_pathShape = PathUnitShapes::ShapeCross;
 		crossPath->setParent(groupPtr);
 		groupPtr->m_children.push_back(crossPath);
+		auto quadPath = segPathPtr->subPath(quad_posOfM_begin, quad_posOfM_end, false);
+		((SvgPath*)quadPath.get())->m_pathShape = PathUnitShapes::ShapeQuad;
+		quadPath->setParent(groupPtr);
+		groupPtr->m_children.push_back(quadPath);
 		return group;
 	}
 
@@ -429,6 +442,51 @@ namespace svg
 			if (is_crossed_segs(segs[od[0]], segs[od[1]], segs[od[2]]))
 				return true;
 		}
+
+		return false;
+	}
+
+	inline int num_contact_segs(const ldp::Float2* pts, const int nSegments, int id)
+	{
+		const ldp::Float2 *p = pts + id*2;
+		int n = 0;
+		for (int k = 0; k < nSegments; k++)
+		{
+			if (k == id) continue;
+			const ldp::Float2* t = pts + k*2;
+			float d1 = (p[0] - t[0]).length();
+			float d2 = (p[0] - t[1]).length();
+			float d3 = (p[1] - t[0]).length();
+			float d4 = (p[1] - t[1]).length();
+			n += d1 < QUAD_PATTERN_CONTACT_DIST_THRE;
+			n += d2 < QUAD_PATTERN_CONTACT_DIST_THRE;
+			n += d3 < QUAD_PATTERN_CONTACT_DIST_THRE;
+			n += d4 < QUAD_PATTERN_CONTACT_DIST_THRE;
+		}
+		return n;
+	}
+
+	bool SvgPath::isOrderedSegmentsQuadPattern(int cmdPos)const
+	{
+		const static int nSegments = 5;
+		const static int nCmds = nSegments * 2;
+		if (cmdPos + nSegments * 2 > m_cmds.size())
+			return false;
+
+		ldp::Float2 segs[nSegments*2];
+		for (int k = 0; k < nCmds; k++)
+			segs[k] = ldp::Float2(m_coords[(cmdPos + k) * 2], m_coords[(cmdPos + k) * 2 + 1]);
+
+		int num_contacts[3] = { 0, 0, 0 };
+		for (int k = 0; k < nSegments; k++)
+		{
+			int n = num_contact_segs(segs, nSegments, k);
+			if (n > 3) return false;
+			num_contacts[n-1]++;
+		}
+
+		if (num_contacts[0] == 0 && num_contacts[1] == 3 && num_contacts[2] == 2)
+			return true;
 
 		return false;
 	}

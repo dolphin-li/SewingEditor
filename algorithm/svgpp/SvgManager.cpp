@@ -7,6 +7,7 @@
 
 #include "nvprsvg\svg_loader.hpp"
 #include "stc\scene_stc.hpp"
+#include "tinyxml\tinyxml.h"
 
 #include "SvgAbstractObject.h"
 #include "SvgAttribute.h"
@@ -235,6 +236,45 @@ namespace svg
 			ldp::Float4 b = m_rootGroup->getBound();
 			m_renderCam->setFrustum(b[0], b[1], b[2], b[3], -1, 1);
 		}
+	}
+
+	void SvgManager::save(const char* svg_file)
+	{
+		TiXmlDocument doc;
+
+		// header info-------------------------------------------------------
+		TiXmlDeclaration *dec = new TiXmlDeclaration("1.0", "utf-8", "");
+		doc.LinkEndChild(dec);
+		TiXmlElement *dec_ele = new TiXmlElement("!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\"");
+		doc.LinkEndChild(dec_ele);
+		dec_ele->ldp_hack_ignore_last_dash = true;
+		TiXmlElement *root_ele = new TiXmlElement("svg");
+		doc.LinkEndChild(root_ele);
+		root_ele->SetAttribute("version", "1.1");
+		root_ele->SetAttribute("id", "Layer_1");
+		if (m_rootGroup.get())
+		{
+			std::string x, y, w, h;
+			x = std::to_string(m_rootGroup->getOrigion()[0]);
+			y = std::to_string(m_rootGroup->getOrigion()[1]);
+			w = std::to_string(m_rootGroup->getSize()[0]);
+			h = std::to_string(m_rootGroup->getSize()[1]);
+			root_ele->SetAttribute("x", (x + "px").c_str());
+			root_ele->SetAttribute("y", (y + "px").c_str());
+			root_ele->SetAttribute("width", (w + "px").c_str());
+			root_ele->SetAttribute("height", (h + "px").c_str());
+			root_ele->SetAttribute("viewBox", (x + " " + y + " " + w + " " + h).c_str());
+			root_ele->SetAttribute("enable-background", ("new " + x + " " + y + " " + w + " " + h).c_str());
+			root_ele->SetAttribute("xml:space", "preserve");
+		}
+
+		if (m_rootGroup.get())
+		{
+			m_rootGroup->toXML(root_ele);
+		}
+
+		if (!doc.SaveFile(svg_file))
+			throw std::exception((("error writing svg file: ") + std::string(svg_file)).c_str());
 	}
 
 	int SvgManager::width()const

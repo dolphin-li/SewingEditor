@@ -1000,6 +1000,8 @@ protected:
 private:
 
 	TiXmlAttributeSet attributeSet;
+public:
+	bool ldp_hack_ignore_last_dash;
 };
 
 

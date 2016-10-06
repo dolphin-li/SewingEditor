@@ -25,6 +25,11 @@ namespace svg
 	const static float MIDDASH_PATTERN_SPACE_MEAN_LENGTH = 4.3;
 	const static float MIDDASH_PATTERN_SPACE_THRE_LENGTH = 0.8;
 	const static int MIDDASH_PATTERN_MIN_SEGS_NUM = 3;
+	const static float LONGSHORT_PATTERN_MIN_LONG_SHORT_RATIO_MIN = 1.5;
+	const static float LONGSHORT_PATTERN_MIN_LONG_SHORT_RATIO_MAX = 100;
+	const static float LONGSHORT_PATTERN_MIN_SHORT_STD_THRE = 0.5;
+	const static int LONGSHORT_PATTERN_MIN_SEGS_NUM = 2;
+	const static float LONGSHORT_PATTERN_CONTACT_DIST_THRE = 0.2;
 
 	static GLenum lineJoinConverter(const SvgPath *path)
 	{
@@ -312,6 +317,7 @@ namespace svg
 		std::vector<int> solid_posOfM_begin, solid_posOfM_end;
 		std::vector<int> tinyDash_posOfM_begin, tinyDash_posOfM_end;
 		std::vector<int> midDash_posOfM_begin, midDash_posOfM_end;
+		std::vector<int> lsDash_posOfM_begin, lsDash_posOfM_end;
 		for (size_t i = 0; i < segPathPtr->m_cmds.size(); )
 		{
 			int nCmdLength = 0;
@@ -343,6 +349,12 @@ namespace svg
 			{
 				midDash_posOfM_begin.push_back(i);
 				midDash_posOfM_end.push_back(i + nCmdLength);
+				i += nCmdLength;
+			}
+			else if (segPathPtr->isOrderedLongShortPattern(i, nCmdLength))
+			{
+				lsDash_posOfM_begin.push_back(i);
+				lsDash_posOfM_end.push_back(i + nCmdLength);
 				i += nCmdLength;
 			}
 			else
@@ -380,6 +392,13 @@ namespace svg
 		{
 			auto tmpPath = segPathPtr->subPath(midDash_posOfM_begin, midDash_posOfM_end, false);
 			((SvgPath*)tmpPath.get())->m_pathShape = PathUnitShapes::ShapeMidDash;
+			tmpPath->setParent(groupPtr);
+			groupPtr->m_children.push_back(tmpPath);
+		}
+		if (lsDash_posOfM_begin.size())
+		{
+			auto tmpPath = segPathPtr->subPath(lsDash_posOfM_begin, lsDash_posOfM_end, false);
+			((SvgPath*)tmpPath.get())->m_pathShape = PathUnitShapes::ShapeLongShort;
 			tmpPath->setParent(groupPtr);
 			groupPtr->m_children.push_back(tmpPath);
 		}
@@ -688,6 +707,72 @@ namespace svg
 		return true;
 	}
 
+	bool SvgPath::isOrderedLongShortPattern(int cmdPos, int& nCmdLength)const
+	{
+		if (m_cmds.size() <= 1)
+			return false;
+
+		nCmdLength = 0;
+		assert((m_cmds.size() - cmdPos) % 2 == 0);
+		ldp::Float2 lastPM, lastPL;
+		float lastLen = 0;
+		int numLongs = 0, numShorts = 0, numSpaces = 0;
+		float avgLongs = 0, avgShorts = 0, avgSpaces = 0, avgShorts2 = 0;
+		bool longSide = true;
+		for (size_t k = cmdPos; k < m_cmds.size(); k += 2)
+		{
+			ldp::Float2 pM(m_coords[k * 2], m_coords[k * 2 + 1]);
+			ldp::Float2 pL(m_coords[k * 2 + 2], m_coords[k * 2 + 3]);
+			float len = (pM - pL).length();
+			if (k > cmdPos)
+			{
+				float dmin = seg_min_distance(pM, pL, lastPM, lastPL);
+				float dmax = seg_max_distance(pM, pL, lastPM, lastPL);
+				if (dmin > SEG_BREAK_DISTANCE_THRE)
+					break;
+				if (dmin > LONGSHORT_PATTERN_CONTACT_DIST_THRE)
+				{
+					if (longSide) 
+						numLongs++;
+					else 
+						numShorts++;
+					longSide = !longSide;
+				}
+				avgSpaces += dmin;
+				numSpaces++;
+			}
+			if (longSide)
+			{
+				avgLongs += len;
+			}
+			else
+			{
+				avgShorts += len;
+				avgShorts2 += len * len;
+			}
+			lastPM = pM;
+			lastPL = pL;
+			lastLen = len;
+			nCmdLength += 2;
+			/// TO DO bugs here...
+		}
+
+		if (numLongs + numShorts < LONGSHORT_PATTERN_MIN_SEGS_NUM)
+			return false;
+		
+		avgLongs /= numLongs;
+		avgShorts /= numShorts;
+		avgShorts2 /= numShorts;
+		avgSpaces /= numSpaces;
+		float ratio = std::max(avgLongs / avgShorts, avgShorts / avgLongs);
+		if (ratio < LONGSHORT_PATTERN_MIN_LONG_SHORT_RATIO_MIN || ratio > LONGSHORT_PATTERN_MIN_LONG_SHORT_RATIO_MAX)
+			return false;
+		//float std = sqrt(avgShorts2 - avgShorts*avgShorts);
+		//if (std > LONGSHORT_PATTERN_MIN_SHORT_STD_THRE)
+		//	return false;
+		return true;
+	}
+
 	void SvgPath::copyTo(SvgAbstractObject* obj)const
 	{
 		SvgAbstractObject::copyTo(obj);
@@ -711,6 +796,41 @@ namespace svg
 		copyTo(newTptr);
 
 		return newT;
+	}
+
+	void SvgPath::toXML(TiXmlNode* parent)const
+	{
+		std::string cmdStr;
+		char buffer[1014];
+		std::vector<int> cmdPos;
+		cmdPos.push_back(0);
+		for (auto c : m_cmds)
+			cmdPos.push_back(cmdPos.back() + numCoords(c));
+		for (size_t i_cmd = 0; i_cmd < m_cmds.size(); i_cmd++)
+		{
+			auto str = svgCmd(m_cmds[i_cmd]);
+			if (str == 'A')
+				throw std::exception("arc export not implemented!");
+			cmdStr += str;
+			int bg = cmdPos[i_cmd], ed = cmdPos[i_cmd + 1];
+			for (int i = bg; i < ed; i++)
+			{
+				sprintf_s(buffer, "%.2f", m_coords[i]);
+				cmdStr += buffer;
+				if (i < ed - 1)
+					cmdStr += ',';
+			}
+		}
+
+		TiXmlElement* ele = new TiXmlElement("path");
+		parent->LinkEndChild(ele);
+		ele->SetAttribute("fill", strokeFillMap(m_pathStyle.fill_rule));
+		ele->SetAttribute("stroke", "#231F20");
+		ele->SetDoubleAttribute("stroke-width", m_pathStyle.stroke_width);
+		ele->SetAttribute("stroke-linecap", strokeLineCapMap(m_pathStyle.line_cap));
+		ele->SetAttribute("stroke-linejoin", strokeLineJoinMap(m_pathStyle.line_join));
+		ele->SetDoubleAttribute("stroke-miterlimit", m_pathStyle.miter_limit);
+		ele->SetAttribute("d", cmdStr.c_str());
 	}
 
 	bool SvgPath::isClosed()const
@@ -1362,9 +1482,84 @@ namespace svg
 		return a;
 	}
 
-	int SvgPath::numCoords(GLuint cmd)
+	int SvgPath::numCoords(GLubyte cmd)
 	{
 		static std::vector<int> ary = createCoordCmdMap();
 		return ary[cmd];
 	}
+
+	static std::vector<char> createCmdMap()
+	{
+		std::vector<char> a;
+		a.resize(100, 0);
+		a[GL_MOVE_TO_NV] = 'M';
+		a[GL_LINE_TO_NV] = 'L';
+		a[GL_QUADRATIC_CURVE_TO_NV] = 'Q';
+		a[GL_CUBIC_CURVE_TO_NV] = 'C';
+		a[GL_LARGE_CCW_ARC_TO_NV] = 'A';
+		a[GL_LARGE_CW_ARC_TO_NV] = 'A';
+		a[GL_SMALL_CCW_ARC_TO_NV] = 'A';
+		a[GL_SMALL_CW_ARC_TO_NV] = 'A';
+		a[GL_CLOSE_PATH_NV] = 'Z';
+		return a;
+	}
+
+	char SvgPath::svgCmd(GLubyte cmd)
+	{
+		static std::vector<char> ary = createCmdMap();
+		return ary[cmd];
+	}
+
+	const char* SvgPath::strokeFillMap(int fill)
+	{
+		PathStyle::FillRule f = (PathStyle::FillRule)fill;
+		switch (f)
+		{
+		case PathStyle::EVEN_ODD:
+			return "none";
+		case PathStyle::NON_ZERO:
+			return "none";
+		default:
+			return "none";
+		}
+	}
+
+	const char* SvgPath::strokeLineCapMap(int cap)
+	{
+		PathStyle::LineCap l = PathStyle::LineCap(cap);
+		switch (l)
+		{
+		case PathStyle::BUTT_CAP:
+			return "butt";
+		case PathStyle::ROUND_CAP:
+			return "round";
+		case PathStyle::SQUARE_CAP:
+			return "square";
+		case PathStyle::TRIANGLE_CAP:
+			return "triangle";
+		default:
+			return "round";
+		}
+	}
+
+	const char* SvgPath::strokeLineJoinMap(int join)
+	{
+		PathStyle::LineJoin j = PathStyle::LineJoin(join);
+		switch (j)
+		{
+		case PathStyle::NONE_JOIN:
+			return "none";
+		case PathStyle::MITER_REVERT_JOIN:
+			return "miter-revert";
+		case PathStyle::ROUND_JOIN:
+			return "round";
+		case PathStyle::BEVEL_JOIN:
+			return "bevel";
+		case PathStyle::MITER_TRUNCATE_JOIN:
+			return "miter-truncate";
+		default:
+			return "none";
+		}
+	}
+
 }

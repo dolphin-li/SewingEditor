@@ -14,6 +14,7 @@ namespace svg
 		virtual void render(PathUnitShapes shapeToRender = ShapeAll);
 		virtual void renderId(PathUnitShapes shapeToRender = ShapeAll);
 		virtual std::shared_ptr<SvgAbstractObject> clone()const;
+		virtual void toXML(TiXmlNode* parent)const;
 		virtual void copyTo(SvgAbstractObject* obj)const;
 		virtual ldp::Float2 getStartPoint()const;
 		virtual ldp::Float2 getEndPoint()const;
@@ -48,6 +49,7 @@ namespace svg
 		bool isOrderedSolidPattern(int cmdPos)const;
 		bool isOrderedTinyDashPattern(int cmdPos, int& nCmdLength)const;
 		bool isOrderedMidDashPattern(int cmdPos, int& nCmdLength)const;
+		bool isOrderedLongShortPattern(int cmdPos, int& nCmdLength)const;
 	public:
 		std::vector<GLubyte> m_cmds;
 		std::vector<GLfloat> m_coords;
@@ -55,8 +57,11 @@ namespace svg
 		PathStyle m_pathStyle;
 
 		// return number of coordinates associated with a cmd
-		static int numCoords(GLuint cmd);
-
+		static int numCoords(GLubyte cmd);
+		static char svgCmd(GLubyte cmd);
+		static const char* strokeFillMap(int fill);
+		static const char* strokeLineCapMap(int cap);
+		static const char* strokeLineJoinMap(int join);
 	public:
 		struct GLPathResource{
 			GLuint id;

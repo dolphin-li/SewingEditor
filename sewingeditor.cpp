@@ -104,6 +104,7 @@ void SewingEditor::on_actionSave_svg_triggered()
 			return;
 		if (!name.endsWith(".svg"))
 			name.append(".svg");
+		ui.widget->getSvgManager()->save(name.toStdString().c_str());
 	}
 	catch (std::exception e)
 	{

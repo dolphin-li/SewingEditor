@@ -1,6 +1,5 @@
 #include "GL\glew.h"
 #include "SvgGroup.h"
-
 namespace svg
 {
 #undef min
@@ -43,6 +42,14 @@ namespace svg
 		}
 
 		setBound(unionBound(box));
+	}
+
+	void SvgGroup::toXML(TiXmlNode* parent)const
+	{
+		TiXmlElement* ele = new TiXmlElement("g");
+		parent->LinkEndChild(ele);
+		for (auto child : m_children)
+			child->toXML(ele);
 	}
 
 	void SvgGroup::copyTo(SvgAbstractObject* obj)const

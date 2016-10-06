@@ -216,6 +216,23 @@ namespace svg
 		return newT;
 	}
 
+	void SvgText::toXML(TiXmlNode* parent)const
+	{
+		TiXmlElement* ele = new TiXmlElement("text");
+		parent->LinkEndChild(ele);
+		std::string trans = "matrix(";
+		trans += std::to_string(m_attribute->m_transfrom(0, 0)) + " ";
+		trans += std::to_string(m_attribute->m_transfrom(0, 1)) + " ";
+		trans += std::to_string(m_attribute->m_transfrom(1, 0)) + " ";
+		trans += std::to_string(m_attribute->m_transfrom(1, 1)) + " ";
+		trans += std::to_string(m_attribute->m_transfrom(0, 2)) + " ";
+		trans += std::to_string(m_attribute->m_transfrom(1, 2)) + ")";
+		ele->SetAttribute("transform", trans.c_str());
+		ele->SetAttribute("font-family", ("'"+m_font.substr(1, m_font.size()-2)+"'").c_str());
+		ele->SetAttribute("font-size", std::to_string(m_font_size).c_str());
+		ele->LinkEndChild(new TiXmlText(m_text.c_str()));
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	std::map<std::string, SvgText::FontFacePtr> SvgText::m_font_face_map;
 	int SvgText::FontFace::gl_path_id = 0;

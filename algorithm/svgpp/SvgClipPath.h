@@ -14,6 +14,7 @@ namespace svg
 		virtual void renderId(PathUnitShapes shape = ShapeAll);
 		virtual std::shared_ptr<SvgAbstractObject> clone()const;
 		virtual void copyTo(SvgAbstractObject* obj)const{}
+		virtual void toXML(TiXmlNode* parent)const{}
 	private:
 
 	};

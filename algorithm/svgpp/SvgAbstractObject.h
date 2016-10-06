@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 #include "ldp_basic_mat.h"
-
+#include "tinyxml\tinyxml.h"
 namespace svg
 {
 	class SvgAttribute;
@@ -46,6 +46,7 @@ namespace svg
 		virtual void render(PathUnitShapes shapeToRender = ShapeAll) = 0;
 		virtual void renderId(PathUnitShapes shapeToRender = ShapeAll) = 0;
 		virtual std::shared_ptr<SvgAbstractObject> clone()const = 0;
+		virtual void toXML(TiXmlNode* parent)const = 0;
 		void invalid(){ m_invalid = true; } // call me when render context updated.
 		virtual void copyTo(SvgAbstractObject* obj)const;
 		virtual PathUnitShapes shapeType()const{ return m_pathShape; }
@@ -78,7 +79,7 @@ namespace svg
 		ldp::Float4 unionBound(ldp::Float4 b)const;
 		ldp::Float4 unionBound(ldp::Float2 point)const;
 		ldp::Float4 intersectBound(ldp::Float4 b)const;
-		ldp::Float2 getOrigion()const{ return ldp::Float2(m_bbox[0], m_bbox[1]); }
+		ldp::Float2 getOrigion()const{ return ldp::Float2(m_bbox[0], m_bbox[2]); }
 		ldp::Float2 getSize()const { return ldp::Float2(width(), height()); }
 		virtual ldp::Float2 getStartPoint()const{ return std::numeric_limits<float>::quiet_NaN(); }
 		virtual ldp::Float2 getEndPoint()const{ return std::numeric_limits<float>::quiet_NaN(); }

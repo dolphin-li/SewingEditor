@@ -93,7 +93,9 @@ void TiXmlBase::PutString( const TIXML_STRING& str, TIXML_STRING* outString )
 		}
 		else if ( c == '\'' )
 		{
-			outString->append( entity[4].str, entity[4].strLength );
+			//outString->append( entity[4].str, entity[4].strLength );
+			// ldp hack: @apos; seems not a standard, we just use ' itself
+			outString->append("\'", 1);
 			++i;
 		}
 		else if ( c < 32 )
@@ -618,6 +620,7 @@ TiXmlElement::TiXmlElement (const char * _value)
 {
 	firstChild = lastChild = 0;
 	value = _value;
+	ldp_hack_ignore_last_dash = false;
 }
 
 
@@ -636,6 +639,7 @@ TiXmlElement::TiXmlElement( const TiXmlElement& copy)
 {
 	firstChild = lastChild = 0;
 	copy.CopyTo( this );	
+	ldp_hack_ignore_last_dash = false;
 }
 
 
@@ -833,7 +837,10 @@ void TiXmlElement::Print( FILE* cfile, int depth ) const
 	TiXmlNode* node;
 	if ( !firstChild )
 	{
-		fprintf( cfile, " />" );
+		if (ldp_hack_ignore_last_dash)
+			fprintf(cfile, ">");
+		else
+			fprintf( cfile, " />" );
 	}
 	else if ( firstChild == lastChild && firstChild->ToText() )
 	{

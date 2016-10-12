@@ -360,9 +360,10 @@ void SewingEditor::rollBackTo(int pos)
 		return;
 
 	m_rollPos = (m_rollHead + pos) % MAX_ROLLBACK_STEP;
+	ldp::Float4 lastBound = ui.widget->getSvgManager()->getBound();
 	ui.widget->setSvgManager(m_rollBackControls[m_rollPos].data->clone());
-	if (ui.widget->width() != ui.widget->getSvgManager()->width() ||
-		ui.widget->height() != ui.widget->getSvgManager()->height())
+	ldp::Float4 thisBound = ui.widget->getSvgManager()->getBound();
+	if (lastBound != thisBound)
 	{
 		float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
 		ui.squareWidget->setAspect(asp);

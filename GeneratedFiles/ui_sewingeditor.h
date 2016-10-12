@@ -62,9 +62,14 @@ public:
     QStatusBar *statusBar;
     QDockWidget *dockWidgetRight;
     QWidget *dockWidgetRightContents;
-    QGridLayout *gridLayout_2;
+    QGridLayout *gridLayout_3;
     QListWidget *listHistory;
+    QGroupBox *gbLayers;
+    QGridLayout *gridLayout_2;
     QListWidget *listLayers;
+    QPushButton *pbNewLayer;
+    QPushButton *pbMergeLayers;
+    QPushButton *pbRemoveLayers;
     QGroupBox *gbParam;
     QPushButton *pbSelectConnected;
     QPushButton *pbSelectSimilarShape;
@@ -77,7 +82,7 @@ public:
     {
         if (SewingEditorClass->objectName().isEmpty())
             SewingEditorClass->setObjectName(QStringLiteral("SewingEditorClass"));
-        SewingEditorClass->resize(1080, 869);
+        SewingEditorClass->resize(1086, 873);
         QPalette palette;
         QBrush brush(QColor(255, 255, 255, 255));
         brush.setStyle(Qt::SolidPattern);
@@ -197,7 +202,7 @@ public:
         menuBar = new QMenuBar(SewingEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
         menuBar->setEnabled(true);
-        menuBar->setGeometry(QRect(0, 0, 1080, 21));
+        menuBar->setGeometry(QRect(0, 0, 1086, 21));
         QPalette palette1;
         palette1.setBrush(QPalette::Active, QPalette::WindowText, brush1);
         palette1.setBrush(QPalette::Active, QPalette::Button, brush1);
@@ -259,29 +264,59 @@ public:
         SewingEditorClass->setStatusBar(statusBar);
         dockWidgetRight = new QDockWidget(SewingEditorClass);
         dockWidgetRight->setObjectName(QStringLiteral("dockWidgetRight"));
-        dockWidgetRight->setMinimumSize(QSize(200, 575));
+        dockWidgetRight->setMinimumSize(QSize(275, 575));
         dockWidgetRight->setFeatures(QDockWidget::NoDockWidgetFeatures);
         dockWidgetRight->setAllowedAreas(Qt::RightDockWidgetArea);
         dockWidgetRightContents = new QWidget();
         dockWidgetRightContents->setObjectName(QStringLiteral("dockWidgetRightContents"));
-        gridLayout_2 = new QGridLayout(dockWidgetRightContents);
-        gridLayout_2->setSpacing(6);
-        gridLayout_2->setContentsMargins(11, 11, 11, 11);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout_3 = new QGridLayout(dockWidgetRightContents);
+        gridLayout_3->setSpacing(6);
+        gridLayout_3->setContentsMargins(11, 11, 11, 11);
+        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
         listHistory = new QListWidget(dockWidgetRightContents);
         listHistory->setObjectName(QStringLiteral("listHistory"));
         listHistory->setStyleSheet(QStringLiteral(""));
+        listHistory->setTabKeyNavigation(false);
 
-        gridLayout_2->addWidget(listHistory, 0, 0, 1, 1);
+        gridLayout_3->addWidget(listHistory, 0, 0, 1, 1);
 
-        listLayers = new QListWidget(dockWidgetRightContents);
+        gbLayers = new QGroupBox(dockWidgetRightContents);
+        gbLayers->setObjectName(QStringLiteral("gbLayers"));
+        gridLayout_2 = new QGridLayout(gbLayers);
+        gridLayout_2->setSpacing(6);
+        gridLayout_2->setContentsMargins(11, 11, 11, 11);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        listLayers = new QListWidget(gbLayers);
         listLayers->setObjectName(QStringLiteral("listLayers"));
         listLayers->setStyleSheet(QStringLiteral(""));
+        listLayers->setTabKeyNavigation(true);
+        listLayers->setDragEnabled(true);
+        listLayers->setDragDropMode(QAbstractItemView::InternalMove);
         listLayers->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        listLayers->setResizeMode(QListView::Adjust);
+        listLayers->setLayoutMode(QListView::Batched);
         listLayers->setGridSize(QSize(50, 20));
         listLayers->setViewMode(QListView::ListMode);
 
-        gridLayout_2->addWidget(listLayers, 1, 0, 1, 1);
+        gridLayout_2->addWidget(listLayers, 0, 0, 1, 3);
+
+        pbNewLayer = new QPushButton(gbLayers);
+        pbNewLayer->setObjectName(QStringLiteral("pbNewLayer"));
+
+        gridLayout_2->addWidget(pbNewLayer, 1, 0, 1, 1);
+
+        pbMergeLayers = new QPushButton(gbLayers);
+        pbMergeLayers->setObjectName(QStringLiteral("pbMergeLayers"));
+
+        gridLayout_2->addWidget(pbMergeLayers, 1, 1, 1, 1);
+
+        pbRemoveLayers = new QPushButton(gbLayers);
+        pbRemoveLayers->setObjectName(QStringLiteral("pbRemoveLayers"));
+
+        gridLayout_2->addWidget(pbRemoveLayers, 1, 2, 1, 1);
+
+
+        gridLayout_3->addWidget(gbLayers, 1, 0, 1, 1);
 
         gbParam = new QGroupBox(dockWidgetRightContents);
         gbParam->setObjectName(QStringLiteral("gbParam"));
@@ -299,7 +334,7 @@ public:
         pbSplitByShape->setObjectName(QStringLiteral("pbSplitByShape"));
         pbSplitByShape->setGeometry(QRect(20, 120, 111, 23));
 
-        gridLayout_2->addWidget(gbParam, 2, 0, 1, 1);
+        gridLayout_3->addWidget(gbParam, 2, 0, 1, 1);
 
         dockWidgetRight->setWidget(dockWidgetRightContents);
         SewingEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
@@ -376,6 +411,13 @@ public:
         menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));
         menuPath->setTitle(QApplication::translate("SewingEditorClass", "path", 0));
         menuOp->setTitle(QApplication::translate("SewingEditorClass", "op", 0));
+        gbLayers->setTitle(QApplication::translate("SewingEditorClass", "Layers", 0));
+        pbNewLayer->setText(QApplication::translate("SewingEditorClass", "New", 0));
+        pbNewLayer->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+N", 0));
+        pbMergeLayers->setText(QApplication::translate("SewingEditorClass", "Merge", 0));
+        pbMergeLayers->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+M", 0));
+        pbRemoveLayers->setText(QApplication::translate("SewingEditorClass", "Remove", 0));
+        pbRemoveLayers->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+R", 0));
         gbParam->setTitle(QApplication::translate("SewingEditorClass", "param", 0));
         pbSelectConnected->setText(QApplication::translate("SewingEditorClass", "select connected", 0));
         pbSelectSimilarShape->setText(QApplication::translate("SewingEditorClass", "select similar shape", 0));

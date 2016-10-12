@@ -13,6 +13,26 @@ namespace svg
 	class SvgManager
 	{
 	public:
+		struct Layer
+		{
+			Layer();
+
+			bool operator < (const Layer& rhs)
+			{
+				return name < rhs.name;
+			}
+			bool operator == (const Layer& rhs)
+			{
+				return name == rhs.name;
+			}
+			void updateIndex(SvgAbstractObject* obj, int &idx);
+
+			std::shared_ptr<SvgAbstractObject> root;
+			std::map<int, SvgAbstractObject*> idxMap;
+			std::set<SvgAbstractObject*> groups_for_selection;
+			std::string name;
+			bool selected;
+		};
 		enum SelectOp{
 			SelectThis,
 			SelectUnion,
@@ -27,10 +47,22 @@ namespace svg
 
 		void init(Camera* cam);
 		void load(const char* svg_file);
-		void save(const char* svg_file);
+		void save(const char* svg_file, bool selectionOnly=true);
 		void render(int shapes);
 		void renderIndex(int shapes);
 		std::shared_ptr<SvgManager> clone()const;
+
+		Layer* addLayer(std::string name = "");
+		Layer* getLayer(std::string name);
+		const Layer* getLayer(std::string name)const;
+		Layer* getCurrentLayer();
+		const Layer* getCurrentLayer()const;
+		void setCurrentLayer(std::string name);
+		void removeLayer(std::string name);
+		void renameLayer(std::string oldname, std::string newname);
+		void mergeSelectedLayers();
+		const std::map<std::string, std::shared_ptr<Layer>>& layers()const { return m_layers; }
+		
 
 		int width()const;
 		int height()const;
@@ -76,7 +108,6 @@ namespace svg
 		// for burdastyle data, see SvgPath::PathUnitShapes
 		void splitSelectedPathByShape();
 	protected:
-		void updateIndex(SvgAbstractObject* obj, int &idx);
 		void removeSelected(SvgAbstractObject* obj);
 		bool groupSelected_findCommonParent(std::shared_ptr<SvgAbstractObject> obj,
 			std::shared_ptr<SvgAbstractObject> objParent,
@@ -88,8 +119,7 @@ namespace svg
 		void splitPathByShape(std::shared_ptr<SvgAbstractObject>& obj);
 	private:
 		Camera* m_renderCam;
-		std::shared_ptr<SvgAbstractObject> m_rootGroup;
-		std::map<int, SvgAbstractObject*> m_idxMap;
-		std::set<SvgAbstractObject*> m_groups_for_selection;
+		std::map<std::string, std::shared_ptr<Layer>> m_layers;
+		std::string m_currentLayerName;
 	};
 }

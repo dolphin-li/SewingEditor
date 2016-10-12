@@ -12,7 +12,12 @@ SewingEditor::SewingEditor(QWidget *parent)
 	new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(showFullScreen()));
 	new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(showNormal()));
 
+	setAcceptDrops(true);
+
 	initLeftDockActions();
+
+	connect(ui.listLayers->itemDelegate(), SIGNAL(closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint)), 
+		this, SLOT(on_listWidgetEditEnd(QWidget*, QAbstractItemDelegate::EndEditHint)));
 	initLayerList();
 
 	resetRoll();
@@ -22,6 +27,37 @@ SewingEditor::SewingEditor(QWidget *parent)
 SewingEditor::~SewingEditor()
 {
 
+}
+
+void SewingEditor::dragEnterEvent(QDragEnterEvent* event)
+{
+	if (event->mimeData()->hasUrls())
+	{
+		QList<QUrl> urls = event->mimeData()->urls();
+		if (urls[0].fileName().endsWith(".svg"))
+			event->acceptProposedAction();
+	}
+}
+
+void SewingEditor::dropEvent(QDropEvent* event)
+{
+	QUrl url = event->mimeData()->urls()[0];
+	QString name = url.toLocalFile();
+	try
+	{
+		ui.widget->loadSvg(name);
+		pushHistory("load svg");
+		float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
+		ui.squareWidget->setAspect(asp);
+		ui.squareWidget->adjustChildWidget();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+
+	event->acceptProposedAction();
 }
 
 void SewingEditor::initLeftDockActions()
@@ -88,6 +124,7 @@ void SewingEditor::on_actionLoad_svg_triggered()
 		ui.squareWidget->setAspect(asp);
 		ui.squareWidget->adjustChildWidget();
 		ui.widget->updateGL();
+		initLayerList();
 	}
 	catch (std::exception e)
 	{
@@ -371,7 +408,10 @@ void SewingEditor::rollBackTo(int pos)
 		ui.widget->resetCamera();
 	}
 	ui.widget->updateGL();
+
 	updateHistoryList();
+
+	initLayerList();
 }
 
 void SewingEditor::rollBackward()
@@ -438,33 +478,138 @@ void SewingEditor::on_listHistory_currentRowChanged(int r)
 // layer control
 void SewingEditor::initLayerList()
 {
-	m_layerMap.clear();
-	m_layerMap.insert("unknown", svg::SvgAbstractObject::ShapeUnknown);
-	m_layerMap.insert("solid", svg::SvgAbstractObject::ShapeSolid);
-	m_layerMap.insert("tiny-dash", svg::SvgAbstractObject::ShapeTinyDash);
-	m_layerMap.insert("mid-dash", svg::SvgAbstractObject::ShapeMidDash);
-	m_layerMap.insert("long-short", svg::SvgAbstractObject::ShapeLongShort);
-	m_layerMap.insert("cross", svg::SvgAbstractObject::ShapeCross);
-	m_layerMap.insert("quad", svg::SvgAbstractObject::ShapeQuad);
-	m_layerMap.insert("circle", svg::SvgAbstractObject::ShapeCircle);
-	m_layerMap.insert("text", svg::SvgAbstractObject::ShapeText);
+	m_disableCurrentRowChanged = true;
+	ui.listLayers->setUpdatesEnabled(false);
 	ui.listLayers->clear();
-	for (auto iter : m_layerMap.toStdMap())
+	ui.listLayers->setEditTriggers(QAbstractItemView::DoubleClicked
+		| QAbstractItemView::EditKeyPressed);
+	int currentRow = 0;
+	for (auto iter : ui.widget->getSvgManager()->layers())
 	{
-		ui.listLayers->addItem(iter.first);
+		ui.listLayers->addItem(iter.first.c_str());
+		auto item = ui.listLayers->item(ui.listLayers->count() - 1);
+		item->setFlags(item->flags() | Qt::ItemIsEditable);
+		item->setSelected(iter.second->selected);
+		auto currentLayer = ui.widget->getSvgManager()->getCurrentLayer();
+		if (currentLayer == nullptr)
+		{
+			ui.widget->getSvgManager()->setCurrentLayer(iter.first);
+			currentLayer = ui.widget->getSvgManager()->getCurrentLayer();
+		}
+		if (currentLayer->name == iter.first)
+			currentRow = ui.listLayers->count() - 1;
 	}
-	ui.listLayers->selectAll();
+	ui.listLayers->setCurrentRow(currentRow);
+	ui.listLayers->setUpdatesEnabled(true);
+	m_disableCurrentRowChanged = false;
 }
 
 void SewingEditor::on_listLayers_itemSelectionChanged()
 {
-	auto items = ui.listLayers->selectedItems();
-	int shape = 0;
-	for (auto item : items)
+	try
 	{
-		shape |= m_layerMap[item->text()];
+		if (m_disableCurrentRowChanged)
+			return;
+		for (int i = 0; i < ui.listLayers->count(); i++)
+		{
+			auto item = ui.listLayers->item(i);
+			auto name = item->text().toStdString();
+			auto layer = ui.widget->getSvgManager()->getLayer(name);
+			if (layer == nullptr)
+				throw std::exception("FATAL: nullptr in itemSelectionChanged!");
+			layer->selected = item->isSelected();
+		}
+		ui.widget->updateGL();
 	}
-	ui.widget->setSvgShapeToRender(shape);
-	ui.widget->updateGL();
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_listLayers_currentRowChanged(int rowId)
+{
+	try
+	{
+		if (m_disableCurrentRowChanged)
+			return;
+		if (ui.listLayers->count() <= rowId || rowId < 0)
+			return;
+		ui.widget->getSvgManager()->setCurrentLayer(ui.listLayers->item(rowId)->text().toStdString());
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_listWidgetEditEnd(QWidget* widget, QAbstractItemDelegate::EndEditHint hint)
+{
+	try
+	{
+		if (m_disableCurrentRowChanged)
+			return;
+		QString newName = ui.listLayers->currentItem()->text();
+		ui.widget->getSvgManager()->renameLayer(
+			ui.widget->getSvgManager()->getCurrentLayer()->name, newName.toStdString());
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_pbNewLayer_clicked()
+{
+	try
+	{
+		auto layer = ui.widget->getSvgManager()->addLayer();
+		pushHistory(QString("add layer: ") + layer->name.c_str());
+		initLayerList();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_pbMergeLayers_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->mergeSelectedLayers();		
+		initLayerList();
+		ui.widget->updateGL();
+		pushHistory("merge selected layers");
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+void SewingEditor::on_pbRemoveLayers_clicked()
+{
+	try
+	{
+		QString info("remove layers: ");
+		auto items = ui.listLayers->selectedItems();
+		for (auto item : items)
+		{
+			ui.widget->getSvgManager()->removeLayer(item->text().toStdString());
+			info += item->text() + "; ";
+		}
+
+		initLayerList();
+
+		ui.widget->updateGL();
+		pushHistory(info);
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
 }
 

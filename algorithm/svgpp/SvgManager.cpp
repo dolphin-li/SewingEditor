@@ -4,6 +4,7 @@
 #include "SvgManager.h"
 
 #include "Camera.h"
+#include "util.h"
 
 #include "nvprsvg\svg_loader.hpp"
 #include "stc\scene_stc.hpp"
@@ -194,6 +195,12 @@ namespace svg
 
 #pragma endregion
 
+	SvgManager::Layer::Layer()
+	{
+		name = "";
+		selected = false;
+	}
+
 	SvgManager::SvgManager()
 	{
 		m_renderCam = nullptr;
@@ -208,8 +215,14 @@ namespace svg
 	{
 		std::shared_ptr<SvgManager> manager(new SvgManager());
 		manager->m_renderCam = m_renderCam;
-		if (m_rootGroup.get())
-			manager->m_rootGroup = m_rootGroup->clone();
+		manager->m_currentLayerName = m_currentLayerName;
+		for (auto iter : m_layers)
+		{
+			auto layer = manager->addLayer(iter.second->name);
+			layer->root = iter.second->root->clone();
+			layer->name = iter.second->name;
+			layer->selected = iter.second->selected;
+		}
 		manager->updateIndex();
 		manager->updateBound();
 		return manager;
@@ -224,21 +237,26 @@ namespace svg
 	{
 		// load scene using nvpr implementation
 		SvgScenePtr svg_scene = svg_loader(svg_file);
+		if (svg_scene.get() == nullptr)
+			throw std::exception(("file not exist:" + std::string(svg_file)).c_str());
 		
 		// convert to my data structure
-		m_rootGroup = std::shared_ptr<SvgAbstractObject>(new SvgGroup);
+		std::string pureName, dummy;
+		ldp::fileparts(svg_file, dummy, pureName, dummy);
+		Layer* layer = addLayer(pureName);
+		layer->root = std::shared_ptr<SvgAbstractObject>(new SvgGroup);
 		ConvertTraversal traversal; 
-		svg_scene->traverse(VisitorPtr(new ConvertVisitor((SvgGroup*)m_rootGroup.get())), traversal);
-
+		svg_scene->traverse(VisitorPtr(new ConvertVisitor((SvgGroup*)layer->root.get())), traversal);
+		m_currentLayerName = pureName;
 		removeSingleNodeAndEmptyNode();
 		if (m_renderCam)
 		{
-			ldp::Float4 b = m_rootGroup->getBound();
+			ldp::Float4 b = layer->root->getBound();
 			m_renderCam->setFrustum(b[0], b[1], b[2], b[3], -1, 1);
 		}
 	}
 
-	void SvgManager::save(const char* svg_file)
+	void SvgManager::save(const char* svg_file, bool selectionOnly)
 	{
 		TiXmlDocument doc;
 
@@ -252,25 +270,29 @@ namespace svg
 		doc.LinkEndChild(root_ele);
 		root_ele->SetAttribute("version", "1.1");
 		root_ele->SetAttribute("id", "Layer_1");
-		if (m_rootGroup.get())
-		{
-			std::string x, y, w, h;
-			x = std::to_string(m_rootGroup->getOrigion()[0]);
-			y = std::to_string(m_rootGroup->getOrigion()[1]);
-			w = std::to_string(m_rootGroup->getSize()[0]);
-			h = std::to_string(m_rootGroup->getSize()[1]);
-			root_ele->SetAttribute("x", (x + "px").c_str());
-			root_ele->SetAttribute("y", (y + "px").c_str());
-			root_ele->SetAttribute("width", (w + "px").c_str());
-			root_ele->SetAttribute("height", (h + "px").c_str());
-			root_ele->SetAttribute("viewBox", (x + " " + y + " " + w + " " + h).c_str());
-			root_ele->SetAttribute("enable-background", ("new " + x + " " + y + " " + w + " " + h).c_str());
-			root_ele->SetAttribute("xml:space", "preserve");
-		}
 
-		if (m_rootGroup.get())
+		for (auto iter : m_layers)
 		{
-			m_rootGroup->toXML(root_ele);
+			auto root = iter.second->root;
+			if (root.get()) continue;
+			if (selectionOnly && !iter.second->selected) continue;
+			if (root.get())
+			{
+				std::string x, y, w, h;
+				x = std::to_string(root->getOrigion()[0]);
+				y = std::to_string(root->getOrigion()[1]);
+				w = std::to_string(root->getSize()[0]);
+				h = std::to_string(root->getSize()[1]);
+				root_ele->SetAttribute("x", (x + "px").c_str());
+				root_ele->SetAttribute("y", (y + "px").c_str());
+				root_ele->SetAttribute("width", (w + "px").c_str());
+				root_ele->SetAttribute("height", (h + "px").c_str());
+				root_ele->SetAttribute("viewBox", (x + " " + y + " " + w + " " + h).c_str());
+				root_ele->SetAttribute("enable-background", ("new " + x + " " + y + " " + w + " " + h).c_str());
+				root_ele->SetAttribute("xml:space", "preserve");
+
+				root->toXML(root_ele);
+			}
 		}
 
 		if (!doc.SaveFile(svg_file))
@@ -279,36 +301,45 @@ namespace svg
 
 	int SvgManager::width()const
 	{
-		if (!m_rootGroup.get())
-			return 0;
-		return m_rootGroup->width();
+		float w = 0;
+		for (auto iter : m_layers)
+		{
+			w = std::max(w, iter.second->root->width());
+		}
+		return std::lroundf(w);
 	}
 
 	int SvgManager::height()const
 	{
-		if (!m_rootGroup.get())
-			return 0;
-		return m_rootGroup->height();
+		float h = 0;
+		for (auto iter : m_layers)
+		{
+			h = std::max(h, iter.second->root->height());
+		}
+		return std::lroundf(h);
 	}
 
 	void SvgManager::updateIndex()
 	{
 		int idx = SvgAbstractObject::INDEX_BEGIN;
-		m_idxMap.clear();
-		m_groups_for_selection.clear();
-		updateIndex(m_rootGroup.get(), idx);
+		for (auto iter : m_layers)
+		{
+			iter.second->idxMap.clear();
+			iter.second->groups_for_selection.clear();
+			iter.second->updateIndex(iter.second->root.get(), idx);
+		}
 	}
 
-	void SvgManager::updateIndex(SvgAbstractObject* obj, int& idx)
+	void SvgManager::Layer::updateIndex(SvgAbstractObject* obj, int& idx)
 	{
 		if (obj == nullptr)
 			return;
 		SvgAbstractObject* ogp = obj->ancestorAfterRoot();
 		if(ogp)
-			m_groups_for_selection.insert(ogp);
+			groups_for_selection.insert(ogp);
 
 		obj->setId(idx);
-		m_idxMap.insert(std::make_pair(idx, obj));
+		idxMap.insert(std::make_pair(idx, obj));
 		idx++;
 		if (obj->objectType() == SvgAbstractObject::Group)
 		{
@@ -320,37 +351,52 @@ namespace svg
 
 	void SvgManager::updateBound()
 	{
-		if (m_rootGroup.get() == nullptr)
+		if (m_layers.empty())
 			return;
-		m_rootGroup->updateBoundFromGeometry();
+		for (auto iter : m_layers)
+		{
+			iter.second->root->updateBoundFromGeometry();
+		}
 	}
 
 	ldp::Float4 SvgManager::getBound()const
 	{
-		if (m_rootGroup.get() == nullptr)
-			return ldp::Float4();
-		return m_rootGroup->getBound();
+		ldp::Float4 box;
+		for (auto iter : m_layers)
+		{
+			box = iter.second->root->unionBound(box);
+		}
+		return box;
 	}
 
 	void SvgManager::render(int shapes)
 	{
-		if (m_rootGroup.get() == nullptr)
+		if (m_layers.empty())
 			return;
-
-		m_rootGroup->render((SvgAbstractObject::PathUnitShapes)shapes);
+		for (auto iter : m_layers)
+		{
+			if (iter.second->root)
+				iter.second->root->render((SvgAbstractObject::PathUnitShapes)shapes);
+		}
 	}
 
 	void SvgManager::renderIndex(int shapes)
 	{
-		if (m_rootGroup.get() == nullptr)
+		if (m_layers.empty())
 			return;
-
-		m_rootGroup->renderId((SvgAbstractObject::PathUnitShapes)shapes);
+		for (auto iter : m_layers)
+		{
+			if (iter.second->root)
+				iter.second->root->renderId((SvgAbstractObject::PathUnitShapes)shapes);
+		}
 	}
 
 	void SvgManager::selectShapeByIndex(int id, SelectOp op)
 	{
-		for (auto iter : m_idxMap)
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
+			return;
+		for (auto iter : layer->idxMap)
 		{
 			SvgAbstractObject* obj = iter.second;
 			switch (op)
@@ -385,6 +431,9 @@ namespace svg
 
 	void SvgManager::selectShapeByIndex(const std::set<int>& ids, SelectOp op)
 	{
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
+			return;
 		bool has_valid = false;
 		for (auto iter : ids)
 		{
@@ -395,7 +444,7 @@ namespace svg
 			}
 		}
 
-		for (auto iter : m_idxMap)
+		for (auto iter : layer->idxMap)
 		{
 			SvgAbstractObject* obj = iter.second;
 			bool found = (ids.find(obj->getId()) != ids.end());
@@ -431,12 +480,15 @@ namespace svg
 
 	void SvgManager::selectGroupByIndex(int id_, SelectOp op)
 	{
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
+			return;
 		SvgAbstractObject* target = nullptr;
-		auto it = m_idxMap.find(id_);
-		if (it != m_idxMap.end())
+		auto it = layer->idxMap.find(id_);
+		if (it != layer->idxMap.end())
 			target = it->second->ancestorAfterRoot();
 
-		for (auto giter : m_groups_for_selection)
+		for (auto giter : layer->groups_for_selection)
 		{
 			SvgAbstractObject* ans = giter;
 			switch (op)
@@ -470,15 +522,18 @@ namespace svg
 
 	void SvgManager::selectGroupByIndex(const std::set<int>& ids, SelectOp op)
 	{
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
+			return;
 		std::set<SvgAbstractObject*> targets;
-		for (auto iter : m_idxMap)
+		for (auto iter : layer->idxMap)
 		{
 			auto it = ids.find(iter.first);
 			if (it != ids.end())
 				targets.insert(iter.second->ancestorAfterRoot());
 		}
 
-		for (auto giter : m_groups_for_selection)
+		for (auto giter : layer->groups_for_selection)
 		{
 			SvgAbstractObject* ans = giter;
 			switch (op)
@@ -514,21 +569,25 @@ namespace svg
 
 	void SvgManager::highlightShapeByIndex(int lastId, int thisId)
 	{
-		auto lastIt = m_idxMap.find(lastId);
-		if (lastIt != m_idxMap.end())
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
+			return;
+		auto lastIt = layer->idxMap.find(lastId);
+		if (lastIt != layer->idxMap.end())
 			lastIt->second->setHighlighted(false);
-		auto thisIt = m_idxMap.find(thisId);
-		if (thisIt != m_idxMap.end())
+		auto thisIt = layer->idxMap.find(thisId);
+		if (thisIt != layer->idxMap.end())
 			thisIt->second->setHighlighted(true);
 	}
 
 	bool SvgManager::groupSelected()
 	{
-		if (m_rootGroup.get() == nullptr)
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
 			return true;
 		std::shared_ptr<SvgAbstractObject> commonParent;
 		int cnt = 0;
-		bool ret = groupSelected_findCommonParent(m_rootGroup, 
+		bool ret = groupSelected_findCommonParent(layer->root, 
 			std::shared_ptr<SvgAbstractObject>(), commonParent, cnt);
 
 		if (commonParent.get() == nullptr)
@@ -571,10 +630,11 @@ namespace svg
 
 	void SvgManager::ungroupSelected()
 	{
-		if (m_rootGroup.get() == nullptr)
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
 			return;
 		std::set<SvgGroup*> groups;
-		ungroupSelected_collect(m_rootGroup.get(), groups);
+		ungroupSelected_collect(layer->root.get(), groups);
 
 		for (auto g : groups)
 		{
@@ -602,18 +662,18 @@ namespace svg
 
 	void SvgManager::removeSingleNodeAndEmptyNode()
 	{
-		if (m_rootGroup.get() == nullptr)
-			return;
-		removeSingleNodeAndEmptyNode(m_rootGroup);
+		for (auto iter : m_layers)
+			removeSingleNodeAndEmptyNode(iter.second->root);
 		updateIndex();
 		updateBound();
 	}
 
 	void SvgManager::removeSelected()
 	{
-		if (m_rootGroup.get() == nullptr)
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
 			return;
-		removeSelected(m_rootGroup.get());
+		removeSelected(layer->root.get());
 		updateIndex();
 		updateBound();
 	}
@@ -727,20 +787,22 @@ namespace svg
 
 	void SvgManager::splitSelectedPath()
 	{
-		if (m_rootGroup.get() == nullptr)
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
 			return;
-		splitPath(m_rootGroup);
+		splitPath(layer->root);
 		updateIndex();
 		updateBound();
 	}
 
 	bool SvgManager::mergeSelectedPath()
 	{
-		if (m_rootGroup.get() == nullptr)
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
 			return true;
 		std::shared_ptr<SvgAbstractObject> commonParent;
 		int cnt = 0;
-		bool ret = groupSelected_findCommonParent(m_rootGroup,
+		bool ret = groupSelected_findCommonParent(layer->root,
 			std::shared_ptr<SvgAbstractObject>(), commonParent, cnt);
 		if (commonParent.get() == nullptr)
 			return true;
@@ -794,9 +856,10 @@ namespace svg
 
 	void SvgManager::splitSelectedPathByShape()
 	{
-		if (m_rootGroup.get() == nullptr)
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
 			return;
-		splitPathByShape(m_rootGroup);
+		splitPathByShape(layer->root);
 		updateIndex();
 		updateBound();
 	}
@@ -849,8 +912,11 @@ namespace svg
 
 	void SvgManager::selectPathBySimilarSelectedWidth()
 	{
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
+			return;
 		std::set<float> widths;
-		for (auto iter : m_idxMap)
+		for (auto iter : layer->idxMap)
 		{
 			if (iter.second->objectType() == SvgAbstractObject::Path && iter.second->isSelected())
 			{
@@ -865,7 +931,10 @@ namespace svg
 
 	void SvgManager::selectPathByWidths(const std::set<float>& widths)
 	{
-		for (auto iter : m_idxMap)
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
+			return;
+		for (auto iter : layer->idxMap)
 		{
 			if (iter.second->objectType() == SvgAbstractObject::Path)
 			{
@@ -877,7 +946,8 @@ namespace svg
 
 	void SvgManager::selectPathConnected()
 	{
-		if (m_rootGroup.get() == nullptr)
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
 			return;
 		
 		// TO DO
@@ -885,7 +955,8 @@ namespace svg
 
 	void SvgManager::selectPathSimilarShape()
 	{
-		if (m_rootGroup.get() == nullptr)
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
 			return;
 
 		// TO DO
@@ -893,7 +964,10 @@ namespace svg
 
 	void SvgManager::selectPathClosed()
 	{
-		for (auto iter : m_idxMap)
+		auto layer = getCurrentLayer();
+		if (layer == nullptr)
+			return;
+		for (auto iter : layer->idxMap)
 		{
 			if (iter.second->objectType() == SvgAbstractObject::Path)
 			{
@@ -902,5 +976,123 @@ namespace svg
 					p->setSelected(true);
 			}
 		}
+	}
+
+	//////////////////////////////////////////////////////////////////
+	/// layer related
+	SvgManager::Layer* SvgManager::addLayer(std::string name)
+	{
+		// get a default layer name
+		if (name == "")
+		{
+			for (auto i = 0; i < 999999; i++)
+			{
+				std::string name_loc = "layer_" + std::to_string(i);
+				if (!getLayer(name_loc))
+				{
+					name = name_loc;
+					break;
+				}
+			}
+		}
+
+		auto ly = getLayer(name);
+		if (ly)
+			throw std::exception(("addlayer, given name already existed: " + name).c_str());
+		std::shared_ptr<Layer> layer(new Layer);
+		layer->name = name;
+		layer->selected = false;
+		layer->root = std::shared_ptr<SvgGroup>(new SvgGroup);
+		m_layers.insert(std::make_pair(name, layer));
+		return layer.get();
+	}
+
+	SvgManager::Layer* SvgManager::getLayer(std::string name)
+	{
+		auto iter = m_layers.find(name);
+		if (iter != m_layers.end())
+			return iter->second.get();
+		return nullptr;
+	}
+
+	const SvgManager::Layer* SvgManager::getLayer(std::string name)const
+	{
+		auto iter = m_layers.find(name);
+		if (iter != m_layers.end())
+			return iter->second.get();
+		return nullptr;
+	}
+
+	SvgManager::Layer* SvgManager::getCurrentLayer()
+	{
+		return getLayer(m_currentLayerName);
+	}
+
+	const SvgManager::Layer* SvgManager::getCurrentLayer()const
+	{
+		return getLayer(m_currentLayerName);
+	}
+
+	void SvgManager::setCurrentLayer(std::string name)
+	{
+		m_currentLayerName = name;
+	}
+
+	void SvgManager::removeLayer(std::string name)
+	{
+		auto iter = m_layers.find(name);
+		if (iter != m_layers.end())
+			m_layers.erase(iter);
+		else
+			throw std::exception(("remove layer, not found: " + name).c_str());
+		updateIndex();
+		updateBound();
+	}
+
+	void SvgManager::mergeSelectedLayers()
+	{
+		auto tmpLayers = m_layers;
+		m_layers.clear();
+		auto selectedLayers = m_layers;
+		for (auto iter : tmpLayers)
+		{
+			if (iter.second->selected)
+				selectedLayers.insert(iter);
+			else
+				m_layers.insert(iter);
+		}
+
+		if (selectedLayers.size() == 0)
+			return;
+
+		auto iter0 = selectedLayers.begin();
+		for (auto iter : selectedLayers)
+		{
+			if (iter0->first == iter.first) continue;
+			auto g0 = (SvgGroup*)iter0->second->root.get();
+			auto g = (SvgGroup*)iter.second->root.get();
+			g0->m_children.insert(g0->m_children.end(), g->m_children.begin(), g->m_children.end());
+		}
+		m_layers.insert(*iter0);
+
+		updateIndex();
+		updateBound();
+	}
+
+	void SvgManager::renameLayer(std::string oldname, std::string newname)
+	{
+		if (oldname == newname)
+			return;
+		auto iter = m_layers.find(oldname);
+		if (iter == m_layers.end())
+			throw std::exception(("rename layer, not found: " + oldname).c_str());
+		
+		auto newLayer = addLayer(newname);
+		newLayer->selected = iter->second->selected;
+		newLayer->root = iter->second->root->clone();
+
+		removeLayer(oldname);
+		updateIndex();
+		updateBound();
 	}
 } // namespace svg

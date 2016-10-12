@@ -13,6 +13,8 @@ class SewingEditor : public QMainWindow
 public:
 	SewingEditor(QWidget *parent = 0);
 	~SewingEditor();
+	void dragEnterEvent(QDragEnterEvent* ev);
+	void dropEvent(QDropEvent* ev);
 	public slots:
 	void on_actionLoad_svg_triggered();
 	void on_actionSave_svg_triggered();
@@ -43,13 +45,17 @@ protected:
 	void addLeftDockWidgetButton(AbstractEventHandle::ProcessorType type, QString iconImage, QString toolTip="");
 
 //////////////////////////////////////////////////////////////////////////
-	// layer control
-	QMap<QString, int> m_layerMap;
 public:
 	void initLayerList();
 	void updateLayerList();
+	void on_listLayers_rename();
 	public slots:
 	void on_listLayers_itemSelectionChanged();
+	void on_listLayers_currentRowChanged(int row);
+	void on_pbNewLayer_clicked();
+	void on_pbMergeLayers_clicked();
+	void on_pbRemoveLayers_clicked(); 
+	void on_listWidgetEditEnd(QWidget *editor, QAbstractItemDelegate::EndEditHint hint);
 protected:
 //////////////////////////////////////////////////////////////////////////
 	// roll back control

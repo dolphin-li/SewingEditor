@@ -34,7 +34,7 @@ QWidget
 {
     color: #eff0f1;
     background-color: #31363b;
-    selection-background-color:#3daee9;
+    selection-background-color:#808080;
     selection-color: #eff0f1;
     background-clip: border;
     border-image: none;
@@ -44,13 +44,13 @@ QWidget
 
 QWidget:item:hover
 {
-    background-color: #3daee9;
+    background-color: #808080;
     color: #eff0f1;
 }
 
 QWidget:item:selected
 {
-    background-color: #3daee9;
+    background-color: #606060;
 }
 
 QCheckBox
@@ -215,7 +215,7 @@ QMenuBar::item:selected
 QMenuBar::item:pressed
 {
     border: 1px solid #76797C;
-    background-color: #3daee9;
+    background-color: #808080;
     color: #eff0f1;
     margin-bottom:-1px;
     padding-bottom:1px;
@@ -314,7 +314,7 @@ QAbstractItemView
 
 QWidget:focus, QMenuBar:focus
 {
-    border: 1px solid #3daee9;
+    border: 1px solid #808080;
 }
 
 QTabWidget:focus, QCheckBox:focus, QRadioButton:focus, QSlider:focus
@@ -610,20 +610,20 @@ QPushButton:disabled
 }
 
 QPushButton:focus {
-    background-color: #3daee9;
+    background-color: #808080;
     color: white;
 }
 
 QPushButton:pressed
 {
-    background-color: #3daee9;
+    background-color: #808080;
     padding-top: -15px;
     padding-bottom: -17px;
 }
 
 QComboBox
 {
-    selection-background-color: #3daee9;
+    selection-background-color: #808080;
     border-style: solid;
     border: 1px solid #76797C;
     border-radius: 2px;
@@ -638,7 +638,7 @@ QPushButton:checked{
 
 QComboBox:hover,QPushButton:hover,QAbstractSpinBox:hover,QLineEdit:hover,QTextEdit:hover,QPlainTextEdit:hover,QAbstractView:hover,QTreeView:hover
 {
-    border: 1px solid #3daee9;
+    border: 1px solid #808080;
     color: #eff0f1;
 }
 
@@ -962,7 +962,7 @@ QListView::item:!selected:hover, QListView::item:!selected:hover, QTreeView::ite
 }
 
 QListView::item:selected:hover, QListView::item:selected:hover, QTreeView::item:selected:hover  {
-    background: #3daee9;
+    background: #808080;
     color: #eff0f1;
 }
 
@@ -1077,12 +1077,12 @@ QTableView, QHeaderView
 }
 
 QTableView::item:pressed, QListView::item:pressed, QTreeView::item:pressed  {
-    background: #3daee9;
+    background: #808080;
     color: #eff0f1;
 }
 
 QTableView::item:selected:active, QTreeView::item:selected:active, QListView::item:selected:active  {
-    background: #3daee9;
+    background: #808080;
     color: #eff0f1;
 }
 

@@ -428,6 +428,7 @@ void SewingEditor::on_listHistory_currentRowChanged(int r)
 // layer control
 void SewingEditor::initLayerList()
 {
+	m_layerMap.clear();
 	m_layerMap.insert("unknown", svg::SvgAbstractObject::ShapeUnknown);
 	m_layerMap.insert("solid", svg::SvgAbstractObject::ShapeSolid);
 	m_layerMap.insert("tiny-dash", svg::SvgAbstractObject::ShapeTinyDash);

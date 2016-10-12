@@ -361,6 +361,14 @@ void SewingEditor::rollBackTo(int pos)
 
 	m_rollPos = (m_rollHead + pos) % MAX_ROLLBACK_STEP;
 	ui.widget->setSvgManager(m_rollBackControls[m_rollPos].data->clone());
+	if (ui.widget->width() != ui.widget->getSvgManager()->width() ||
+		ui.widget->height() != ui.widget->getSvgManager()->height())
+	{
+		float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
+		ui.squareWidget->setAspect(asp);
+		ui.squareWidget->resize(ui.widget->getSvgManager()->width(), ui.widget->getSvgManager()->height());
+		ui.widget->resetCamera();
+	}
 	ui.widget->updateGL();
 	updateHistoryList();
 }
@@ -386,6 +394,7 @@ void SewingEditor::pushHistory(QString name)
 		m_rollHead = (m_rollHead + 1) % MAX_ROLLBACK_STEP;
 	m_disableCurrentRowChanged = true;
 	ui.listHistory->setCurrentRow(rollPos());
+	ui.listHistory->scrollToBottom();
 	m_disableCurrentRowChanged = false;
 	updateHistoryList();
 }

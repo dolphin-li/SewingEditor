@@ -325,6 +325,13 @@ namespace svg
 		m_rootGroup->updateBoundFromGeometry();
 	}
 
+	ldp::Float4 SvgManager::getBound()const
+	{
+		if (m_rootGroup.get() == nullptr)
+			return ldp::Float4();
+		return m_rootGroup->getBound();
+	}
+
 	void SvgManager::render(int shapes)
 	{
 		if (m_rootGroup.get() == nullptr)

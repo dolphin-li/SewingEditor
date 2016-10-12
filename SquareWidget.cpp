@@ -21,7 +21,12 @@ void  SquareWidget::setAspect(qreal aspect)
 
 void SquareWidget::resizeEvent(QResizeEvent *event)
 {
-	float thisAspectRatio = (float)event->size().width() / event->size().height();
+	adjustChildWidget();
+}
+
+void SquareWidget::adjustChildWidget()
+{
+	float thisAspectRatio = (float)width() / height();
 	int widgetStretch, outerStretch;
 
 	if (thisAspectRatio > m_aspect) // too wide

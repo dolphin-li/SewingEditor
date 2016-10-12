@@ -86,7 +86,7 @@ void SewingEditor::on_actionLoad_svg_triggered()
 		pushHistory("load svg");
 		float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
 		ui.squareWidget->setAspect(asp);
-		ui.squareWidget->resize(ui.squareWidget->size() - QSize(1, 1));
+		ui.squareWidget->adjustChildWidget();
 		ui.widget->updateGL();
 	}
 	catch (std::exception e)
@@ -366,7 +366,7 @@ void SewingEditor::rollBackTo(int pos)
 	{
 		float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
 		ui.squareWidget->setAspect(asp);
-		ui.squareWidget->resize(ui.widget->getSvgManager()->width(), ui.widget->getSvgManager()->height());
+		ui.squareWidget->adjustChildWidget();
 		ui.widget->resetCamera();
 	}
 	ui.widget->updateGL();

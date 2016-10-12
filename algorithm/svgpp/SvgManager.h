@@ -2,7 +2,10 @@
 #include <memory>
 #include <map>
 #include <set>
+#include "ldp_basic_mat.h"
 class Camera;
+#undef min
+#undef max
 namespace svg
 {
 	class SvgGroup;
@@ -37,6 +40,7 @@ namespace svg
 
 		// should be called after geometric changes
 		void updateBound();
+		ldp::Float4 getBound()const;
 
 		// given an index, select shapes
 		void selectShapeByIndex(int id, SelectOp op = SelectThis);

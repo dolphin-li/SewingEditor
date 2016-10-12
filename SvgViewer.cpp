@@ -58,7 +58,10 @@ void SvgViewer::resetCamera()
 	m_camera.setFrustum(0, width(), 0, height(), -1, 1);
 	m_camera.lookAt(ldp::Float3(0, 0, 0), ldp::Float3(0, 0, -1), ldp::Float3(0, 1, 0));
 	if (m_svgManager)
-		m_camera.setFrustum(0, m_svgManager->width(), 0, m_svgManager->height(), -1, 1);
+	{
+		ldp::Float4 b = m_svgManager->getBound();
+		m_camera.setFrustum(b[0], b[1], b[2], b[3], -1, 1);
+	}
 }
 
 void SvgViewer::initializeGL()

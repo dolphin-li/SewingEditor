@@ -803,7 +803,7 @@ namespace svg
 		return newT;
 	}
 
-	void SvgPath::toXML(TiXmlNode* parent)const
+	TiXmlElement* SvgPath::toXML(TiXmlNode* parent)const
 	{
 		std::string cmdStr;
 		char buffer[1014];
@@ -836,6 +836,7 @@ namespace svg
 		ele->SetAttribute("stroke-linejoin", strokeLineJoinMap(m_pathStyle.line_join));
 		ele->SetDoubleAttribute("stroke-miterlimit", m_pathStyle.miter_limit);
 		ele->SetAttribute("d", cmdStr.c_str());
+		return ele;
 	}
 
 	bool SvgPath::isClosed()const

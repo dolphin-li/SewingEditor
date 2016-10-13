@@ -119,9 +119,10 @@ namespace svg
 	class ConvertVisitor : public ClipSaveVisitor, public enable_shared_from_this<ConvertVisitor>
 	{
 	public:
-		ConvertVisitor(SvgGroup* g)
+		ConvertVisitor(SvgManager* manager)
 		{
-			m_rootGroup = g;
+			m_manager = manager;
+			m_layer = nullptr;
 			m_group = nullptr;
 		}
 		virtual void visit(ShapePtr shape)
@@ -156,9 +157,19 @@ namespace svg
 		}
 		virtual void apply(GroupPtr group) 
 		{
-			if (m_group == nullptr)
+			if (group->ldp_layer_name != "")
 			{
-				m_group = m_rootGroup;
+				m_layer = m_manager->getLayer(group->ldp_layer_name);
+				if (m_layer == nullptr)
+					m_layer = m_manager->addLayer(group->ldp_layer_name);
+				m_group = (SvgGroup*)m_layer->root.get();
+				m_layer->selected = true;
+			}
+			if (m_layer == nullptr)
+			{
+				m_layer = m_manager->addLayer("default");
+				m_group = (SvgGroup*)m_layer->root.get();
+				m_layer->selected = true;
 			}
 			else
 			{
@@ -176,8 +187,9 @@ namespace svg
 		virtual void fill(StCShapeRendererPtr shape_renderer_renderer) { }
 		virtual void stroke(StCShapeRendererPtr shape_renderer_renderer) { }
 	private:
-		SvgGroup* m_rootGroup;
 		SvgGroup* m_group;
+		SvgManager* m_manager;
+		SvgManager::Layer* m_layer;
 	};
 
 	class ConvertTraversal : public GenericTraversal
@@ -240,19 +252,20 @@ namespace svg
 			throw std::exception(("file not exist:" + std::string(svg_file)).c_str());
 		
 		// convert to my data structure
-		std::string pureName, dummy;
-		ldp::fileparts(svg_file, dummy, pureName, dummy);
-		Layer* layer = addLayer(pureName);
-		layer->root = std::shared_ptr<SvgAbstractObject>(new SvgGroup);
-		layer->selected = true;
+		m_layers.clear();
 		ConvertTraversal traversal; 
-		svg_scene->traverse(VisitorPtr(new ConvertVisitor((SvgGroup*)layer->root.get())), traversal);
-		m_currentLayerName = pureName;
-		removeSingleNodeAndEmptyNode();
-		if (m_renderCam)
+		svg_scene->traverse(VisitorPtr(new ConvertVisitor(this)), traversal);
+		if (m_layers.size())
 		{
-			ldp::Float4 b = layer->root->getBound();
-			m_renderCam->setFrustum(b[0], b[1], b[2], b[3], -1, 1);
+			m_currentLayerName = m_layers.begin()->second->name;
+			removeSingleNodeAndEmptyNode();
+			updateIndex();
+			updateBound();
+			if (m_renderCam)
+			{
+				ldp::Float4 b = getBound();
+				m_renderCam->setFrustum(b[0], b[1], b[2], b[3], -1, 1);
+			}
 		}
 	}
 
@@ -264,37 +277,34 @@ namespace svg
 		TiXmlElement *dec_ele = new TiXmlElement("!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\"");
 		doc.LinkEndChild(dec_ele);
 		dec_ele->ldp_hack_ignore_last_dash = true;
+		// header info-------------------------------------------------------
+		TiXmlElement *root_ele = new TiXmlElement("svg");
+		doc.LinkEndChild(root_ele);
+		root_ele->SetAttribute("version", "1.1");
+		root_ele->SetAttribute("id", "svg_base");
+		std::string x, y, w, h;
+		ldp::Float4 bound = getBound();
+		x = std::to_string(bound[0]);
+		y = std::to_string(bound[2]);
+		w = std::to_string(bound[1]-bound[0]);
+		h = std::to_string(bound[3]-bound[2]);
+		root_ele->SetAttribute("x", (x + "px").c_str());
+		root_ele->SetAttribute("y", (y + "px").c_str());
+		root_ele->SetAttribute("width", (w + "px").c_str());
+		root_ele->SetAttribute("height", (h + "px").c_str());
+		root_ele->SetAttribute("viewBox", (x + " " + y + " " + w + " " + h).c_str());
+		root_ele->SetAttribute("enable-background", ("new " + x + " " + y + " " + w + " " + h).c_str());
+		root_ele->SetAttribute("xml:space", "preserve");
 
 		for (auto iter : m_layers)
 		{
-			std::string layer_file_name, basename, path, ext;
-			ldp::fileparts(svg_file, path, basename, ext);
-			layer_file_name = fullfile(path, basename + "_" + iter.second->name + ext);
-			// header info-------------------------------------------------------
-			TiXmlElement *root_ele = new TiXmlElement("svg");
-			doc.LinkEndChild(root_ele);
-			root_ele->SetAttribute("version", "1.1");
-			root_ele->SetAttribute("id", iter.second->name.c_str());
-
+			if (selectionOnly && !iter.second->selected)
+				continue;
 			auto root = iter.second->root;
-			if (root.get()) continue;
-			if (selectionOnly && !iter.second->selected) continue;
 			if (root.get())
 			{
-				std::string x, y, w, h;
-				x = std::to_string(root->getOrigion()[0]);
-				y = std::to_string(root->getOrigion()[1]);
-				w = std::to_string(root->getSize()[0]);
-				h = std::to_string(root->getSize()[1]);
-				root_ele->SetAttribute("x", (x + "px").c_str());
-				root_ele->SetAttribute("y", (y + "px").c_str());
-				root_ele->SetAttribute("width", (w + "px").c_str());
-				root_ele->SetAttribute("height", (h + "px").c_str());
-				root_ele->SetAttribute("viewBox", (x + " " + y + " " + w + " " + h).c_str());
-				root_ele->SetAttribute("enable-background", ("new " + x + " " + y + " " + w + " " + h).c_str());
-				root_ele->SetAttribute("xml:space", "preserve");
-
-				root->toXML(root_ele);
+				TiXmlElement* ele = root->toXML(root_ele);
+				ele->SetAttribute("ldp_layer_name", iter.second->name.c_str());
 			}
 		} // end for layers
 		if (!doc.SaveFile(svg_file))
@@ -678,6 +688,14 @@ namespace svg
 	{
 		for (auto iter : m_layers)
 			removeSingleNodeAndEmptyNode(iter.second->root);
+		auto tmpLayers = m_layers;
+		m_layers.clear();
+		for (auto iter : tmpLayers)
+		{
+			auto g = (SvgGroup*)iter.second->root.get();
+			if (g->m_children.size())
+				m_layers.insert(iter);
+		}
 		updateIndex();
 		updateBound();
 	}

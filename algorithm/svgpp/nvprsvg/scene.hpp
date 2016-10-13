@@ -562,6 +562,8 @@ struct Group : public Node, enable_shared_from_this<Group> {
 
     using Node::traverse; // Lame ... Node::traverse(VisitorPtr visitor) gets "shadowed"
     void traverse(VisitorPtr visitor, Traversal &traversal);
+
+	std::string ldp_layer_name;
 };
 typedef shared_ptr<Group> GroupPtr;
 

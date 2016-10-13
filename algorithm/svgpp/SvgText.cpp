@@ -221,7 +221,7 @@ namespace svg
 		return newT;
 	}
 
-	void SvgText::toXML(TiXmlNode* parent)const
+	TiXmlElement* SvgText::toXML(TiXmlNode* parent)const
 	{
 		TiXmlElement* ele = new TiXmlElement("text");
 		parent->LinkEndChild(ele);
@@ -236,6 +236,7 @@ namespace svg
 		ele->SetAttribute("font-family", ("'"+m_font.substr(1, m_font.size()-2)+"'").c_str());
 		ele->SetAttribute("font-size", std::to_string(m_font_size).c_str());
 		ele->LinkEndChild(new TiXmlText(m_text.c_str()));
+		return ele;
 	}
 
 	//////////////////////////////////////////////////////////////////////

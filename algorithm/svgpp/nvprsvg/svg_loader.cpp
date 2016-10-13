@@ -2248,7 +2248,10 @@ NodePtr SVGParser::parseGroup(TiXmlElement *elem)
 {
     style_stack.pushChild();
 
+	std::string ldp_layer_name = "";
     for(TiXmlAttribute* a = elem->FirstAttribute(); a; a = a->Next()) {
+		if (a->Name() == std::string("ldp_layer_name"))
+			ldp_layer_name = a->Value();
         bool got_one = parseGenericShapeProperty(a, elem);
         if (got_one) {
             continue;
@@ -2256,6 +2259,7 @@ NodePtr SVGParser::parseGroup(TiXmlElement *elem)
     }
 
     GroupPtr group = GroupPtr(new Group);
+	group->ldp_layer_name = ldp_layer_name;
     for(TiXmlElement *subelem=elem->FirstChildElement(); subelem; subelem = subelem->NextSiblingElement()) {
         NodePtr node = parseNode(subelem);
         if (node) {

@@ -97,4 +97,21 @@ namespace svg
 
 		return g;
 	}
+
+	void SvgGroup::collectObjects(ObjectType type, 
+		std::vector<std::shared_ptr<SvgAbstractObject>>& objects,
+		bool selectedOnly)const
+	{
+		for (auto c : m_children)
+		{
+			if (c->objectType() == Group)
+				((SvgGroup*)c.get())->collectObjects(type, objects, selectedOnly);
+			else
+			{
+				if (c->objectType() == type)
+				if (!selectedOnly || c->isSelected())
+					objects.push_back(c);
+			}
+		}
+	}
 }

@@ -5,6 +5,7 @@
 
 #include "Camera.h"
 #include "util.h"
+#include "kdtree\PointTree.h"
 
 #include "nvprsvg\svg_loader.hpp"
 #include "stc\scene_stc.hpp"
@@ -18,6 +19,8 @@
 
 namespace svg
 {
+	const static float PATH_CONTACT_DIST_THRE = 0.2f;
+	const static float PATH_COS_ANGLE_DIST_THRE = cos(15.f * ldp::PI_S / 180.f);
 #pragma region --helper
 
 	struct ConvertPathProcessor : PathSegmentProcessor
@@ -155,7 +158,7 @@ namespace svg
 			t->setParent(m_group);
 			m_group->m_children.push_back(std::shared_ptr<SvgText>(t));
 		}
-		virtual void apply(GroupPtr group) 
+		virtual void apply(GroupPtr group)
 		{
 			if (group->ldp_layer_name != "")
 			{
@@ -179,7 +182,7 @@ namespace svg
 				m_group = g;
 			}
 		}
-		virtual void unapply(GroupPtr group) 
+		virtual void unapply(GroupPtr group)
 		{
 			assert(m_group);
 			m_group = m_group->parent();
@@ -250,11 +253,11 @@ namespace svg
 		SvgScenePtr svg_scene = svg_loader(svg_file);
 		if (svg_scene.get() == nullptr)
 			throw std::exception(("file not exist:" + std::string(svg_file)).c_str());
-		
+
 		// convert to my data structure
 		if (clearOld)
 			m_layers.clear();
-		ConvertTraversal traversal; 
+		ConvertTraversal traversal;
 		svg_scene->traverse(VisitorPtr(new ConvertVisitor(this)), traversal);
 		if (m_layers.size())
 		{
@@ -287,8 +290,8 @@ namespace svg
 		ldp::Float4 bound = getBound();
 		x = std::to_string(bound[0]);
 		y = std::to_string(bound[2]);
-		w = std::to_string(bound[1]-bound[0]);
-		h = std::to_string(bound[3]-bound[2]);
+		w = std::to_string(bound[1] - bound[0]);
+		h = std::to_string(bound[3] - bound[2]);
 		root_ele->SetAttribute("x", (x + "px").c_str());
 		root_ele->SetAttribute("y", (y + "px").c_str());
 		root_ele->SetAttribute("width", (w + "px").c_str());
@@ -348,7 +351,7 @@ namespace svg
 		if (obj == nullptr)
 			return;
 		SvgAbstractObject* ogp = obj->ancestorAfterRoot();
-		if(ogp)
+		if (ogp)
 			groups_for_selection.insert(ogp);
 
 		obj->setId(idx);
@@ -1028,6 +1031,167 @@ namespace svg
 		}
 	}
 
+	struct GraphNode
+	{
+		int idx;
+		std::vector<GraphNode*> nbNodes;
+		GraphNode* father;
+		bool visited;
+		GraphNode()
+		{
+			idx = -1;
+			father = nullptr;
+			visited = false;
+		}
+	};
+
+	static bool graph_find_cycle(const std::vector<GraphNode>& graph, GraphNode*& startNode)
+	{
+		std::stack<GraphNode*> nodeStack;
+		nodeStack.push(startNode);
+		startNode->visited = true;
+
+		while (!nodeStack.empty())
+		{
+			GraphNode* node = nodeStack.top();
+			nodeStack.pop();
+			for (auto nbNode : node->nbNodes)
+			{
+				if (!nbNode->visited)
+				{
+					nodeStack.push(nbNode);
+					nbNode->father = node;
+					nbNode->visited = true;
+				}
+				else if (nbNode != node->father)
+				{
+					startNode = nbNode;
+					nbNode->father = node;
+					return true;
+				}
+			}
+			startNode = node;
+		} // end while not stack empty
+
+		return false;
+	}
+
+	static void graph_to_connected_components(
+		const std::set<ldp::Int2>& graphSet, int nNodes,
+		std::vector<std::vector<int>>& groups)
+	{
+		groups.clear();
+
+		// 1. produce a graph representation
+		std::vector<GraphNode> graph(nNodes);
+		for (int i = 0; i < nNodes; i++)
+			graph[i].idx = i;
+		for (auto c : graphSet)
+			graph[c[0]].nbNodes.push_back(&graph[c[1]]);
+
+		// 2. visit all paths
+		while (1)
+		{
+			GraphNode* curNode = nullptr;
+			for (auto& node : graph)
+			if (!node.visited)
+			{
+				curNode = &node;
+				break;
+			}
+			if (curNode == nullptr) break;
+
+			auto endNode = curNode;
+			graph_find_cycle(graph, endNode);
+			groups.push_back(std::vector<int>());
+			auto group = groups.back();
+			do{
+				group.push_back(endNode->idx);
+				endNode = endNode->father;
+			} while (endNode != curNode && endNode != nullptr);
+		} // end while not nonVisitedPath.empty()
+	}
+
+	void SvgManager::convertSelectedPathToConnectedGroups()
+	{
+		typedef kdtree::PointTree<float, 2> Tree;
+		typedef Tree::Point Point;
+		typedef std::shared_ptr<SvgAbstractObject> ObjPtr;
+		for (auto layer_iter : m_layers)
+		{
+			auto layer = layer_iter.second;
+			if (!layer->selected) continue;
+			auto rootPtr = (SvgGroup*)layer->root.get();
+
+			// 1. pre-process, split into individual small paths
+			splitPath(layer->root);
+
+			// 2. collect all paths, the idx corresponds to paths
+			std::vector<ObjPtr> paths; // each path generate two points, a start point and an end point
+			std::vector<Point> points;
+			std::vector<int> pointMapper, validPointIds; // map from points to merged points
+			rootPtr->collectObjects(SvgAbstractObject::Path, paths, true);
+			for (auto path : paths)
+			{
+				auto ptr = (SvgPath*)path.get();
+				points.push_back(Point(ptr->getStartPoint(), points.size()));
+				points.push_back(Point(ptr->getEndPoint(), points.size()));
+			}
+
+			// 3. find too-close points and merge them
+			Tree tree; tree.build(points);
+			std::vector<std::vector<int>> mergePaths(points.size());
+			std::set<ldp::Int2> pathGraph;
+			for (auto p : points)
+			{
+				std::vector<std::pair<size_t, float>> results;
+				tree.pointInSphere(p, PATH_CONTACT_DIST_THRE, results);
+				for (auto r : results)
+				{
+					if (r.first / 2 == p.idx / 2) continue;
+					mergePaths[p.idx].push_back(r.first);
+					mergePaths[r.first].push_back(p.idx);
+				}
+			}
+			for (int iPoint = 0; iPoint < (int)points.size(); iPoint++)
+			{
+				bool valid = true;
+				for (auto c : mergePaths[iPoint])
+				if (c < iPoint)
+				{
+					valid = false;
+					break;
+				}
+				if (valid)
+					validPointIds.push_back(iPoint);
+			}
+			pointMapper.resize(points.size(), -1);
+			for (int i = 0; i < (int)validPointIds.size(); i++)
+			{
+				int vid = validPointIds[i];
+				pointMapper[vid] = i;
+				for (auto c : mergePaths[vid])
+					pointMapper[c] = i;
+			}
+
+			// 3.1 finally we construct the connection graph
+			for (int i = 0; i < (int)points.size(); i += 2)
+				pathGraph.insert(ldp::Int2(pointMapper[i], pointMapper[i + 1]));
+
+			// 4. group each polygons and associates
+			std::vector<std::vector<int>> pathGroups;
+			graph_to_connected_components(pathGraph, (int)validPointIds.size(), pathGroups);
+
+			// 5. create new path groups
+			std::vector<ObjPtr> newGroups;
+			for (auto pathGroupIds : pathGroups)
+			{
+
+			}
+		} // end for all layers
+		updateIndex();
+		updateBound();
+	}
 	//////////////////////////////////////////////////////////////////
 	/// layer related
 	SvgManager::Layer* SvgManager::addLayer(std::string name)
@@ -1140,7 +1304,7 @@ namespace svg
 		auto iter = m_layers.find(oldname);
 		if (iter == m_layers.end())
 			throw std::exception(("rename layer, not found: " + oldname).c_str());
-		
+
 		auto newLayer = addLayer(newname);
 		newLayer->selected = iter->second->selected;
 		newLayer->root = iter->second->root->clone();

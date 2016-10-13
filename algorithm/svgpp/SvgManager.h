@@ -86,7 +86,7 @@ namespace svg
 		void selectPathConnected();
 		// not finished
 		void selectPathSimilarShape();
-
+		// not finished
 		void selectPathClosed();
 
 		// given an index, find the largest group that contains this object.
@@ -105,9 +105,10 @@ namespace svg
 		// path operations
 		void splitSelectedPath(); // split selected, non-closed paths
 		bool mergeSelectedPath(); // merge will fail if the paths have been in different groups
-
-		// for burdastyle data, see SvgPath::PathUnitShapes
+		// not finished, for burdastyle data, see SvgPath::PathUnitShapes
 		void splitSelectedPathByShape();
+		// not finished
+		void convertSelectedPathToConnectedGroups();
 	protected:
 		void removeSelected(SvgAbstractObject* obj);
 		bool groupSelected_findCommonParent(std::shared_ptr<SvgAbstractObject> obj,

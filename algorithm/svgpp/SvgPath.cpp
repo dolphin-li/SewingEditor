@@ -244,9 +244,14 @@ namespace svg
 
 		for (int i = 0; i < (int)posOfM.size() - 1; i++)
 		{
-			std::shared_ptr<SvgAbstractObject> sp = subPath(posOfM[i], posOfM[i + 1]);
-			groupPtr->m_children.push_back(sp);
-			sp->setParent(groupPtr);
+			int cb = posOfM[i];
+			int ce = posOfM[i + 1];
+			for (int j = cb; j < ce; j++)
+			{
+				std::shared_ptr<SvgAbstractObject> sp = subPath(j, j+1, true);
+				groupPtr->m_children.push_back(sp);
+				sp->setParent(groupPtr);
+			}
 		}
 
 		return group;
@@ -449,9 +454,10 @@ namespace svg
 			}//
 			else
 			{
-				ldp::Float2 lastCoord(m_coords[coordPoses[posOfM_Begin]],
-					m_coords[coordPoses[posOfM_Begin] + 1]);
-				for (int i_cmd = posOfM_Begin + 1; i_cmd < posOfM_End; i_cmd++)
+				bool isM = m_cmds[posOfM_Begin] == GL_MOVE_TO_NV;
+				ldp::Float2 lastCoord(m_coords[coordPoses[posOfM_Begin - !isM]],
+					m_coords[coordPoses[posOfM_Begin - !isM] + 1]);
+				for (int i_cmd = posOfM_Begin + isM; i_cmd < posOfM_End; i_cmd++)
 				{
 					subPath->m_cmds.push_back(GL_MOVE_TO_NV);
 					subPath->m_coords.push_back(lastCoord[0]);

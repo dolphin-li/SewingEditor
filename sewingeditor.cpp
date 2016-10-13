@@ -393,49 +393,13 @@ void SewingEditor::on_pbSelectConnected_clicked()
 	}
 }
 
-void SewingEditor::on_pbSelectSimilarShape_clicked()
+void SewingEditor::on_pbToConnectedGroups_clicked()
 {
 	try
 	{
-		ui.widget->getSvgManager()->selectPathSimilarShape();
+		ui.widget->getSvgManager()->convertSelectedPathToConnectedGroups();
 		ui.widget->updateGL();
-		pushHistory("select path connected");
-	}
-	catch (std::exception e)
-	{
-		std::cout << e.what() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "unknown error" << std::endl;
-	}
-}
-
-void SewingEditor::on_pbSelectClosed_clicked()
-{
-	try
-	{
-		ui.widget->getSvgManager()->selectPathClosed();
-		ui.widget->updateGL();
-		pushHistory("select path closed");
-	}
-	catch (std::exception e)
-	{
-		std::cout << e.what() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "unknown error" << std::endl;
-	}
-}
-
-void SewingEditor::on_pbSplitByShape_clicked()
-{
-	try
-	{
-		ui.widget->getSvgManager()->splitSelectedPathByShape();
-		ui.widget->updateGL();
-		pushHistory("split path by shape");
+		pushHistory("path to connected groups");
 	}
 	catch (std::exception e)
 	{

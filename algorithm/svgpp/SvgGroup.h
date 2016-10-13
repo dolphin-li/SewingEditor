@@ -18,6 +18,8 @@ namespace svg
 		virtual bool hasSelectedChildren()const;
 
 		virtual void updateBoundFromGeometry();
+
+		void collectObjects(ObjectType type, std::vector<std::shared_ptr<SvgAbstractObject>>& objects, bool selectedOnly)const;
 	public:
 		std::vector<std::shared_ptr<SvgAbstractObject>> m_children;
 	};

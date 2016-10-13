@@ -31,9 +31,7 @@ public:
 	void on_actionUndo_triggered();
 	void on_actionRedo_triggered();
 	void on_pbSelectConnected_clicked();
-	void on_pbSelectSimilarShape_clicked();
-	void on_pbSelectClosed_clicked();
-	void on_pbSplitByShape_clicked();
+	void on_pbToConnectedGroups_clicked();
 	void leftDocButtonsClicked(int i);
 public:
 	void initLeftDockActions();

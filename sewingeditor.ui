@@ -966,58 +966,22 @@
        <property name="title">
         <string>param</string>
        </property>
-       <widget class="QPushButton" name="pbSelectConnected">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>30</y>
-          <width>91</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>select connected</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pbSelectSimilarShape">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>60</y>
-          <width>111</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>select similar shape</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pbSelectClosed">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>90</y>
-          <width>111</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>select closed</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pbSplitByShape">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>120</y>
-          <width>111</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>split by shape</string>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pbSelectConnected">
+          <property name="text">
+           <string>select connected</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="pbToConnectedGroups">
+          <property name="text">
+           <string>to connected groups</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>

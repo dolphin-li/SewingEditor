@@ -56,6 +56,10 @@ void SewingEditor::dropEvent(QDropEvent* event)
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 
 	event->acceptProposedAction();
 }
@@ -130,6 +134,10 @@ void SewingEditor::on_actionLoad_svg_triggered()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_actionSave_svg_triggered()
@@ -147,6 +155,10 @@ void SewingEditor::on_actionSave_svg_triggered()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_actionSelect_all_triggered()
@@ -160,6 +172,10 @@ void SewingEditor::on_actionSelect_all_triggered()
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
 	}
 }
 
@@ -175,6 +191,10 @@ void SewingEditor::on_actionSelect_none_triggered()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_actionSelect_inverse_triggered()
@@ -188,6 +208,10 @@ void SewingEditor::on_actionSelect_inverse_triggered()
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
 	}
 }
 
@@ -203,6 +227,10 @@ void SewingEditor::on_actionSelect_similar_width_triggered()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_actionGroup_triggered()
@@ -216,6 +244,10 @@ void SewingEditor::on_actionGroup_triggered()
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
 	}
 }
 
@@ -231,6 +263,10 @@ void SewingEditor::on_actionFix_grouping_triggered()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_actionUngroup_triggered()
@@ -244,6 +280,10 @@ void SewingEditor::on_actionUngroup_triggered()
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
 	}
 }
 
@@ -259,6 +299,10 @@ void SewingEditor::on_actionDelete_selected_triggered()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_actionSplit_selected_path_triggered()
@@ -272,6 +316,10 @@ void SewingEditor::on_actionSplit_selected_path_triggered()
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
 	}
 }
 
@@ -287,6 +335,10 @@ void SewingEditor::on_actionMerge_selected_path_triggered()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_actionUndo_triggered()
@@ -299,6 +351,10 @@ void SewingEditor::on_actionUndo_triggered()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_actionRedo_triggered()
@@ -310,6 +366,10 @@ void SewingEditor::on_actionRedo_triggered()
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
 	}
 }
 
@@ -325,6 +385,10 @@ void SewingEditor::on_pbSelectConnected_clicked()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_pbSelectSimilarShape_clicked()
@@ -338,6 +402,10 @@ void SewingEditor::on_pbSelectSimilarShape_clicked()
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
 	}
 }
 
@@ -353,6 +421,10 @@ void SewingEditor::on_pbSelectClosed_clicked()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_pbSplitByShape_clicked()
@@ -366,6 +438,10 @@ void SewingEditor::on_pbSplitByShape_clicked()
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
 	}
 }
 
@@ -395,23 +471,33 @@ void SewingEditor::rollBackTo(int pos)
 {
 	if (pos < 0 || pos >= rollNum())
 		return;
-
-	m_rollPos = (m_rollHead + pos) % MAX_ROLLBACK_STEP;
-	ldp::Float4 lastBound = ui.widget->getSvgManager()->getBound();
-	ui.widget->setSvgManager(m_rollBackControls[m_rollPos].data->clone());
-	ldp::Float4 thisBound = ui.widget->getSvgManager()->getBound();
-	if (lastBound != thisBound)
+	try
 	{
-		float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
-		ui.squareWidget->setAspect(asp);
-		ui.squareWidget->adjustChildWidget();
-		ui.widget->resetCamera();
+		m_rollPos = (m_rollHead + pos) % MAX_ROLLBACK_STEP;
+		ldp::Float4 lastBound = ui.widget->getSvgManager()->getBound();
+		ui.widget->setSvgManager(m_rollBackControls[m_rollPos].data->clone());
+		ldp::Float4 thisBound = ui.widget->getSvgManager()->getBound();
+		if (lastBound != thisBound)
+		{
+			float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
+			ui.squareWidget->setAspect(asp);
+			ui.squareWidget->adjustChildWidget();
+			ui.widget->resetCamera();
+		}
+		ui.widget->updateGL();
+
+		updateHistoryList();
+
+		initLayerList();
 	}
-	ui.widget->updateGL();
-
-	updateHistoryList();
-
-	initLayerList();
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::rollBackward()
@@ -426,18 +512,29 @@ void SewingEditor::rollForward()
 
 void SewingEditor::pushHistory(QString name)
 {
-	m_rollPos = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
-	m_rollBackControls[m_rollPos].name = name;
-	m_rollBackControls[m_rollPos].data = ui.widget->getSvgManager()->clone();
+	try
+	{
+		m_rollPos = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
+		m_rollBackControls[m_rollPos].name = name;
+		m_rollBackControls[m_rollPos].data = ui.widget->getSvgManager()->clone();
 
-	m_rollTail = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
-	if (m_rollTail == m_rollHead)
-		m_rollHead = (m_rollHead + 1) % MAX_ROLLBACK_STEP;
-	m_disableCurrentRowChanged = true;
-	ui.listHistory->setCurrentRow(rollPos());
-	ui.listHistory->scrollToBottom();
-	m_disableCurrentRowChanged = false;
-	updateHistoryList();
+		m_rollTail = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
+		if (m_rollTail == m_rollHead)
+			m_rollHead = (m_rollHead + 1) % MAX_ROLLBACK_STEP;
+		m_disableCurrentRowChanged = true;
+		ui.listHistory->setCurrentRow(rollPos());
+		ui.listHistory->scrollToBottom();
+		m_disableCurrentRowChanged = false;
+		updateHistoryList();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::initHistoryList()
@@ -525,6 +622,10 @@ void SewingEditor::on_listLayers_itemSelectionChanged()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_listLayers_currentRowChanged(int rowId)
@@ -542,6 +643,10 @@ void SewingEditor::on_listLayers_currentRowChanged(int rowId)
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_listWidgetEditEnd(QWidget* widget, QAbstractItemDelegate::EndEditHint hint)
@@ -558,6 +663,10 @@ void SewingEditor::on_listWidgetEditEnd(QWidget* widget, QAbstractItemDelegate::
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_pbNewLayer_clicked()
@@ -573,6 +682,10 @@ void SewingEditor::on_pbNewLayer_clicked()
 	{
 		std::cout << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SewingEditor::on_pbMergeLayers_clicked()
@@ -587,6 +700,10 @@ void SewingEditor::on_pbMergeLayers_clicked()
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
 	}
 }
 
@@ -610,6 +727,10 @@ void SewingEditor::on_pbRemoveLayers_clicked()
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
 	}
 }
 

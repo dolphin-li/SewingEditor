@@ -258,18 +258,19 @@ namespace svg
 
 	void SvgManager::save(const char* svg_file, bool selectionOnly)
 	{
+		TiXmlDocument doc;
+		TiXmlDeclaration *dec = new TiXmlDeclaration("1.0", "utf-8", "");
+		doc.LinkEndChild(dec);
+		TiXmlElement *dec_ele = new TiXmlElement("!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\"");
+		doc.LinkEndChild(dec_ele);
+		dec_ele->ldp_hack_ignore_last_dash = true;
+
 		for (auto iter : m_layers)
 		{
 			std::string layer_file_name, basename, path, ext;
 			ldp::fileparts(svg_file, path, basename, ext);
 			layer_file_name = fullfile(path, basename + "_" + iter.second->name + ext);
-			TiXmlDocument doc;
 			// header info-------------------------------------------------------
-			TiXmlDeclaration *dec = new TiXmlDeclaration("1.0", "utf-8", "");
-			doc.LinkEndChild(dec);
-			TiXmlElement *dec_ele = new TiXmlElement("!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\"");
-			doc.LinkEndChild(dec_ele);
-			dec_ele->ldp_hack_ignore_last_dash = true;
 			TiXmlElement *root_ele = new TiXmlElement("svg");
 			doc.LinkEndChild(root_ele);
 			root_ele->SetAttribute("version", "1.1");
@@ -295,9 +296,9 @@ namespace svg
 
 				root->toXML(root_ele);
 			}
-			if (!doc.SaveFile(layer_file_name.c_str()))
-				throw std::exception(("error writing svg file: " + layer_file_name).c_str());
 		} // end for layers
+		if (!doc.SaveFile(svg_file))
+			throw std::exception(("error writing svg file: " + std::string(svg_file)).c_str());
 	}
 
 	int SvgManager::width()const
@@ -1101,7 +1102,11 @@ namespace svg
 			if (iter0->first == iter.first) continue;
 			auto g0 = (SvgGroup*)iter0->second->root.get();
 			auto g = (SvgGroup*)iter.second->root.get();
-			g0->m_children.insert(g0->m_children.end(), g->m_children.begin(), g->m_children.end());
+			for (auto c : g->m_children)
+			{
+				c->setParent(g0);
+				g0->m_children.push_back(c);
+			}
 		}
 		m_layers.insert(*iter0);
 
@@ -1133,6 +1138,7 @@ namespace svg
 		for (auto layer_iter : m_layers)
 		{
 			auto layer = layer_iter.second;
+			if (!layer->selected) continue;
 			if (layer->root->hasSelectedChildren() || layer->root->isSelected())
 			{
 				auto g = layer->root->clone(true);

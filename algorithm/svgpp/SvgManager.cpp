@@ -244,7 +244,7 @@ namespace svg
 		m_renderCam = cam;
 	}
 
-	void SvgManager::load(const char* svg_file)
+	void SvgManager::load(const char* svg_file, bool clearOld)
 	{
 		// load scene using nvpr implementation
 		SvgScenePtr svg_scene = svg_loader(svg_file);
@@ -252,7 +252,8 @@ namespace svg
 			throw std::exception(("file not exist:" + std::string(svg_file)).c_str());
 		
 		// convert to my data structure
-		m_layers.clear();
+		if (clearOld)
+			m_layers.clear();
 		ConvertTraversal traversal; 
 		svg_scene->traverse(VisitorPtr(new ConvertVisitor(this)), traversal);
 		if (m_layers.size())

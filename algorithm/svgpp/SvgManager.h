@@ -46,8 +46,8 @@ namespace svg
 		~SvgManager();
 
 		void init(Camera* cam);
-		void load(const char* svg_file);
-		void save(const char* svg_file, bool selectionOnly=true);
+		void load(const char* svg_file, bool clearOld = true);
+		void save(const char* svg_file, bool selectionOnly=false);
 		void render(int shapes);
 		void renderIndex(int shapes);
 		std::shared_ptr<SvgManager> clone()const;

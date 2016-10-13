@@ -129,6 +129,7 @@ void SewingEditor::on_actionLoad_svg_triggered()
 		ui.squareWidget->adjustChildWidget();
 		ui.widget->updateGL();
 		initLayerList();
+		setWindowTitle(name);
 	}
 	catch (std::exception e)
 	{
@@ -150,6 +151,7 @@ void SewingEditor::on_actionSave_svg_triggered()
 		if (!name.endsWith(".svg"))
 			name.append(".svg");
 		ui.widget->getSvgManager()->save(name.toStdString().c_str());
+		setWindowTitle(name);
 	}
 	catch (std::exception e)
 	{

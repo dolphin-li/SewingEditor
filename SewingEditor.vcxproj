@@ -281,7 +281,6 @@
     <ClCompile Include="algorithm\svgpp\nvprsvg\svg_loader.cpp" />
     <ClCompile Include="algorithm\svgpp\SvgAbstractObject.cpp" />
     <ClCompile Include="algorithm\svgpp\SvgAttribute.cpp" />
-    <ClCompile Include="algorithm\svgpp\SvgClipPath.cpp" />
     <ClCompile Include="algorithm\svgpp\SvgGroup.cpp" />
     <ClCompile Include="algorithm\svgpp\SvgManager.cpp" />
     <ClCompile Include="algorithm\svgpp\SvgPath.cpp" />
@@ -462,7 +461,6 @@
     <ClInclude Include="algorithm\svgpp\nvprsvg\svg_loader.hpp" />
     <ClInclude Include="algorithm\svgpp\SvgAbstractObject.h" />
     <ClInclude Include="algorithm\svgpp\SvgAttribute.h" />
-    <ClInclude Include="algorithm\svgpp\SvgClipPath.h" />
     <ClInclude Include="algorithm\svgpp\SvgGroup.h" />
     <ClInclude Include="algorithm\svgpp\SvgManager.h" />
     <ClInclude Include="algorithm\svgpp\SvgPath.h" />

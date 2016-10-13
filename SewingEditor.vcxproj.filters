@@ -559,9 +559,6 @@
     <ClCompile Include="algorithm\svgpp\SvgAttribute.cpp">
       <Filter>algorithm\svgpp</Filter>
     </ClCompile>
-    <ClCompile Include="algorithm\svgpp\SvgClipPath.cpp">
-      <Filter>algorithm\svgpp</Filter>
-    </ClCompile>
     <ClCompile Include="algorithm\svgpp\SvgPath.cpp">
       <Filter>algorithm\svgpp</Filter>
     </ClCompile>
@@ -852,9 +849,6 @@
       <Filter>algorithm\svgpp</Filter>
     </ClInclude>
     <ClInclude Include="algorithm\svgpp\SvgAttribute.h">
-      <Filter>algorithm\svgpp</Filter>
-    </ClInclude>
-    <ClInclude Include="algorithm\svgpp\SvgClipPath.h">
       <Filter>algorithm\svgpp</Filter>
     </ClInclude>
     <ClInclude Include="algorithm\svgpp\SvgPath.h">

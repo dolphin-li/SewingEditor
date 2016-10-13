@@ -788,8 +788,13 @@ namespace svg
 		}
 	}
 
-	std::shared_ptr<SvgAbstractObject> SvgPath::clone()const
+	std::shared_ptr<SvgAbstractObject> SvgPath::clone(bool selectedOnly)const
 	{
+		if (selectedOnly)
+		{
+			if (!(hasSelectedChildren() || isSelected()))
+				throw std::exception("ERROR: SvgPath::clone(), mis-called");
+		}
 		std::shared_ptr<SvgAbstractObject> newT(new SvgPath());
 		auto newTptr = (SvgPath*)newT.get();
 

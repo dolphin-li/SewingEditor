@@ -2,7 +2,6 @@
 #include "SvgAttribute.h"
 #include "SvgPath.h"
 #include "SvgText.h"
-#include "SvgClipPath.h"
 #include "SvgGroup.h"
 
 #undef min
@@ -49,8 +48,6 @@ namespace svg
 			return (SvgAbstractObject*)new SvgPath();
 		case svg::SvgAbstractObject::Text:
 			return (SvgAbstractObject*)new SvgText();
-		case svg::SvgAbstractObject::ClipPath:
-			return (SvgAbstractObject*)new SvgClipPath();
 		case svg::SvgAbstractObject::Group:
 			return (SvgAbstractObject*)new SvgGroup();
 		default:

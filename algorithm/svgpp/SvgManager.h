@@ -61,6 +61,7 @@ namespace svg
 		void removeLayer(std::string name);
 		void renameLayer(std::string oldname, std::string newname);
 		void mergeSelectedLayers();
+		Layer* selectedToNewLayer();
 		const std::map<std::string, std::shared_ptr<Layer>>& layers()const { return m_layers; }
 		
 

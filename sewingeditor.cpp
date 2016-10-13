@@ -564,7 +564,7 @@ void SewingEditor::on_pbNewLayer_clicked()
 {
 	try
 	{
-		auto layer = ui.widget->getSvgManager()->addLayer();
+		auto layer = ui.widget->getSvgManager()->selectedToNewLayer();
 		pushHistory(QString("add layer: ") + layer->name.c_str());
 		initLayerList();
 		ui.widget->updateGL();

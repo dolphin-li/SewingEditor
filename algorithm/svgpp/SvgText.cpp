@@ -207,8 +207,13 @@ namespace svg
 		}
 	}
 
-	std::shared_ptr<SvgAbstractObject> SvgText::clone()const
+	std::shared_ptr<SvgAbstractObject> SvgText::clone(bool selectedOnly)const
 	{
+		if (selectedOnly)
+		{
+			if (!(hasSelectedChildren() || isSelected()))
+				throw std::exception("ERROR: SvgText::clone(), mis-called");
+		}
 		// to save memory, we assume text are not edited, thus no new resources needed.
 		std::shared_ptr<SvgAbstractObject> newT(new SvgText());
 		auto newTptr = (SvgText*)newT.get();

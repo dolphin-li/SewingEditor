@@ -16,7 +16,8 @@ namespace svg
 		{
 			Path,
 			Text,
-			Group
+			Group,
+			PolyPath
 		};
 		enum
 		{

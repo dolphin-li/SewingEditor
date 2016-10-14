@@ -586,6 +586,9 @@
     <ClCompile Include="GeneratedFiles\qrc_style.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="algorithm\svgpp\SvgPolyPath.cpp">
+      <Filter>algorithm\svgpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="sewingeditor.ui">
@@ -877,6 +880,9 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\svgpp\SvgPolyPath.h">
+      <Filter>algorithm\svgpp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

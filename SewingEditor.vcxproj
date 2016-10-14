@@ -284,6 +284,7 @@
     <ClCompile Include="algorithm\svgpp\SvgGroup.cpp" />
     <ClCompile Include="algorithm\svgpp\SvgManager.cpp" />
     <ClCompile Include="algorithm\svgpp\SvgPath.cpp" />
+    <ClCompile Include="algorithm\svgpp\SvgPolyPath.cpp" />
     <ClCompile Include="algorithm\svgpp\SvgText.cpp" />
     <ClCompile Include="algorithm\tinyxml\tinystr.cpp" />
     <ClCompile Include="algorithm\tinyxml\tinyxml.cpp" />
@@ -464,6 +465,7 @@
     <ClInclude Include="algorithm\svgpp\SvgGroup.h" />
     <ClInclude Include="algorithm\svgpp\SvgManager.h" />
     <ClInclude Include="algorithm\svgpp\SvgPath.h" />
+    <ClInclude Include="algorithm\svgpp\SvgPolyPath.h" />
     <ClInclude Include="algorithm\svgpp\SvgText.h" />
     <ClInclude Include="algorithm\tinyxml\tinystr.h" />
     <ClInclude Include="algorithm\tinyxml\tinyxml.h" />

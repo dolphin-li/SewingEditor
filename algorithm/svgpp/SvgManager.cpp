@@ -14,6 +14,7 @@
 #include "SvgAbstractObject.h"
 #include "SvgAttribute.h"
 #include "SvgPath.h"
+#include "SvgPolyPath.h"
 #include "SvgText.h"
 #include "SvgGroup.h"
 
@@ -748,6 +749,12 @@ namespace svg
 					if (pc->m_cmds.size())
 						g->m_children.push_back(iter);
 				}
+				else if (iter->objectType() == SvgAbstractObject::PolyPath)
+				{
+					auto pc = (SvgPolyPath*)iter.get();
+					if (pc->m_cmds.size())
+						g->m_children.push_back(iter);
+				}
 				else
 					g->m_children.push_back(iter);
 			}
@@ -884,7 +891,9 @@ namespace svg
 			std::shared_ptr<SvgAbstractObject> path;
 			for (auto c : tmpChildren)
 			{
-				if (c->objectType() != SvgAbstractObject::Path || !c->isSelected())
+				if ((c->objectType() != SvgAbstractObject::Path
+					&& c->objectType() != SvgAbstractObject::PolyPath)
+					|| !c->isSelected())
 					parentPtr->m_children.push_back(c);
 				else
 				{
@@ -942,7 +951,7 @@ namespace svg
 			for (auto& c : g->m_children)
 				splitPath(c, to_single_seg);
 		}
-		else if (obj->objectType() == obj->Path && obj->isSelected())
+		else if ((obj->objectType() == obj->Path || obj->objectType() ==obj->PolyPath) && obj->isSelected())
 		{
 			SvgPath* p = (SvgPath*)obj.get();
 			auto newGroup = p->splitToSegments(to_single_seg);
@@ -992,6 +1001,11 @@ namespace svg
 					auto p = (SvgPath*)iter.second;
 					widths.insert(p->m_pathStyle.stroke_width);
 				}
+				if (iter.second->objectType() == SvgAbstractObject::PolyPath && iter.second->isSelected())
+				{
+					auto p = (SvgPolyPath*)iter.second;
+					widths.insert(p->m_pathStyle.stroke_width);
+				}
 			}
 		}
 		if (widths.size())
@@ -1009,6 +1023,11 @@ namespace svg
 				if (iter.second->objectType() == SvgAbstractObject::Path)
 				{
 					auto p = (SvgPath*)iter.second;
+					p->setSelected(widths.find(p->m_pathStyle.stroke_width) != widths.end());
+				}
+				else if (iter.second->objectType() == SvgAbstractObject::PolyPath)
+				{
+					auto p = (SvgPolyPath*)iter.second;
 					p->setSelected(widths.find(p->m_pathStyle.stroke_width) != widths.end());
 				}
 			}
@@ -1048,6 +1067,12 @@ namespace svg
 				if (iter.second->objectType() == SvgAbstractObject::Path)
 				{
 					SvgPath* p = (SvgPath*)iter.second;
+					if (p->isClosed())
+						p->setSelected(true);
+				}
+				else if (iter.second->objectType() == SvgAbstractObject::PolyPath)
+				{
+					SvgPath* p = (SvgPolyPath*)iter.second;
 					if (p->isClosed())
 						p->setSelected(true);
 				}
@@ -1351,6 +1376,7 @@ namespace svg
 			std::vector<Point> points, validPoints;
 			std::vector<int> pointMapper, validPointIds; // map from points to merged points
 			rootPtr->collectObjects(SvgAbstractObject::Path, paths, true);
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, paths, true);
 			for (auto path : paths)
 			{
 				auto ptr = (SvgPath*)path.get();
@@ -1411,15 +1437,15 @@ namespace svg
 			for (auto gIds : pathGroups)
 			{
 				std::shared_ptr<SvgAbstractObject> newPath;
-				auto newPathPtr = (SvgPath*)nullptr;
+				auto newPathPtr = (SvgPolyPath*)nullptr;
 				for (int i = 0; i < (int)gIds.nodes.size(); i++)
 				{
 					int pointId = validPointIds[gIds.nodes[i]];
 					if (i == 0)
 					{
-						auto oldPathPtr = (SvgPath*)paths[validPointIds[0]].get();
-						newPath.reset(new SvgPath);
-						newPathPtr = (SvgPath*)newPath.get();
+						auto oldPathPtr = (SvgPolyPath*)paths[validPointIds[0]].get();
+						newPath.reset(new SvgPolyPath);
+						newPathPtr = (SvgPolyPath*)newPath.get();
 						oldPathPtr->SvgAbstractObject::copyTo(newPathPtr);
 						newPathPtr->m_pathStyle = oldPathPtr->m_pathStyle;
 						newPathPtr->m_gl_fill_rull = oldPathPtr->m_gl_fill_rull;

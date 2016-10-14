@@ -791,7 +791,8 @@ namespace svg
 	void SvgPath::copyTo(SvgAbstractObject* obj)const
 	{
 		SvgAbstractObject::copyTo(obj);
-		if (obj->objectType() == SvgAbstractObject::Path)
+		if (obj->objectType() == SvgAbstractObject::Path
+			|| obj->objectType() == SvgAbstractObject::PolyPath)
 		{
 			auto newTptr = (SvgPath*)obj;
 			newTptr->m_gl_path_res = m_gl_path_res;

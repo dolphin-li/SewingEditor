@@ -3,6 +3,7 @@
 #include "SvgPath.h"
 #include "SvgText.h"
 #include "SvgGroup.h"
+#include "SvgPolyPath.h"
 
 #undef min
 #undef max
@@ -50,6 +51,8 @@ namespace svg
 			return (SvgAbstractObject*)new SvgText();
 		case svg::SvgAbstractObject::Group:
 			return (SvgAbstractObject*)new SvgGroup();
+		case svg::SvgAbstractObject::PolyPath:
+			return (SvgAbstractObject*)new SvgPolyPath();
 		default:
 			return nullptr;
 			break;

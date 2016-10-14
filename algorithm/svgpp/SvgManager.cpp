@@ -1055,6 +1055,9 @@ namespace svg
 		}
 	}
 
+#pragma region --graph related
+	typedef kdtree::PointTree<float, 2> Tree;
+	typedef Tree::Point Point;
 	struct GraphNode
 	{
 		int idx;
@@ -1080,15 +1083,30 @@ namespace svg
 			return *a < *b;
 		}
 	};
-
 	struct PolyPath
 	{
 		bool closed;
 		std::vector<int> nodes;
+		std::set<int> nodeSet;
+		std::vector<ldp::Float2> points;
 
 		PolyPath()
 		{
 			closed = false;
+		}
+
+		void prepareNodeset()
+		{
+			nodeSet.clear();
+			for (auto n : nodes)
+				nodeSet.insert(n);
+		}
+
+		void collectPoints(const std::vector<Point>& pts)
+		{
+			points.clear();
+			for (auto id : nodes)
+				points.push_back(pts[id].p);
 		}
 
 		bool operator == (const PolyPath& r)const
@@ -1135,11 +1153,8 @@ namespace svg
 
 		bool operator < (const PolyPath& r)const
 		{
-			std::set<int> rNodeSet;
-			for (auto rn : r.nodes)
-				rNodeSet.insert(rn);
 			for (auto n : nodes)
-			if (rNodeSet.find(n) == rNodeSet.end())
+			if (r.nodeSet.find(n) == r.nodeSet.end())
 				return false;
 			return true;
 		}
@@ -1159,36 +1174,10 @@ namespace svg
 
 		bool intersected(const PolyPath& r)const
 		{
-			std::set<int> rNodeSet;
-			for (auto rn : r.nodes)
-				rNodeSet.insert(rn);
 			for (auto n : nodes)
-			if (rNodeSet.find(n) != rNodeSet.end())
-				return false;
-			return true;
-		}
-
-		PolyPath operator | (const PolyPath& r)const
-		{
-			PolyPath out;
-			return out;
-		}
-
-		PolyPath operator & (const PolyPath& r)const
-		{
-			PolyPath out;
-
-			std::set<int> rNodeSet;
-			for (auto rn : r.nodes)
-				rNodeSet.insert(rn);
-
-			for (int i = 0; i < int(nodes.size()); i++)
-			{
-				if (rNodeSet.find(nodes[i]) != rNodeSet.end())
-					out.nodes.push_back(nodes[i]);
-			}
-			out.closed = false;
-			return out;
+			if (r.nodeSet.find(n) != r.nodeSet.end())
+				return true;
+			return false;
 		}
 	};
 
@@ -1287,10 +1276,64 @@ namespace svg
 		} // end while
 	}
 
+	static void graph_convert_inner_loops_to_segs(std::vector<PolyPath>& groups,
+		const std::vector<Point>& points)
+	{
+		for (auto& group : groups)
+		{
+			group.prepareNodeset();
+			group.collectPoints(points);
+		}
+
+		for (auto& groupi : groups)
+		{
+			if (!groupi.closed) continue;
+			for (auto& groupj : groups)
+			{
+				if (&groupi == &groupj) continue;
+				if (!groupj.closed) continue;
+				if (!groupi.intersected(groupj))
+					continue;
+
+				std::vector<int> tmpIds;
+				int startPos = 0, numBreaks = 0;
+				for (int groupj_pid = 0; groupj_pid < groupj.nodes.size(); groupj_pid++)
+				{
+					int v = groupj.nodes[groupj_pid];
+					if (groupi.nodeSet.find(v) != groupi.nodeSet.end()) continue;
+					ldp::Float2 p = groupj.points[groupj_pid];
+					if (ldp::PointInPolygon(groupi.points.size() - 1, groupi.points.data(), p))
+					{
+						if (tmpIds.size()){
+							if (groupj_pid - tmpIds.back() > 1){
+								startPos = tmpIds.size();
+								numBreaks++;
+							}
+						}
+						tmpIds.push_back(groupj_pid);
+					}
+				} // end for groupj_pid
+
+				// we only handle continuous segments
+				if (numBreaks > 1 || tmpIds.size() == 0) continue;
+
+				PolyPath tmpPath;
+				int prePos = (tmpIds[startPos] + groupj.nodes.size() - 1) % groupj.nodes.size();
+				tmpPath.nodes.push_back(groupj.nodes[prePos]);
+				for (int i = 0; i < tmpIds.size(); i++)
+				{
+					int pos = (i + startPos) % tmpIds.size();
+					tmpPath.nodes.push_back(groupj.nodes[tmpIds[pos]]);
+				}
+				int postPos = (tmpIds[(startPos - 1 + tmpIds.size()) % tmpIds.size()] + 1) % groupj.nodes.size();
+				tmpPath.nodes.push_back(groupj.nodes[postPos]);
+				groupj = tmpPath;
+			} // groupj
+		} // groupi
+	}
+#pragma endregion
 	void SvgManager::convertSelectedPathToConnectedGroups()
 	{
-		typedef kdtree::PointTree<float, 2> Tree;
-		typedef Tree::Point Point;
 		typedef std::shared_ptr<SvgAbstractObject> ObjPtr;
 		for (auto layer_iter : m_layers)
 		{
@@ -1305,7 +1348,7 @@ namespace svg
 
 			// 2. collect all paths, the idx corresponds to paths
 			std::vector<ObjPtr> paths; // each path generate two points, a start point and an end point
-			std::vector<Point> points;
+			std::vector<Point> points, validPoints;
 			std::vector<int> pointMapper, validPointIds; // map from points to merged points
 			rootPtr->collectObjects(SvgAbstractObject::Path, paths, true);
 			for (auto path : paths)
@@ -1323,8 +1366,7 @@ namespace svg
 			{
 				std::vector<std::pair<size_t, float>> results;
 				tree.pointInSphere(p, PATH_CONTACT_DIST_THRE, results);
-				for (auto r : results)
-				{
+				for (auto r : results){
 					if (r.first / 2 == p.idx / 2) continue;
 					mergePaths[p.idx].push_back(r.first);
 					mergePaths[r.first].push_back(p.idx);
@@ -1334,13 +1376,14 @@ namespace svg
 			{
 				bool valid = true;
 				for (auto c : mergePaths[iPoint])
-				if (c < iPoint)
-				{
+				if (c < iPoint){
 					valid = false;
 					break;
 				}
-				if (valid)
+				if (valid){
 					validPointIds.push_back(iPoint);
+					validPoints.push_back(points[iPoint]);
+				}
 			}
 			pointMapper.resize(points.size(), -1);
 			for (int i = 0; i < (int)validPointIds.size(); i++)
@@ -1361,6 +1404,7 @@ namespace svg
 			// 4. group each polygons and associates
 			std::vector<PolyPath> pathGroups;
 			graph_to_connected_components(pathGraph, (int)validPointIds.size(), pathGroups);
+			graph_convert_inner_loops_to_segs(pathGroups, validPoints);
 
 			// 5. create new path groups
 			std::vector<ObjPtr> newGroups;

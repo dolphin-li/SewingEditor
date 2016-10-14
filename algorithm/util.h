@@ -275,7 +275,7 @@ namespace ldp
 		for (i = 0, j = nvert - 1; i < nvert; j = i++) {
 			if (((verts[i][1]>p[1]) != (verts[j][1]>p[1])) &&
 				(p[0] < (verts[j][0] - verts[i][0]) * (p[1] - verts[i][1]) / 
-				(verts[j][1] - verts[i][1]) + verts[i][1]))
+				(verts[j][1] - verts[i][1]) + verts[i][0]))
 				c = !c;
 		}
 		return c;

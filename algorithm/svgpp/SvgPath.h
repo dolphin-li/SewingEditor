@@ -27,7 +27,7 @@ namespace svg
 		// split all segments to individual paths
 		// if there is only one segment, we do not split and return an nullptr
 		// else we return grouped splittings
-		std::shared_ptr<SvgAbstractObject> splitToSegments()const;
+		std::shared_ptr<SvgAbstractObject> splitToSegments(bool to_single_segs = true)const;
 
 		std::shared_ptr<SvgAbstractObject> splitToDifferentShapes()const;
 

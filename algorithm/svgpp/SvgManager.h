@@ -111,13 +111,14 @@ namespace svg
 		void convertSelectedPathToConnectedGroups();
 	protected:
 		void removeSelected(SvgAbstractObject* obj);
+		void removeInvalidPaths(SvgAbstractObject* obj);
 		bool groupSelected_findCommonParent(std::shared_ptr<SvgAbstractObject> obj,
 			std::shared_ptr<SvgAbstractObject> objParent,
 			std::shared_ptr<SvgAbstractObject>& commonParent, 
 			int& cnt);
 		void ungroupSelected_collect(SvgAbstractObject* obj, std::set<SvgGroup*>& groups);
 		void removeSingleNodeAndEmptyNode(std::shared_ptr<SvgAbstractObject>& obj);
-		void splitPath(std::shared_ptr<SvgAbstractObject>& obj);
+		void splitPath(std::shared_ptr<SvgAbstractObject>& obj, bool to_single_segs);
 		void splitPathByShape(std::shared_ptr<SvgAbstractObject>& obj);
 	private:
 		Camera* m_renderCam;

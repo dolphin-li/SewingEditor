@@ -691,15 +691,9 @@ namespace svg
 	void SvgManager::removeSingleNodeAndEmptyNode()
 	{
 		for (auto iter : m_layers)
+			removeInvalidPaths(iter.second->root.get());
+		for (auto iter : m_layers)
 			removeSingleNodeAndEmptyNode(iter.second->root);
-		auto tmpLayers = m_layers;
-		m_layers.clear();
-		for (auto iter : tmpLayers)
-		{
-			auto g = (SvgGroup*)iter.second->root.get();
-			if (g->m_children.size())
-				m_layers.insert(iter);
-		}
 		updateIndex();
 		updateBound();
 	}
@@ -733,6 +727,33 @@ namespace svg
 			for (auto iter : tmp)
 			{
 				removeSelected(iter.get());
+			}
+		}
+	}
+
+	void SvgManager::removeInvalidPaths(SvgAbstractObject* obj)
+	{
+		if (obj == nullptr)
+			return;
+		if (obj->objectType() == obj->Group)
+		{
+			SvgGroup* g = (SvgGroup*)obj;
+			auto tmp = g->m_children;
+			g->m_children.clear();
+			for (auto iter : tmp)
+			{
+				if (iter->objectType() == SvgAbstractObject::Path)
+				{
+					auto pc = (SvgPath*)iter.get();
+					if (pc->m_cmds.size())
+						g->m_children.push_back(iter);
+				}
+				else
+					g->m_children.push_back(iter);
+			}
+			for (auto iter : tmp)
+			{
+				removeInvalidPaths(iter.get());
 			}
 		}
 	}
@@ -818,8 +839,11 @@ namespace svg
 			auto tmp = objGroup->m_children;
 			objGroup->m_children.clear();
 			for (auto c : tmp)
-			if (c->getId() != obj->INDEX_BEGIN - 1)
-				objGroup->m_children.push_back(c);
+			if (c.get())
+			{
+				if (c->getId() != obj->INDEX_BEGIN - 1)
+					objGroup->m_children.push_back(c);
+			}
 		}
 	}
 
@@ -829,7 +853,7 @@ namespace svg
 		{
 			auto layer = layer_iter.second;
 			if (!layer->selected) continue;
-			splitPath(layer->root);
+			splitPath(layer->root, true);
 		}
 		updateIndex();
 		updateBound();
@@ -908,7 +932,7 @@ namespace svg
 		updateBound();
 	}
 
-	void SvgManager::splitPath(std::shared_ptr<SvgAbstractObject>& obj)
+	void SvgManager::splitPath(std::shared_ptr<SvgAbstractObject>& obj, bool to_single_seg)
 	{
 		if (obj.get() == nullptr)
 			return;
@@ -916,12 +940,12 @@ namespace svg
 		{
 			SvgGroup* g = (SvgGroup*)obj.get();
 			for (auto& c : g->m_children)
-				splitPath(c);
+				splitPath(c, to_single_seg);
 		}
 		else if (obj->objectType() == obj->Path && obj->isSelected())
 		{
 			SvgPath* p = (SvgPath*)obj.get();
-			auto newGroup = p->splitToSegments();
+			auto newGroup = p->splitToSegments(to_single_seg);
 			if (newGroup.get())
 			{
 				newGroup->setParent(obj->parent());
@@ -1043,73 +1067,96 @@ namespace svg
 			father = nullptr;
 			visited = false;
 		}
+
+		bool operator < (const GraphNode& r)const
+		{
+			return nbNodes.size() < r.nbNodes.size();
+		}
+	};
+	struct GraphNodePtrLess
+	{
+		bool operator () (std::shared_ptr<GraphNode> a, std::shared_ptr<GraphNode> b)
+		{
+			return *a < *b;
+		}
 	};
 
-	static bool graph_find_cycle(const std::vector<GraphNode>& graph, GraphNode*& startNode)
+	struct PolyPath
 	{
-		std::stack<GraphNode*> nodeStack;
-		nodeStack.push(startNode);
-		startNode->visited = true;
+		bool closed;
+		std::vector<int> nodes;
+	};
 
-		while (!nodeStack.empty())
-		{
-			GraphNode* node = nodeStack.top();
-			nodeStack.pop();
+	static void graph_find_cycles(GraphNode* startNode, std::vector<PolyPath>& groups)
+	{
+		std::function<void(GraphNode*)> dfs;
+		dfs = [&](GraphNode *node) {
+			node->visited = true;
 			for (auto nbNode : node->nbNodes)
 			{
-				if (!nbNode->visited)
-				{
-					nodeStack.push(nbNode);
-					nbNode->father = node;
-					nbNode->visited = true;
+				if (nbNode == node->father) continue;
+				nbNode->father = node;
+				if (nbNode->visited) {
+					// found a loop
+					PolyPath group;
+					group.closed = true;
+					for (auto pn = node; ; pn = pn->father) {
+						assert(pn);
+						group.nodes.push_back(pn->idx);
+						if (pn == nbNode) break;
+					}
+					groups.push_back(group);
 				}
-				else if (nbNode != node->father)
-				{
-					startNode = nbNode;
-					nbNode->father = node;
-					return true;
-				}
+				else
+					dfs(nbNode);
 			}
-			startNode = node;
-		} // end while not stack empty
+			node->visited = false;
+		};
 
-		return false;
+		startNode->father = nullptr;
+		dfs(startNode);
 	}
 
 	static void graph_to_connected_components(
 		const std::set<ldp::Int2>& graphSet, int nNodes,
-		std::vector<std::vector<int>>& groups)
+		std::vector<PolyPath>& groups)
 	{
 		groups.clear();
 
+		if (nNodes == 0)
+			return;
+
 		// 1. produce a graph representation
 		std::vector<GraphNode> graph(nNodes);
+		std::vector<int> node_visited(nNodes, 0);
 		for (int i = 0; i < nNodes; i++)
 			graph[i].idx = i;
 		for (auto c : graphSet)
 			graph[c[0]].nbNodes.push_back(&graph[c[1]]);
 
-		// 2. visit all paths
+		// 2. visit all loops
 		while (1)
 		{
-			GraphNode* curNode = nullptr;
-			for (auto& node : graph)
-			if (!node.visited)
+			int startNodeId = -1;
+			for (int i = 0; i < node_visited.size(); i++)
 			{
-				curNode = &node;
-				break;
+				if (!node_visited[i])
+				{
+					startNodeId = i;
+					break;
+				}
 			}
-			if (curNode == nullptr) break;
-
-			auto endNode = curNode;
-			graph_find_cycle(graph, endNode);
-			groups.push_back(std::vector<int>());
-			auto group = groups.back();
-			do{
-				group.push_back(endNode->idx);
-				endNode = endNode->father;
-			} while (endNode != curNode && endNode != nullptr);
-		} // end while not nonVisitedPath.empty()
+			if (startNodeId == -1) break;
+			int lastGroupNum = (int)groups.size();
+			graph_find_cycles(&graph[startNodeId], groups);
+			if (lastGroupNum == groups.size()) break;
+			for (int gId = lastGroupNum; gId < (int)groups.size(); gId++)
+			{
+				auto group = groups[gId];
+				for (auto pId : group.nodes)
+					node_visited[pId] = true;
+			}
+		} // end while
 	}
 
 	void SvgManager::convertSelectedPathToConnectedGroups()
@@ -1124,7 +1171,8 @@ namespace svg
 			auto rootPtr = (SvgGroup*)layer->root.get();
 
 			// 1. pre-process, split into individual small paths
-			splitPath(layer->root);
+			splitPath(layer->root, true);
+			removeInvalidPaths(layer->root.get());
 
 			// 2. collect all paths, the idx corresponds to paths
 			std::vector<ObjPtr> paths; // each path generate two points, a start point and an end point
@@ -1176,21 +1224,58 @@ namespace svg
 
 			// 3.1 finally we construct the connection graph
 			for (int i = 0; i < (int)points.size(); i += 2)
+			{
 				pathGraph.insert(ldp::Int2(pointMapper[i], pointMapper[i + 1]));
+				pathGraph.insert(ldp::Int2(pointMapper[i + 1], pointMapper[i]));
+			}
 
 			// 4. group each polygons and associates
-			std::vector<std::vector<int>> pathGroups;
+			std::vector<PolyPath> pathGroups;
 			graph_to_connected_components(pathGraph, (int)validPointIds.size(), pathGroups);
 
 			// 5. create new path groups
 			std::vector<ObjPtr> newGroups;
-			for (auto pathGroupIds : pathGroups)
+			for (auto gIds : pathGroups)
 			{
+				std::shared_ptr<SvgAbstractObject> newPath;
+				auto newPathPtr = (SvgPath*)nullptr;
+				for (int i = 0; i < (int)gIds.nodes.size(); i++)
+				{
+					int pointId = validPointIds[gIds.nodes[i]];
+					if (i == 0)
+					{
+						auto oldPathPtr = (SvgPath*)paths[validPointIds[0]].get();
+						newPath.reset(new SvgPath);
+						newPathPtr = (SvgPath*)newPath.get();
+						oldPathPtr->SvgAbstractObject::copyTo(newPathPtr);
+						newPathPtr->m_pathStyle = oldPathPtr->m_pathStyle;
+						newPathPtr->m_gl_fill_rull = oldPathPtr->m_gl_fill_rull;
+						newPathPtr->setParent(rootPtr);
+						newPathPtr->m_cmds.push_back(GL_MOVE_TO_NV);
+					}
+					else
+					{
+						newPathPtr->m_cmds.push_back(GL_LINE_TO_NV);
+					}
+					newPathPtr->m_coords.push_back(points[pointId].p[0]);
+					newPathPtr->m_coords.push_back(points[pointId].p[1]);
+				}
+				if (gIds.closed)
+				{
+					newPathPtr->m_cmds.push_back(GL_LINE_TO_NV);
+					int pid = validPointIds[gIds.nodes[0]];
+					newPathPtr->m_coords.push_back(points[pid].p[0]);
+					newPathPtr->m_coords.push_back(points[pid].p[1]);
+				}
+				if (newPathPtr)
+					newGroups.push_back(newPath);
+			} // end for gIds
 
-			}
+			// 6. remove old and insert new
+			removeSelected(rootPtr);
+			rootPtr->m_children.insert(rootPtr->m_children.end(), newGroups.begin(), newGroups.end());
 		} // end for all layers
-		updateIndex();
-		updateBound();
+		removeSingleNodeAndEmptyNode();
 	}
 	//////////////////////////////////////////////////////////////////
 	/// layer related

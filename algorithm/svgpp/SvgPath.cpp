@@ -221,7 +221,7 @@ namespace svg
 		}
 	}
 
-	std::shared_ptr<SvgAbstractObject> SvgPath::splitToSegments()const
+	std::shared_ptr<SvgAbstractObject> SvgPath::splitToSegments(bool to_single_segs)const
 	{
 		std::shared_ptr<SvgAbstractObject> group;
 		if (m_cmds.size() == 0)
@@ -236,7 +236,7 @@ namespace svg
 		}
 		posOfM.push_back(m_cmds.size());
 
-		if (posOfM.size() <= 2)
+		if (posOfM.size() <= 2 && !to_single_segs)
 			return group;
 
 		group.reset(new SvgGroup);
@@ -246,9 +246,18 @@ namespace svg
 		{
 			int cb = posOfM[i];
 			int ce = posOfM[i + 1];
-			for (int j = cb; j < ce; j++)
+			if (to_single_segs)
 			{
-				std::shared_ptr<SvgAbstractObject> sp = subPath(j, j+1, true);
+				for (int j = cb; j < ce; j++)
+				{
+					std::shared_ptr<SvgAbstractObject> sp = subPath(j, j + 1, true);
+					groupPtr->m_children.push_back(sp);
+					sp->setParent(groupPtr);
+				}
+			}
+			else
+			{
+				std::shared_ptr<SvgAbstractObject> sp = subPath(cb, ce, false);
 				groupPtr->m_children.push_back(sp);
 				sp->setParent(groupPtr);
 			}

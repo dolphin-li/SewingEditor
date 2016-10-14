@@ -547,12 +547,15 @@ void SewingEditor::initLayerList()
 	ui.listLayers->setEditTriggers(QAbstractItemView::DoubleClicked
 		| QAbstractItemView::EditKeyPressed);
 	int currentRow = 0;
+	bool hasSelection = false;
 	for (auto iter : ui.widget->getSvgManager()->layers())
 	{
 		ui.listLayers->addItem(iter.first.c_str());
 		auto item = ui.listLayers->item(ui.listLayers->count() - 1);
 		item->setFlags(item->flags() | Qt::ItemIsEditable);
 		item->setSelected(iter.second->selected);
+		if (iter.second->selected)
+			hasSelection = true;
 		auto currentLayer = ui.widget->getSvgManager()->getCurrentLayer();
 		if (currentLayer == nullptr)
 		{
@@ -563,6 +566,10 @@ void SewingEditor::initLayerList()
 			currentRow = ui.listLayers->count() - 1;
 	}
 	ui.listLayers->setCurrentRow(currentRow);
+	if (!hasSelection && ui.listLayers->count()){
+		ui.listLayers->item(0)->setSelected(true);
+		ui.widget->getSvgManager()->getLayer(ui.listLayers->item(0)->text().toStdString())->selected = true;
+	}
 	ui.listLayers->setUpdatesEnabled(true);
 	m_disableCurrentRowChanged = false;
 }
@@ -681,7 +688,8 @@ void SewingEditor::on_pbRemoveLayers_clicked()
 		auto items = ui.listLayers->selectedItems();
 		for (auto item : items)
 		{
-			ui.widget->getSvgManager()->removeLayer(item->text().toStdString());
+			if (ui.widget->getSvgManager()->getLayer(item->text().toStdString()))
+				ui.widget->getSvgManager()->removeLayer(item->text().toStdString());
 			info += item->text() + "; ";
 		}
 

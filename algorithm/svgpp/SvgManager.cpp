@@ -853,7 +853,7 @@ namespace svg
 		{
 			auto layer = layer_iter.second;
 			if (!layer->selected) continue;
-			splitPath(layer->root, true);
+			splitPath(layer->root, false);
 		}
 		updateIndex();
 		updateBound();
@@ -1085,40 +1085,169 @@ namespace svg
 	{
 		bool closed;
 		std::vector<int> nodes;
+
+		PolyPath()
+		{
+			closed = false;
+		}
+
+		bool operator == (const PolyPath& r)const
+		{
+			if (nodes.size() != r.nodes.size())
+				return false;
+			auto r0_iter = std::find(r.nodes.begin(), r.nodes.end(), nodes[0]);
+			if (r0_iter == r.nodes.end())
+				return false;
+			if (nodes.size() == 1)
+				return true;
+
+			// forward matching
+			auto my_iter = nodes.begin();
+			for (auto r_iter = r0_iter;; )
+			{
+				if (*r_iter != *my_iter)
+					break;
+				r_iter++;
+				my_iter++;
+				if (r_iter == r0_iter)
+					return true;
+				if (r_iter == r.nodes.end())
+					r_iter = r.nodes.begin();
+			}
+
+			// backward matching
+			my_iter = nodes.begin();
+			for (auto r_iter = r0_iter;;)
+			{
+				if (*r_iter != *my_iter)
+					return false;
+				if (r_iter == r.nodes.begin())
+					r_iter = r.nodes.end() - 1;
+				else
+					r_iter--;
+				my_iter++;
+				if (r_iter == r0_iter)
+					return true;
+			}
+
+			return false;
+		}
+
+		bool operator < (const PolyPath& r)const
+		{
+			std::set<int> rNodeSet;
+			for (auto rn : r.nodes)
+				rNodeSet.insert(rn);
+			for (auto n : nodes)
+			if (rNodeSet.find(n) == rNodeSet.end())
+				return false;
+			return true;
+		}
+
+		bool operator > (const PolyPath& r)
+		{
+			return r < *this;
+		}
+
+		bool containedIn(const std::vector<PolyPath>& paths)
+		{
+			for (auto& path : paths)
+				if (path == *this)
+					return true;
+			return false;
+		}
+
+		bool intersected(const PolyPath& r)const
+		{
+			std::set<int> rNodeSet;
+			for (auto rn : r.nodes)
+				rNodeSet.insert(rn);
+			for (auto n : nodes)
+			if (rNodeSet.find(n) != rNodeSet.end())
+				return false;
+			return true;
+		}
+
+		PolyPath operator | (const PolyPath& r)const
+		{
+			PolyPath out;
+			return out;
+		}
+
+		PolyPath operator & (const PolyPath& r)const
+		{
+			PolyPath out;
+
+			std::set<int> rNodeSet;
+			for (auto rn : r.nodes)
+				rNodeSet.insert(rn);
+
+			for (int i = 0; i < int(nodes.size()); i++)
+			{
+				if (rNodeSet.find(nodes[i]) != rNodeSet.end())
+					out.nodes.push_back(nodes[i]);
+			}
+			out.closed = false;
+			return out;
+		}
 	};
 
-	static void graph_find_cycles(GraphNode* startNode, std::vector<PolyPath>& groups)
+	static void graph_find_cycles(GraphNode* node, std::vector<PolyPath>& groups, 
+		std::vector<int>& global_visit_flag)
 	{
-		std::function<void(GraphNode*)> dfs;
-		dfs = [&](GraphNode *node) {
-			node->visited = true;
-			for (auto nbNode : node->nbNodes)
-			{
-				if (nbNode == node->father) continue;
-				nbNode->father = node;
-				if (nbNode->visited) {
-					// found a loop
-					PolyPath group;
-					group.closed = true;
-					for (auto pn = node; ; pn = pn->father) {
-						assert(pn);
-						group.nodes.push_back(pn->idx);
-						if (pn == nbNode) break;
-					}
+		node->visited = true;
+		global_visit_flag[node->idx] = true;
+		for (auto nbNode : node->nbNodes){
+			if (nbNode == node->father) continue;
+			if (nbNode->visited){
+				// found a loop
+				PolyPath group;
+				group.closed = true;
+				for (auto pn = node; ; pn = pn->father){
+					assert(pn);
+					group.nodes.push_back(pn->idx);
+					if (pn == nbNode) break;
+				} // end for pn
+				if (!group.containedIn(groups))
 					groups.push_back(group);
-				}
-				else
-					dfs(nbNode);
+			} // end if found a group
+			else{
+				nbNode->father = node;
+				graph_find_cycles(nbNode, groups, global_visit_flag);
+				nbNode->father = nullptr;
 			}
-			node->visited = false;
-		};
+		} // end for nbNode
+		node->visited = false;
+	}
 
-		startNode->father = nullptr;
-		dfs(startNode);
+	static void graph_find_non_cycles(GraphNode* node, std::vector<PolyPath>& groups,
+		std::vector<int>& global_visit_flag)
+	{
+		PolyPath path;
+		for (auto nbNode = node;;){
+			path.nodes.push_back(nbNode->idx);
+			if (global_visit_flag[nbNode->idx]) break;
+			global_visit_flag[nbNode->idx] = true;
+			for (auto n : nbNode->nbNodes){
+				if (n != node)
+				{
+					node = nbNode;
+					nbNode = n;
+					break;
+				}
+			} // end for n
+			if (nbNode == node) break;
+		} // end for nbNode
+
+		if (path.nodes.size() > 1)
+		{
+			if (!path.containedIn(groups))
+				groups.push_back(path);
+		}
 	}
 
 	static void graph_to_connected_components(
-		const std::set<ldp::Int2>& graphSet, int nNodes,
+		std::set<ldp::Int2>& graphSet, int nNodes,
 		std::vector<PolyPath>& groups)
 	{
 		groups.clear();
@@ -1134,28 +1263,27 @@ namespace svg
 		for (auto c : graphSet)
 			graph[c[0]].nbNodes.push_back(&graph[c[1]]);
 
-		// 2. visit all loops
-		while (1)
+		// 2. find cycles in this step
+		for (int nodeId = 0; nodeId < node_visited.size(); nodeId++)
 		{
-			int startNodeId = -1;
-			for (int i = 0; i < node_visited.size(); i++)
-			{
-				if (!node_visited[i])
-				{
-					startNodeId = i;
-					break;
-				}
-			}
-			if (startNodeId == -1) break;
-			int lastGroupNum = (int)groups.size();
-			graph_find_cycles(&graph[startNodeId], groups);
-			if (lastGroupNum == groups.size()) break;
-			for (int gId = lastGroupNum; gId < (int)groups.size(); gId++)
-			{
-				auto group = groups[gId];
-				for (auto pId : group.nodes)
-					node_visited[pId] = true;
-			}
+			if (node_visited[nodeId] || graph[nodeId].nbNodes.size() != 2) continue;
+			for (int i = 0; i < nNodes; i++)
+				graph[i].visited = false;
+			graph[nodeId].father = nullptr;
+			graph_find_cycles(&graph[nodeId], groups, node_visited);
+		} // end while
+
+		// 2.1 re-calc visited nodes
+		std::fill(node_visited.begin(), node_visited.end(), 0);
+		for (auto g : groups)
+			for (auto idx : g.nodes)
+				node_visited[idx] = 1;
+
+		// 3. find non-cycles in this step
+		for (int nodeId = 0; nodeId < node_visited.size(); nodeId++)
+		{
+			if (node_visited[nodeId] || graph[nodeId].nbNodes.size() != 1) continue;
+			graph_find_non_cycles(&graph[nodeId], groups, node_visited);
 		} // end while
 	}
 
@@ -1172,7 +1300,8 @@ namespace svg
 
 			// 1. pre-process, split into individual small paths
 			splitPath(layer->root, true);
-			removeInvalidPaths(layer->root.get());
+			removeInvalidPaths(layer->root.get());	
+			removeSingleNodeAndEmptyNode(layer->root);
 
 			// 2. collect all paths, the idx corresponds to paths
 			std::vector<ObjPtr> paths; // each path generate two points, a start point and an end point

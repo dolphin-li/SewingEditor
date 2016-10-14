@@ -18,7 +18,16 @@ namespace svg
 		virtual void copyTo(SvgAbstractObject* obj)const;
 
 		bool isClosed()const;
+
+		// given this polygon (closed or non-closed), we find all the corners
+		void findCorners();
+
+		int numCorners()const{ return (int)m_cornerPos.size(); }
+		ldp::Float2 getCorner(int i)const{ return ldp::Float2(m_coords[m_cornerPos[i] * 2], 
+			m_coords[m_cornerPos[i] * 2 + 1]); }
 	protected:
 		void renderSelection();
+	protected:
+		std::vector<int> m_cornerPos;
 	};
 }

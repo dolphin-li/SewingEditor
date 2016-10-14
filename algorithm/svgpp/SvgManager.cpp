@@ -131,16 +131,24 @@ namespace svg
 		}
 		virtual void visit(ShapePtr shape)
 		{
-			SvgPath* path = new SvgPath();
-			path->m_pathStyle = shape->getPath()->style;
-			ConvertPathProcessor processor(shape->getPath().get(), path->m_gl_fill_rull);
+			GLenum gl_fill_rull = 0;
+			ConvertPathProcessor processor(shape->getPath().get(), gl_fill_rull);
 			shape->getPath()->processSegments(processor);
+			Cg::float4 bd = shape->getPath()->getBounds();
+			SvgPath* path = nullptr;
+			if (shape->getPath()->is_ldp_poly)
+				path = new SvgPolyPath();
+			else
+				path = new SvgPath();
+			path->m_gl_fill_rull = gl_fill_rull;
+			path->m_pathStyle = shape->getPath()->style;
 			path->m_cmds.insert(path->m_cmds.end(), processor.cmds.begin(), processor.cmds.end());
 			path->m_coords.insert(path->m_coords.end(), processor.coords.begin(), processor.coords.end());
-			Cg::float4 bd = shape->getPath()->getBounds();
 			path->setBound(ldp::Float4(bd.x, bd.z, bd.y, bd.w));
 			path->setParent(m_group);
-			m_group->m_children.push_back(std::shared_ptr<SvgPath>(path));
+			if (shape->getPath()->is_ldp_poly)
+				((SvgPolyPath*)path)->findCorners();
+			m_group->m_children.push_back(std::shared_ptr<SvgAbstractObject>(path));
 		}
 		virtual void visit(TextPtr text)
 		{
@@ -1467,7 +1475,10 @@ namespace svg
 					newPathPtr->m_coords.push_back(points[pid].p[1]);
 				}
 				if (newPathPtr)
+				{
+					newPathPtr->findCorners();
 					newGroups.push_back(newPath);
+				}
 			} // end for gIds
 
 			// 6. remove old and insert new

@@ -2170,18 +2170,24 @@ NodePtr SVGParser::parsePath(TiXmlElement* elem)
 
     string path_string;
 
+	bool is_ldp_poly = false;
     for(TiXmlAttribute* a = elem->FirstAttribute(); a; a = a->Next()) {
         string name(a->Name());
         if(name == "d") {
             path_string = a->Value();
             continue;
         }
+		if (name == "ldp_poly"){
+			is_ldp_poly = a->IntValue();
+			continue;
+		}
         bool got_one = parseGenericShapeProperty(a, elem);
         if (got_one) {
             continue;
         }
     }
     PathPtr path = PathPtr(new Path(style().path, path_string.c_str()));
+	path->is_ldp_poly = is_ldp_poly;
     if (!path->isEmpty()) {
         NodePtr shape = createShape(path, style());
         

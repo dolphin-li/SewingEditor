@@ -8,6 +8,8 @@ namespace svg
 #undef min
 #undef max
 
+	const static float CORNER_COS_ANGLE = cos(30.f * ldp::PI_S / 180.f);
+
 	SvgPolyPath::SvgPolyPath() :SvgPath()
 	{
 
@@ -23,6 +25,9 @@ namespace svg
 			return;
 
 		assert(m_gl_path_res->id);
+
+		if (m_cornerPos.size() == 0)
+			findCorners();
 
 		bool ancestorSelected = false;
 		if (ancestorAfterRoot())
@@ -51,7 +56,9 @@ namespace svg
 		if (!isVisible(shapeToRender))
 			return;
 
-		assert(m_gl_path_res->id);
+		assert(m_gl_path_res->id);		
+		if (m_cornerPos.size() == 0)
+			findCorners();
 		glColor4fv(color_from_index(m_id).ptr());
 
 		if (m_invalid)
@@ -72,50 +79,42 @@ namespace svg
 			ancestorSelected = ancestorAfterRoot()->isSelected();
 		if (isHighlighted() || isSelected() || ancestorSelected)
 		{
-			float sz = m_pathStyle.stroke_width / 5;
+			float sz = m_pathStyle.stroke_width;
 			if (isHighlighted() && (isSelected() || ancestorSelected))
 				sz *= 2;
 			// render control points
 			glPushAttrib(GL_ALL_ATTRIB_BITS);
 			glDisable(GL_STENCIL_TEST);
+			glLineWidth(2);
 			glBegin(GL_LINES);
 			int posBegin = 0;
-			for (size_t i = 0; i < m_cmds.size(); i++)
+			for (size_t i = 0; i < m_cornerPos.size(); i++)
 			{
-				int posEnd = posBegin + numCoords(m_cmds[i]);
-				for (int j = posBegin; j < posEnd - 1; j += 2)
-				{
-					ldp::Float2 c(m_coords[j], m_coords[j + 1]);
-					glVertex2f(c[0] - sz, c[1] - sz);
-					glVertex2f(c[0] + sz, c[1] - sz);
+				ldp::Float2 c = getCorner(i);
 
-					glVertex2f(c[0] - sz, c[1] - sz);
-					glVertex2f(c[0] - sz, c[1] + sz);
+				glVertex2f(c[0] - sz, c[1] - sz);
+				glVertex2f(c[0] + sz, c[1] - sz);
 
-					glVertex2f(c[0] + sz, c[1] + sz);
-					glVertex2f(c[0] + sz, c[1] - sz);
+				glVertex2f(c[0] - sz, c[1] - sz);
+				glVertex2f(c[0] - sz, c[1] + sz);
 
-					glVertex2f(c[0] + sz, c[1] + sz);
-					glVertex2f(c[0] - sz, c[1] + sz);
-				}
-				posBegin = posEnd;
+				glVertex2f(c[0] + sz, c[1] + sz);
+				glVertex2f(c[0] + sz, c[1] - sz);
+
+				glVertex2f(c[0] + sz, c[1] + sz);
+				glVertex2f(c[0] - sz, c[1] + sz);
 			}
 			glEnd();
 			glBegin(GL_QUADS);
 			glColor3f(1, 1, 1);
 			posBegin = 0;
-			for (size_t i = 0; i < m_cmds.size(); i++)
+			for (size_t i = 0; i < m_cornerPos.size(); i++)
 			{
-				int posEnd = posBegin + numCoords(m_cmds[i]);
-				for (int j = posBegin; j < posEnd - 1; j += 2)
-				{
-					ldp::Float2 c(m_coords[j], m_coords[j + 1]);
-					glVertex2f(c[0] - sz, c[1] - sz);
-					glVertex2f(c[0] + sz, c[1] - sz);
-					glVertex2f(c[0] + sz, c[1] + sz);
-					glVertex2f(c[0] - sz, c[1] + sz);
-				}
-				posBegin = posEnd;
+				ldp::Float2 c = getCorner(i);
+				glVertex2f(c[0] - sz, c[1] - sz);
+				glVertex2f(c[0] + sz, c[1] - sz);
+				glVertex2f(c[0] + sz, c[1] + sz);
+				glVertex2f(c[0] - sz, c[1] + sz);
 			}
 			glEnd();
 			glPopAttrib();
@@ -128,6 +127,7 @@ namespace svg
 		if (obj->objectType() == SvgAbstractObject::PolyPath)
 		{
 			auto newTptr = (SvgPolyPath*)obj;
+			newTptr->m_cornerPos = m_cornerPos;
 		}
 	}
 
@@ -173,6 +173,7 @@ namespace svg
 		TiXmlElement* ele = new TiXmlElement("path");
 		parent->LinkEndChild(ele);
 		ele->SetAttribute("fill", strokeFillMap(m_pathStyle.fill_rule));
+		ele->SetAttribute("ldp_poly", 1);
 		ele->SetAttribute("stroke", "#231F20");
 		ele->SetDoubleAttribute("stroke-width", m_pathStyle.stroke_width);
 		ele->SetAttribute("stroke-linecap", strokeLineCapMap(m_pathStyle.line_cap));
@@ -188,5 +189,28 @@ namespace svg
 			return false;
 		return m_coords[0] == m_coords[m_coords.size() - 2] && 
 			m_coords[1] == m_coords[m_coords.size()-1];
+	}
+
+	void SvgPolyPath::findCorners()
+	{
+		m_cornerPos.clear();
+		if (m_cmds.size() == 0)
+			return;
+		if (!isClosed())
+			m_cornerPos.push_back(0);
+		for (int icmd = !isClosed(); icmd < (int)m_cmds.size() - 1; icmd++)
+		{
+			int lasti = (icmd - 1 + int(m_cmds.size())) % int(m_cmds.size());
+			int nexti = icmd + 1;
+			ldp::Float2 lastp(m_coords[lasti * 2], m_coords[lasti * 2 + 1]);
+			ldp::Float2 p(m_coords[icmd * 2], m_coords[icmd * 2 + 1]);
+			ldp::Float2 dir = (p - lastp).normalize();
+			ldp::Float2 nextp(m_coords[nexti * 2], m_coords[nexti * 2 + 1]);
+			ldp::Float2 ndir = (nextp - p).normalize();
+			if (dir.dot(ndir) < CORNER_COS_ANGLE)
+				m_cornerPos.push_back(icmd);
+		} // icmd
+		if (!isClosed())
+			m_cornerPos.push_back((int)m_cmds.size() - 1);
 	}
 }

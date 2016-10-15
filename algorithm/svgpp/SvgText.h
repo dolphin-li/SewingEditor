@@ -27,8 +27,8 @@ namespace svg
 		~SvgText();
 		ObjectType objectType()const { return ObjectType::Text; }
 
-		virtual void render(PathUnitShapes shapeToRender = ShapeAll);
-		virtual void renderId(PathUnitShapes shapeToRender = ShapeAll);
+		virtual void render();
+		virtual void renderId();
 		virtual std::shared_ptr<SvgAbstractObject> clone(bool selectedOnly = false)const;
 		virtual TiXmlElement* toXML(TiXmlNode* parent)const;
 		virtual void copyTo(SvgAbstractObject* obj)const;

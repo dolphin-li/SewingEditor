@@ -11,8 +11,8 @@ namespace svg
 		~SvgPath();
 		ObjectType objectType()const { return ObjectType::Path; }
 
-		virtual void render(PathUnitShapes shapeToRender = ShapeAll);
-		virtual void renderId(PathUnitShapes shapeToRender = ShapeAll);
+		virtual void render();
+		virtual void renderId();
 		virtual std::shared_ptr<SvgAbstractObject> clone(bool selectedOnly = false)const;
 		virtual TiXmlElement* toXML(TiXmlNode* parent)const;
 		virtual void copyTo(SvgAbstractObject* obj)const;
@@ -29,8 +29,6 @@ namespace svg
 		// else we return grouped splittings
 		std::shared_ptr<SvgAbstractObject> splitToSegments(bool to_single_segs = true)const;
 
-		std::shared_ptr<SvgAbstractObject> splitToDifferentShapes()const;
-
 		// extract path from cmdsBegin(include) to cmdsEnd(exclude)
 		// to_single_segment will convert 'M-L-L-L' to 'M-L M-L M-L'
 		std::shared_ptr<SvgAbstractObject> subPath(int cmdsBegin, int cmdsEnd,
@@ -41,15 +39,6 @@ namespace svg
 		void cacheNvPaths();
 		void renderSelection();
 		void configNvParams();
-
-		// assume m_cmds and m_coords are all 'M-L-M-L...' types and ordered
-		// then we decide whether the segments, from a given cmd postion, is the given pattern
-		bool isOrderedSegmentsCrossPattern(int cmdPos)const;
-		bool isOrderedSegmentsQuadPattern(int cmdPos)const;
-		bool isOrderedSolidPattern(int cmdPos)const;
-		bool isOrderedTinyDashPattern(int cmdPos, int& nCmdLength)const;
-		bool isOrderedMidDashPattern(int cmdPos, int& nCmdLength)const;
-		bool isOrderedLongShortPattern(int cmdPos, int& nCmdLength)const;
 	public:
 		std::vector<GLubyte> m_cmds;
 		std::vector<GLfloat> m_coords;

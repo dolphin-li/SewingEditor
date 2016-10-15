@@ -12,7 +12,6 @@ SvgViewer::SvgViewer(QWidget *parent)
 	setMouseTracking(true);
 	m_buttons = Qt::MouseButton::NoButton;
 	m_svgManager.reset(new svg::SvgManager());
-	m_svgShapeToRender = svg::SvgAbstractObject::ShapeAll;
 	m_isDragBox = false;
 
 	m_eventHandles.resize((size_t)AbstractEventHandle::ProcessorTypeEnd, nullptr);
@@ -123,7 +122,7 @@ void SvgViewer::paintGL()
 	
 	m_camera.apply();
 	renderDragBox();
-	m_svgManager->render(m_svgShapeToRender);
+	m_svgManager->render();
 }
 
 void SvgViewer::renderFbo()
@@ -144,7 +143,7 @@ void SvgViewer::renderFbo()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	m_camera.apply();
-	m_svgManager->renderIndex(m_svgShapeToRender);
+	m_svgManager->renderIndex();
 
 	m_fbo->release();
 	m_fboImage = m_fbo->toImage();

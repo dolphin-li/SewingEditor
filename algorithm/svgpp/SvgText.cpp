@@ -13,7 +13,6 @@ namespace svg
 		m_boxColor = ldp::Float3(1, 0, 1);
 		m_boxStrokeWidth = 2;
 		m_font_face = nullptr;
-		m_pathShape = ShapeText;
 		updateText();
 	}
 
@@ -21,10 +20,8 @@ namespace svg
 	{
 	}
 
-	void SvgText::render(PathUnitShapes shapeToRender)
+	void SvgText::render()
 	{
-		if (!isVisible(shapeToRender))
-			return;
 		if (m_invalid)
 		{
 			updateText();
@@ -87,10 +84,8 @@ namespace svg
 		glPopMatrix();
 	}
 
-	void SvgText::renderId(PathUnitShapes shapeToRender)
+	void SvgText::renderId()
 	{
-		if (!isVisible(shapeToRender))
-			return;
 		glPushMatrix();
 
 		glColor4fv(color_from_index(m_id).ptr());

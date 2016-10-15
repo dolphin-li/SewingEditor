@@ -21,7 +21,6 @@ namespace svg
 		m_attribute = std::shared_ptr<SvgAttribute>(new SvgAttribute());
 		m_boxColor = 0.f;
 		m_boxStrokeWidth = 1;
-		m_pathShape = ShapeUnknown;
 	}
 
 	SvgAbstractObject::~SvgAbstractObject()
@@ -122,13 +121,6 @@ namespace svg
 
 		while (p->parent()->parent()) p = p->parent();
 		return p;
-	}
-
-	bool SvgAbstractObject::isVisible(PathUnitShapes shapeToRender)const
-	{
-		if ((m_pathShape & shapeToRender) == 0)
-			return false;
-		return true;
 	}
 
 	ldp::Float4 SvgAbstractObject::unionBound(ldp::Float4 b)const

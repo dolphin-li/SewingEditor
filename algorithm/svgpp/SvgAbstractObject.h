@@ -23,34 +23,17 @@ namespace svg
 		{
 			INDEX_BEGIN = 1
 		};
-
-		// NOTE: this are paths specific for burdastyle generated garments.
-		enum PathUnitShapes
-		{
-			ShapeUnknown = 0x01,
-			ShapeSolid = 0x02, // solid lines
-			ShapeTinyDash = 0x04, // '-----'
-			ShapeMidDash = 0x08, // '-----'
-			ShapeLongShort = 0x10, // '_-_-_-'
-			ShapeCross = 0x20, // '-x-x-x'
-			ShapeQuad = 0x40, // '-q-q-q', where 'q' means a quad
-			ShapeCircle = 0x80, // 'o'
-			ShapeText = 0x100, // in fact Text, not path
-			ShapeAll = 0xffffffff,
-		};
 	public:
 		SvgAbstractObject();
 		~SvgAbstractObject();
 
 		virtual ObjectType objectType()const = 0;
-		virtual void render(PathUnitShapes shapeToRender = ShapeAll) = 0;
-		virtual void renderId(PathUnitShapes shapeToRender = ShapeAll) = 0;
+		virtual void render() = 0;
+		virtual void renderId() = 0;
 		virtual std::shared_ptr<SvgAbstractObject> clone(bool selectedOnly = false)const = 0;
 		virtual TiXmlElement* toXML(TiXmlNode* parent)const = 0;
 		void invalid(){ m_invalid = true; } // call me when render context updated.
 		virtual void copyTo(SvgAbstractObject* obj)const;
-		virtual PathUnitShapes shapeType()const{ return m_pathShape; }
-		bool isVisible(PathUnitShapes shapeToRender)const;
 		virtual bool hasSelectedChildren()const{ return false; }
 
 		void setId(int id) { m_id = id; }
@@ -117,6 +100,5 @@ namespace svg
 		bool m_invalid;
 		ldp::Float3 m_boxColor;
 		float m_boxStrokeWidth;
-		PathUnitShapes m_pathShape;
 	};
 }

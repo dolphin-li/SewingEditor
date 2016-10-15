@@ -30,7 +30,6 @@ public:
 	void on_actionMerge_selected_path_triggered();
 	void on_actionUndo_triggered();
 	void on_actionRedo_triggered();
-	void on_pbSelectConnected_clicked();
 	void on_pbToConnectedGroups_clicked();
 	void leftDocButtonsClicked(int i);
 public:

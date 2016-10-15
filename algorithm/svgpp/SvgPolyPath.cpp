@@ -19,11 +19,8 @@ namespace svg
 	{
 	}
 
-	void SvgPolyPath::render(PathUnitShapes shapeToRender)
+	void SvgPolyPath::render()
 	{
-		if (!isVisible(shapeToRender))
-			return;
-
 		assert(m_gl_path_res->id);
 
 		if (m_cornerPos.size() == 0)
@@ -51,11 +48,8 @@ namespace svg
 		renderSelection();
 	}
 
-	void SvgPolyPath::renderId(PathUnitShapes shapeToRender)
+	void SvgPolyPath::renderId()
 	{
-		if (!isVisible(shapeToRender))
-			return;
-
 		assert(m_gl_path_res->id);		
 		if (m_cornerPos.size() == 0)
 			findCorners();

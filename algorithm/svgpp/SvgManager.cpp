@@ -394,25 +394,25 @@ namespace svg
 		return box;
 	}
 
-	void SvgManager::render(int shapes)
+	void SvgManager::render()
 	{
 		if (m_layers.empty())
 			return;
 		for (auto iter : m_layers)
 		{
 			if (iter.second->root && iter.second->selected)
-				iter.second->root->render((SvgAbstractObject::PathUnitShapes)shapes);
+				iter.second->root->render();
 		}
 	}
 
-	void SvgManager::renderIndex(int shapes)
+	void SvgManager::renderIndex()
 	{
 		if (m_layers.empty())
 			return;
 		for (auto iter : m_layers)
 		{
 			if (iter.second->root && iter.second->selected)
-				iter.second->root->renderId((SvgAbstractObject::PathUnitShapes)shapes);
+				iter.second->root->renderId();
 		}
 	}
 
@@ -937,18 +937,6 @@ namespace svg
 		return true;
 	}
 
-	void SvgManager::splitSelectedPathByShape()
-	{
-		for (auto layer_iter : m_layers)
-		{
-			auto layer = layer_iter.second;
-			if (!layer->selected) continue;
-			splitPathByShape(layer->root);
-		}
-		updateIndex();
-		updateBound();
-	}
-
 	void SvgManager::splitPath(std::shared_ptr<SvgAbstractObject>& obj, bool to_single_seg)
 	{
 		if (obj.get() == nullptr)
@@ -963,29 +951,6 @@ namespace svg
 		{
 			SvgPath* p = (SvgPath*)obj.get();
 			auto newGroup = p->splitToSegments(to_single_seg);
-			if (newGroup.get())
-			{
-				newGroup->setParent(obj->parent());
-				newGroup->setSelected(obj->isSelected());
-				obj = newGroup;
-			}
-		}
-	}
-
-	void SvgManager::splitPathByShape(std::shared_ptr<SvgAbstractObject>& obj)
-	{
-		if (obj.get() == nullptr)
-			return;
-		if (obj->objectType() == obj->Group)
-		{
-			SvgGroup* g = (SvgGroup*)obj.get();
-			for (auto& c : g->m_children)
-				splitPathByShape(c);
-		}
-		else if (obj->objectType() == obj->Path && obj->isSelected())
-		{
-			SvgPath* p = (SvgPath*)obj.get();
-			auto newGroup = p->splitToDifferentShapes();
 			if (newGroup.get())
 			{
 				newGroup->setParent(obj->parent());
@@ -1037,52 +1002,6 @@ namespace svg
 				{
 					auto p = (SvgPolyPath*)iter.second;
 					p->setSelected(widths.find(p->m_pathStyle.stroke_width) != widths.end());
-				}
-			}
-		}
-	}
-
-	void SvgManager::selectPathConnected()
-	{
-		for (auto layer_iter : m_layers)
-		{
-			auto layer = layer_iter.second;
-			if (!layer->selected) continue;
-
-			// TO DO
-		}
-	}
-
-	void SvgManager::selectPathSimilarShape()
-	{
-		for (auto layer_iter : m_layers)
-		{
-			auto layer = layer_iter.second;
-			if (!layer->selected) continue;
-
-			// TO DO
-		}
-	}
-
-	void SvgManager::selectPathClosed()
-	{
-		for (auto layer_iter : m_layers)
-		{
-			auto layer = layer_iter.second;
-			if (!layer->selected) continue;
-			for (auto iter : layer->idxMap)
-			{
-				if (iter.second->objectType() == SvgAbstractObject::Path)
-				{
-					SvgPath* p = (SvgPath*)iter.second;
-					if (p->isClosed())
-						p->setSelected(true);
-				}
-				else if (iter.second->objectType() == SvgAbstractObject::PolyPath)
-				{
-					SvgPath* p = (SvgPolyPath*)iter.second;
-					if (p->isClosed())
-						p->setSelected(true);
 				}
 			}
 		}

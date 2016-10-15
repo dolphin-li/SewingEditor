@@ -18,6 +18,9 @@ namespace svg
 		virtual std::shared_ptr<SvgAbstractObject> clone(bool selectedOnly = false)const;
 		virtual TiXmlElement* toXML(TiXmlNode* parent)const;
 		virtual void copyTo(SvgAbstractObject* obj)const;
+		virtual int numId()const;
+		virtual void setSelected(bool s, int idx = -1);
+		virtual void setHighlighted(bool s, int idx = -1);
 
 		// given this polygon (closed or non-closed), we find all the corners
 		void findCorners();
@@ -27,8 +30,12 @@ namespace svg
 		ldp::Float2 getCorner(int i)const{ return ldp::Float2(m_coords[m_cornerPos[i] * 2], 
 			m_coords[m_cornerPos[i] * 2 + 1]); }
 	protected:
+		void cacheNvPaths();
 		void renderSelection();
+		void configNvParams();
 	protected:
 		std::vector<int> m_cornerPos;
+		int m_selectedCorner_arrayId;
+		int m_highlightedCorner_arrayId;
 	};
 }

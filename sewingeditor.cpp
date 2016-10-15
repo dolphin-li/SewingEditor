@@ -690,3 +690,40 @@ void SewingEditor::on_pbRemoveLayers_clicked()
 	}
 }
 
+void SewingEditor::on_pbMakePair_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->makeSelectedToPair();
+		ui.widget->updateGL();
+		ui.widget->updateGL();
+		pushHistory("make pair");
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void SewingEditor::on_pbRemovePairs_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->removeSelectedPairs();
+		ui.widget->updateGL();
+		pushHistory("remove pairs");
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+

@@ -52,6 +52,8 @@ public:
 	void on_pbNewLayer_clicked();
 	void on_pbMergeLayers_clicked();
 	void on_pbRemoveLayers_clicked(); 
+	void on_pbMakePair_clicked();
+	void on_pbRemovePairs_clicked();
 	void on_listWidgetEditEnd(QWidget *editor, QAbstractItemDelegate::EndEditHint hint);
 protected:
 //////////////////////////////////////////////////////////////////////////

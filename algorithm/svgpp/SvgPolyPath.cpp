@@ -12,7 +12,8 @@ namespace svg
 
 	SvgPolyPath::SvgPolyPath() :SvgPath()
 	{
-		
+		m_highlightedCorner_arrayId = -1;
+		m_selectedCorner_arrayId = -1;
 	}
 
 	SvgPolyPath::SvgPolyPath(int id)
@@ -22,6 +23,29 @@ namespace svg
 
 	SvgPolyPath::~SvgPolyPath()
 	{
+	}
+
+	int SvgPolyPath::numId()const
+	{ 
+		int nVerts = (int)m_cornerPos.size();
+		int nEdges = (int)m_cornerPos.size() - (!isClosed());
+		return nVerts + nEdges + 1; // 1 for the path itself
+	}
+
+	void SvgPolyPath::setSelected(bool s, int idx)
+	{
+		SvgPath::setSelected(s, idx);
+		m_selectedCorner_arrayId = idx - m_id;
+		if (m_selectedCorner_arrayId < 0 || m_selectedCorner_arrayId >= numId())
+			m_selectedCorner_arrayId = -1;
+	}
+
+	void SvgPolyPath::setHighlighted(bool s, int idx)
+	{
+		SvgPath::setHighlighted(s, idx);
+		m_highlightedCorner_arrayId = idx - m_id;
+		if (m_highlightedCorner_arrayId < 0 || m_highlightedCorner_arrayId >= numId())
+			m_highlightedCorner_arrayId = -1;
 	}
 
 	void SvgPolyPath::render()
@@ -55,7 +79,7 @@ namespace svg
 
 	void SvgPolyPath::renderId()
 	{
-		assert(m_gl_path_res->id);		
+		assert(m_gl_path_res->id);
 		if (m_cornerPos.size() == 0)
 			findCorners();
 		glColor4fv(color_from_index(m_id).ptr());
@@ -73,6 +97,7 @@ namespace svg
 
 	void SvgPolyPath::renderSelection()
 	{
+		const int nVerts = (int)m_cornerPos.size() - (!isClosed());
 		bool ancestorSelected = false;
 		if (ancestorAfterRoot())
 			ancestorSelected = ancestorAfterRoot()->isSelected();
@@ -86,8 +111,7 @@ namespace svg
 			glDisable(GL_STENCIL_TEST);
 			glLineWidth(2);
 			glBegin(GL_LINES);
-			int posBegin = 0;
-			for (size_t i = 0; i < m_cornerPos.size(); i++)
+			for (size_t i = 0; i < nVerts; i++)
 			{
 				ldp::Float2 c = getCorner(i);
 
@@ -106,8 +130,7 @@ namespace svg
 			glEnd();
 			glBegin(GL_QUADS);
 			glColor3f(1, 1, 1);
-			posBegin = 0;
-			for (size_t i = 0; i < m_cornerPos.size(); i++)
+			for (size_t i = 0; i < nVerts; i++)
 			{
 				ldp::Float2 c = getCorner(i);
 				glVertex2f(c[0] - sz, c[1] - sz);
@@ -120,6 +143,32 @@ namespace svg
 		}
 	}
 
+	void SvgPolyPath::cacheNvPaths()
+	{
+		glPathCommandsNV(m_gl_path_res->id,
+			GLsizei(m_cmds.size()), m_cmds.data(),
+			GLsizei(m_coords.size()), GL_FLOAT, m_coords.data());
+	}
+
+	void SvgPolyPath::configNvParams()
+	{
+		glPathParameteriNV(m_gl_path_res->id, GL_PATH_JOIN_STYLE_NV, lineJoinConverter(this));
+		glPathParameteriNV(m_gl_path_res->id, GL_PATH_END_CAPS_NV, lineCapConverter(this));
+		glPathParameterfNV(m_gl_path_res->id, GL_PATH_STROKE_WIDTH_NV, m_pathStyle.stroke_width);
+		glPathParameterfNV(m_gl_path_res->id, GL_PATH_MITER_LIMIT_NV, m_pathStyle.miter_limit);
+		if (m_pathStyle.dash_array.size())
+		{
+			glPathDashArrayNV(m_gl_path_res->id, GLsizei(m_pathStyle.dash_array.size()), &m_pathStyle.dash_array[0]);
+			glPathParameteriNV(m_gl_path_res->id, GL_PATH_DASH_CAPS_NV, lineCapConverter(this));
+			glPathParameterfNV(m_gl_path_res->id, GL_PATH_DASH_OFFSET_NV, m_pathStyle.dash_offset);
+			glPathParameteriNV(m_gl_path_res->id, GL_PATH_DASH_OFFSET_RESET_NV, m_pathStyle.dash_phase);
+		}
+		else
+		{
+			glPathDashArrayNV(m_gl_path_res->id, 0, NULL);
+		}
+	}
+
 	void SvgPolyPath::copyTo(SvgAbstractObject* obj)const
 	{
 		SvgPath::copyTo(obj);
@@ -127,6 +176,8 @@ namespace svg
 		{
 			auto newTptr = (SvgPolyPath*)obj;
 			newTptr->m_cornerPos = m_cornerPos;
+			newTptr->m_highlightedCorner_arrayId = -1;
+			newTptr->m_selectedCorner_arrayId = m_selectedCorner_arrayId;
 		}
 	}
 
@@ -211,5 +262,7 @@ namespace svg
 		} // icmd
 		if (!isClosed())
 			m_cornerPos.push_back((int)m_cmds.size() - 1);
+
+		invalid();
 	}
 }

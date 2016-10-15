@@ -7,41 +7,6 @@ namespace svg
 {
 #undef min
 #undef max
-
-	static GLenum lineJoinConverter(const SvgPath *path)
-	{
-		switch (path->m_pathStyle.line_join) {
-		default:
-			assert(!"bad line_join");
-		case PathStyle::MITER_TRUNCATE_JOIN:
-			return GL_MITER_TRUNCATE_NV;
-		case PathStyle::MITER_REVERT_JOIN:
-			return GL_MITER_REVERT_NV;
-		case PathStyle::ROUND_JOIN:
-			return GL_ROUND_NV;
-		case PathStyle::BEVEL_JOIN:
-			return GL_BEVEL_NV;
-		case PathStyle::NONE_JOIN:
-			return GL_NONE;
-		}
-	}
-
-	static GLenum lineCapConverter(const SvgPath *path)
-	{
-		switch (path->m_pathStyle.line_cap) {
-		default:
-			assert(!"bad line_cap");
-		case PathStyle::BUTT_CAP:
-			return GL_FLAT;
-		case PathStyle::ROUND_CAP:
-			return GL_ROUND_NV;
-		case PathStyle::SQUARE_CAP:
-			return GL_SQUARE_NV;
-		case PathStyle::TRIANGLE_CAP:
-			return GL_TRIANGULAR_NV;
-		}
-	}
-
 	SvgPath::GLPathResource::GLPathResource()
 	{
 		id = glGenPathsNV(1);
@@ -1099,4 +1064,37 @@ namespace svg
 		}
 	}
 
+	GLenum SvgPath::lineJoinConverter(const SvgPath *path)
+	{
+		switch (path->m_pathStyle.line_join) {
+		default:
+			assert(!"bad line_join");
+		case PathStyle::MITER_TRUNCATE_JOIN:
+			return GL_MITER_TRUNCATE_NV;
+		case PathStyle::MITER_REVERT_JOIN:
+			return GL_MITER_REVERT_NV;
+		case PathStyle::ROUND_JOIN:
+			return GL_ROUND_NV;
+		case PathStyle::BEVEL_JOIN:
+			return GL_BEVEL_NV;
+		case PathStyle::NONE_JOIN:
+			return GL_NONE;
+		}
+	}
+
+	GLenum SvgPath::lineCapConverter(const SvgPath *path)
+	{
+		switch (path->m_pathStyle.line_cap) {
+		default:
+			assert(!"bad line_cap");
+		case PathStyle::BUTT_CAP:
+			return GL_FLAT;
+		case PathStyle::ROUND_CAP:
+			return GL_ROUND_NV;
+		case PathStyle::SQUARE_CAP:
+			return GL_SQUARE_NV;
+		case PathStyle::TRIANGLE_CAP:
+			return GL_TRIANGULAR_NV;
+		}
+	}
 }

@@ -18,6 +18,7 @@ namespace svg
 		virtual void copyTo(SvgAbstractObject* obj)const;
 		virtual ldp::Float2 getStartPoint()const;
 		virtual ldp::Float2 getEndPoint()const;
+		virtual int numId()const{ return 1; }
 
 		// the path is closed or open
 		bool isClosed()const;
@@ -51,6 +52,8 @@ namespace svg
 		static const char* strokeFillMap(int fill);
 		static const char* strokeLineCapMap(int cap);
 		static const char* strokeLineJoinMap(int join);
+		static GLenum lineJoinConverter(const SvgPath *path);
+		static GLenum lineCapConverter(const SvgPath *path);
 	public:
 		struct GLPathResource{
 			GLuint id;

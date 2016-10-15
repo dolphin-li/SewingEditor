@@ -72,8 +72,9 @@ public:
     QPushButton *pbRemoveLayers;
     QGroupBox *gbParam;
     QGridLayout *gridLayout_4;
-    QPushButton *pbSelectConnected;
     QPushButton *pbToConnectedGroups;
+    QPushButton *pbMakePair;
+    QPushButton *pbRemovePairs;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -324,15 +325,20 @@ public:
         gridLayout_4->setSpacing(6);
         gridLayout_4->setContentsMargins(11, 11, 11, 11);
         gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
-        pbSelectConnected = new QPushButton(gbParam);
-        pbSelectConnected->setObjectName(QStringLiteral("pbSelectConnected"));
-
-        gridLayout_4->addWidget(pbSelectConnected, 0, 0, 1, 1);
-
         pbToConnectedGroups = new QPushButton(gbParam);
         pbToConnectedGroups->setObjectName(QStringLiteral("pbToConnectedGroups"));
 
         gridLayout_4->addWidget(pbToConnectedGroups, 0, 1, 1, 1);
+
+        pbMakePair = new QPushButton(gbParam);
+        pbMakePair->setObjectName(QStringLiteral("pbMakePair"));
+
+        gridLayout_4->addWidget(pbMakePair, 1, 0, 1, 1);
+
+        pbRemovePairs = new QPushButton(gbParam);
+        pbRemovePairs->setObjectName(QStringLiteral("pbRemovePairs"));
+
+        gridLayout_4->addWidget(pbRemovePairs, 1, 1, 1, 1);
 
 
         gridLayout_3->addWidget(gbParam, 2, 0, 1, 1);
@@ -413,15 +419,37 @@ public:
         menuPath->setTitle(QApplication::translate("SewingEditorClass", "path", 0));
         menuOp->setTitle(QApplication::translate("SewingEditorClass", "op", 0));
         gbLayers->setTitle(QApplication::translate("SewingEditorClass", "Layers", 0));
+#ifndef QT_NO_TOOLTIP
+        pbNewLayer->setToolTip(QApplication::translate("SewingEditorClass", "copy selected objs to new layer (CTRL+N)", 0));
+#endif // QT_NO_TOOLTIP
         pbNewLayer->setText(QApplication::translate("SewingEditorClass", "New", 0));
         pbNewLayer->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+N", 0));
+#ifndef QT_NO_TOOLTIP
+        pbMergeLayers->setToolTip(QApplication::translate("SewingEditorClass", "merge selected layers (CTRL+M)", 0));
+#endif // QT_NO_TOOLTIP
         pbMergeLayers->setText(QApplication::translate("SewingEditorClass", "Merge", 0));
         pbMergeLayers->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+M", 0));
+#ifndef QT_NO_TOOLTIP
+        pbRemoveLayers->setToolTip(QApplication::translate("SewingEditorClass", "remove selected layers (CTRL+R)", 0));
+#endif // QT_NO_TOOLTIP
         pbRemoveLayers->setText(QApplication::translate("SewingEditorClass", "Remove", 0));
         pbRemoveLayers->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+R", 0));
         gbParam->setTitle(QApplication::translate("SewingEditorClass", "param", 0));
-        pbSelectConnected->setText(QApplication::translate("SewingEditorClass", "select connected", 0));
-        pbToConnectedGroups->setText(QApplication::translate("SewingEditorClass", "to connected groups", 0));
+#ifndef QT_NO_TOOLTIP
+        pbToConnectedGroups->setToolTip(QApplication::translate("SewingEditorClass", "convert selected path to polygons (ALT+C)", 0));
+#endif // QT_NO_TOOLTIP
+        pbToConnectedGroups->setText(QApplication::translate("SewingEditorClass", "Connected groups", 0));
+        pbToConnectedGroups->setShortcut(QApplication::translate("SewingEditorClass", "Alt+C", 0));
+#ifndef QT_NO_TOOLTIP
+        pbMakePair->setToolTip(QApplication::translate("SewingEditorClass", "make selected poly edges to pairs (ALT+M)", 0));
+#endif // QT_NO_TOOLTIP
+        pbMakePair->setText(QApplication::translate("SewingEditorClass", "Make pair", 0));
+        pbMakePair->setShortcut(QApplication::translate("SewingEditorClass", "Alt+M", 0));
+#ifndef QT_NO_TOOLTIP
+        pbRemovePairs->setToolTip(QApplication::translate("SewingEditorClass", "remove selected pairs", 0));
+#endif // QT_NO_TOOLTIP
+        pbRemovePairs->setText(QApplication::translate("SewingEditorClass", "Remove pairs", 0));
+        pbRemovePairs->setShortcut(QApplication::translate("SewingEditorClass", "Alt+R", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

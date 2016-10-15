@@ -924,6 +924,9 @@
         </item>
         <item row="1" column="0">
          <widget class="QPushButton" name="pbNewLayer">
+          <property name="toolTip">
+           <string>copy selected objs to new layer (CTRL+N)</string>
+          </property>
           <property name="text">
            <string>New</string>
           </property>
@@ -934,6 +937,9 @@
         </item>
         <item row="1" column="1">
          <widget class="QPushButton" name="pbMergeLayers">
+          <property name="toolTip">
+           <string>merge selected layers (CTRL+M)</string>
+          </property>
           <property name="text">
            <string>Merge</string>
           </property>
@@ -944,6 +950,9 @@
         </item>
         <item row="1" column="2">
          <widget class="QPushButton" name="pbRemoveLayers">
+          <property name="toolTip">
+           <string>remove selected layers (CTRL+R)</string>
+          </property>
           <property name="text">
            <string>Remove</string>
           </property>
@@ -967,17 +976,42 @@
         <string>param</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
-         <widget class="QPushButton" name="pbSelectConnected">
+        <item row="0" column="1">
+         <widget class="QPushButton" name="pbToConnectedGroups">
+          <property name="toolTip">
+           <string>convert selected path to polygons (ALT+C)</string>
+          </property>
           <property name="text">
-           <string>select connected</string>
+           <string>Connected groups</string>
+          </property>
+          <property name="shortcut">
+           <string>Alt+C</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="pbToConnectedGroups">
+        <item row="1" column="0">
+         <widget class="QPushButton" name="pbMakePair">
+          <property name="toolTip">
+           <string>make selected poly edges to pairs (ALT+M)</string>
+          </property>
           <property name="text">
-           <string>to connected groups</string>
+           <string>Make pair</string>
+          </property>
+          <property name="shortcut">
+           <string>Alt+M</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="pbRemovePairs">
+          <property name="toolTip">
+           <string>remove selected pairs</string>
+          </property>
+          <property name="text">
+           <string>Remove pairs</string>
+          </property>
+          <property name="shortcut">
+           <string>Alt+R</string>
           </property>
          </widget>
         </item>

@@ -364,8 +364,9 @@ namespace svg
 			groups_for_selection.insert(ogp);
 
 		obj->setId(idx);
-		idxMap.insert(std::make_pair(idx, obj));
-		idx++;
+		const int n = obj->numId();
+		for (int i = 0; i < n; i++)
+			idxMap.insert(std::make_pair(idx++, obj));
 		if (obj->objectType() == SvgAbstractObject::Group)
 		{
 			SvgGroup* g = (SvgGroup*)obj;
@@ -429,15 +430,15 @@ namespace svg
 				{
 				case svg::SvgManager::SelectThis:
 					if (id >= SvgAbstractObject::INDEX_BEGIN)
-						obj->setSelected(obj->getId() == id);
+						obj->setSelected(obj->isMyValidIdRange(id), id);
 					break;
 				case svg::SvgManager::SelectUnion:
-					if (obj->getId() == id)
-						obj->setSelected(true);
+					if (obj->isMyValidIdRange(id))
+						obj->setSelected(true, id);
 					break;
 				case svg::SvgManager::SlectionUnionInverse:
-					if (obj->getId() == id)
-						obj->setSelected(!obj->isSelected());
+					if (obj->isMyValidIdRange(id))
+						obj->setSelected(!obj->isSelected(), id);
 					break;
 				case svg::SvgManager::SelectAll:
 					obj->setSelected(true);
@@ -447,7 +448,7 @@ namespace svg
 					break;
 				case svg::SvgManager::SelectInverse:
 					if (obj->objectType() != obj->Group)
-						obj->setSelected(!obj->isSelected());
+						obj->setSelected(!obj->isSelected(), id);
 					break;
 				default:
 					break;
@@ -458,14 +459,17 @@ namespace svg
 
 	void SvgManager::selectShapeByIndex(const std::set<int>& ids, SelectOp op)
 	{
-		bool has_valid = false;
-		for (auto iter : ids)
+		std::set<int> validIds;
+		for (auto id : ids)
 		{
-			if (iter >= SvgAbstractObject::INDEX_BEGIN)
-			{
-				has_valid = true;
-				break;
-			}
+			if (id >= SvgAbstractObject::INDEX_BEGIN)
+				validIds.insert(id);
+		}
+
+		if (validIds.size() == 1)
+		{
+			selectShapeByIndex(*validIds.begin(), op);
+			return;
 		}
 
 		for (auto layer_iter : m_layers)
@@ -479,7 +483,7 @@ namespace svg
 				switch (op)
 				{
 				case svg::SvgManager::SelectThis:
-					if (has_valid)
+					if (validIds.size())
 						obj->setSelected(found);
 					break;
 				case svg::SvgManager::SelectUnion:
@@ -1570,5 +1574,17 @@ namespace svg
 			updateBound();
 		}
 		return layer;
+	}
+
+	////////////////////////////////////////////////////////////////
+	///// pair related
+	void SvgManager::makeSelectedToPair()
+	{
+
+	}
+
+	void SvgManager::removeSelectedPairs()
+	{
+
 	}
 } // namespace svg

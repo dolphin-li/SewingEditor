@@ -38,10 +38,14 @@ namespace svg
 
 		void setId(int id) { m_id = id; }
 		int getId()const { return m_id; }
+		// number of indices this object needed
+		// e.g., a quad may need 4 indices for each of its edge
+		virtual int numId()const{ return 1; }
+		virtual bool isMyValidIdRange(int id)const{ return id - m_id < numId() && id - m_id >= 0; }
 
-		void setSelected(bool s){ m_selected = s; }
+		virtual void setSelected(bool s, int idx = -1){ m_selected = s; }
 		bool isSelected()const{ return m_selected; }
-		void setHighlighted(bool s){ m_highlighted = s; }
+		virtual void setHighlighted(bool s, int idx = -1){ m_highlighted = s; }
 		bool isHighlighted()const{ return m_highlighted; }
 
 		SvgGroup* parent();

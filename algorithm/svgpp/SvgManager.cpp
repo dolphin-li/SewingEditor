@@ -426,6 +426,7 @@ namespace svg
 			for (auto iter : layer->idxMap)
 			{
 				SvgAbstractObject* obj = iter.second;
+				bool firstVisit = (iter.first == obj->getId());
 				switch (op)
 				{
 				case svg::SvgManager::SelectThis:
@@ -437,7 +438,7 @@ namespace svg
 						obj->setSelected(true, id);
 					break;
 				case svg::SvgManager::SlectionUnionInverse:
-					if (obj->isMyValidIdRange(id))
+					if (obj->isMyValidIdRange(id) && firstVisit)
 						obj->setSelected(!obj->isSelected(), id);
 					break;
 				case svg::SvgManager::SelectAll:
@@ -447,7 +448,7 @@ namespace svg
 					obj->setSelected(false);
 					break;
 				case svg::SvgManager::SelectInverse:
-					if (obj->objectType() != obj->Group)
+					if (obj->objectType() != obj->Group && firstVisit)
 						obj->setSelected(!obj->isSelected(), id);
 					break;
 				default:
@@ -479,7 +480,14 @@ namespace svg
 			for (auto iter : layer->idxMap)
 			{
 				SvgAbstractObject* obj = iter.second;
-				bool found = (ids.find(obj->getId()) != ids.end());
+				bool firstVisit =  (iter.first == obj->getId());
+				bool found = false;
+				const int n = obj->numId();
+				for (int i = 0; i < n; i++)
+				if (validIds.find(obj->getId() + i) != validIds.end()){
+					found = true;
+					break;
+				}
 				switch (op)
 				{
 				case svg::SvgManager::SelectThis:
@@ -491,7 +499,7 @@ namespace svg
 						obj->setSelected(true);
 					break;
 				case svg::SvgManager::SlectionUnionInverse:
-					if (found)
+					if (found && firstVisit)
 						obj->setSelected(!obj->isSelected());
 					break;
 				case svg::SvgManager::SelectAll:
@@ -501,7 +509,7 @@ namespace svg
 					obj->setSelected(false);
 					break;
 				case svg::SvgManager::SelectInverse:
-					if (obj->objectType() != obj->Group)
+					if (obj->objectType() != obj->Group && firstVisit)
 						obj->setSelected(!obj->isSelected());
 					break;
 				default:
@@ -1294,12 +1302,12 @@ namespace svg
 		{
 			auto layer = layer_iter.second;
 			if (!layer->selected) continue;
-			auto rootPtr = (SvgGroup*)layer->root.get();
 
 			// 1. pre-process, split into individual small paths
 			splitPath(layer->root, true);
 			removeInvalidPaths(layer->root.get());	
 			removeSingleNodeAndEmptyNode(layer->root);
+			auto rootPtr = (SvgGroup*)layer->root.get();
 
 			// 2. collect all paths, the idx corresponds to paths
 			std::vector<ObjPtr> paths; // each path generate two points, a start point and an end point

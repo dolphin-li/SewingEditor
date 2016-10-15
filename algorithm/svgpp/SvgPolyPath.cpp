@@ -52,9 +52,6 @@ namespace svg
 	{
 		assert(m_gl_path_res->id);
 
-		if (m_cornerPos.size() == 0)
-			findCorners();
-
 		bool ancestorSelected = false;
 		if (ancestorAfterRoot())
 			ancestorSelected = ancestorAfterRoot()->isSelected();
@@ -72,18 +69,17 @@ namespace svg
 		}// end if invalid
 
 		configNvParams();
-		glStencilStrokePathNV(m_gl_path_res->id, 1, ~0);
-		glCoverStrokePathNV(m_gl_path_res->id, GL_BOUNDING_BOX_NV);	
+		for (auto glRes : m_edgeGLIds)
+		{
+			glStencilStrokePathNV(glRes->id, 1, ~0);
+			glCoverStrokePathNV(glRes->id, GL_BOUNDING_BOX_NV);
+		}
 		renderSelection();
 	}
 
 	void SvgPolyPath::renderId()
 	{
 		assert(m_gl_path_res->id);
-		if (m_cornerPos.size() == 0)
-			findCorners();
-		glColor4fv(color_from_index(m_id).ptr());
-
 		if (m_invalid)
 		{
 			cacheNvPaths();
@@ -91,8 +87,13 @@ namespace svg
 		}// end if invalid
 
 		configNvParams();
-		glStencilStrokePathNV(m_gl_path_res->id, 1, ~0);
-		glCoverStrokePathNV(m_gl_path_res->id, GL_BOUNDING_BOX_NV);
+		int id = m_id;
+		for (auto glRes : m_edgeGLIds)
+		{
+			glColor4fv(color_from_index(id++).ptr());
+			glStencilStrokePathNV(glRes->id, 1, ~0);
+			glCoverStrokePathNV(glRes->id, GL_BOUNDING_BOX_NV);
+		}
 	}
 
 	void SvgPolyPath::renderSelection()
@@ -145,27 +146,34 @@ namespace svg
 
 	void SvgPolyPath::cacheNvPaths()
 	{
-		glPathCommandsNV(m_gl_path_res->id,
-			GLsizei(m_cmds.size()), m_cmds.data(),
-			GLsizei(m_coords.size()), GL_FLOAT, m_coords.data());
+		updateEdgeRenderData();
+		for (size_t i = 0; i < m_edgeGLIds.size(); i++)
+		{
+			glPathCommandsNV(m_edgeGLIds[i]->id,
+				GLsizei(m_edgeCmds[i].size()), m_edgeCmds[i].data(),
+				GLsizei(m_edgeCoords[i].size()), GL_FLOAT, m_edgeCoords[i].data());
+		}
 	}
 
 	void SvgPolyPath::configNvParams()
 	{
-		glPathParameteriNV(m_gl_path_res->id, GL_PATH_JOIN_STYLE_NV, lineJoinConverter(this));
-		glPathParameteriNV(m_gl_path_res->id, GL_PATH_END_CAPS_NV, lineCapConverter(this));
-		glPathParameterfNV(m_gl_path_res->id, GL_PATH_STROKE_WIDTH_NV, m_pathStyle.stroke_width);
-		glPathParameterfNV(m_gl_path_res->id, GL_PATH_MITER_LIMIT_NV, m_pathStyle.miter_limit);
-		if (m_pathStyle.dash_array.size())
+		for (auto glRes : m_edgeGLIds)
 		{
-			glPathDashArrayNV(m_gl_path_res->id, GLsizei(m_pathStyle.dash_array.size()), &m_pathStyle.dash_array[0]);
-			glPathParameteriNV(m_gl_path_res->id, GL_PATH_DASH_CAPS_NV, lineCapConverter(this));
-			glPathParameterfNV(m_gl_path_res->id, GL_PATH_DASH_OFFSET_NV, m_pathStyle.dash_offset);
-			glPathParameteriNV(m_gl_path_res->id, GL_PATH_DASH_OFFSET_RESET_NV, m_pathStyle.dash_phase);
-		}
-		else
-		{
-			glPathDashArrayNV(m_gl_path_res->id, 0, NULL);
+			glPathParameteriNV(glRes->id, GL_PATH_JOIN_STYLE_NV, lineJoinConverter(this));
+			glPathParameteriNV(glRes->id, GL_PATH_END_CAPS_NV, lineCapConverter(this));
+			glPathParameterfNV(glRes->id, GL_PATH_STROKE_WIDTH_NV, m_pathStyle.stroke_width);
+			glPathParameterfNV(glRes->id, GL_PATH_MITER_LIMIT_NV, m_pathStyle.miter_limit);
+			if (m_pathStyle.dash_array.size())
+			{
+				glPathDashArrayNV(glRes->id, GLsizei(m_pathStyle.dash_array.size()), &m_pathStyle.dash_array[0]);
+				glPathParameteriNV(glRes->id, GL_PATH_DASH_CAPS_NV, lineCapConverter(this));
+				glPathParameterfNV(glRes->id, GL_PATH_DASH_OFFSET_NV, m_pathStyle.dash_offset);
+				glPathParameteriNV(glRes->id, GL_PATH_DASH_OFFSET_RESET_NV, m_pathStyle.dash_phase);
+			}
+			else
+			{
+				glPathDashArrayNV(glRes->id, 0, NULL);
+			}
 		}
 	}
 
@@ -178,6 +186,9 @@ namespace svg
 			newTptr->m_cornerPos = m_cornerPos;
 			newTptr->m_highlightedCorner_arrayId = -1;
 			newTptr->m_selectedCorner_arrayId = m_selectedCorner_arrayId;
+			newTptr->m_edgeCmds = m_edgeCmds;
+			newTptr->m_edgeCoords = m_edgeCoords;
+			newTptr->m_edgeGLIds = m_edgeGLIds;
 		}
 	}
 
@@ -246,11 +257,14 @@ namespace svg
 		m_cornerPos.clear();
 		if (m_cmds.size() == 0)
 			return;
-		if (!isClosed())
+		const bool closed = isClosed();
+		if (!closed)
 			m_cornerPos.push_back(0);
-		for (int icmd = !isClosed(); icmd < (int)m_cmds.size() - 1; icmd++)
+		for (int icmd = !closed; icmd < (int)m_cmds.size() - 1; icmd++)
 		{
 			int lasti = (icmd - 1 + int(m_cmds.size())) % int(m_cmds.size());
+			if (closed && lasti == (int)m_cmds.size() - 1)
+				lasti--;
 			int nexti = icmd + 1;
 			ldp::Float2 lastp(m_coords[lasti * 2], m_coords[lasti * 2 + 1]);
 			ldp::Float2 p(m_coords[icmd * 2], m_coords[icmd * 2 + 1]);
@@ -264,5 +278,38 @@ namespace svg
 			m_cornerPos.push_back((int)m_cmds.size() - 1);
 
 		invalid();
+	}
+
+	void SvgPolyPath::updateEdgeRenderData()
+	{
+		const bool closed = isClosed();
+		const int nCorners = m_cornerPos.size();
+		const int nEdges = nCorners - !closed;
+		m_edgeCmds.clear();
+		m_edgeCoords.clear();
+		m_edgeCmds.resize(nEdges);
+		m_edgeCoords.resize(nEdges);
+		m_edgeGLIds.resize(nEdges);
+
+		// gl resource
+		for (int iedge = 0; iedge < nEdges; iedge++)
+		if (m_edgeGLIds[iedge].get() == nullptr)
+			m_edgeGLIds[iedge] = std::shared_ptr<GLPathResource>(new GLPathResource());
+
+		// path data
+		for (int iedge = 0; iedge < nEdges; iedge++)
+		{
+			auto& edgeCmd = m_edgeCmds[iedge];
+			auto& edgeCoord = m_edgeCoords[iedge];
+			int cb = m_cornerPos[iedge];
+			int ce = iedge + 1 < nCorners ? m_cornerPos[iedge + 1] + 1 : m_cmds.size();
+			edgeCmd.insert(edgeCmd.end(), m_cmds.begin() + cb, m_cmds.begin() + ce);
+			edgeCoord.insert(edgeCoord.end(), m_coords.begin() + cb * 2, m_coords.begin() + ce * 2);
+			if (iedge + 1 == nCorners){
+				edgeCmd.insert(edgeCmd.end(), m_cmds.begin(), m_cmds.begin() + m_cornerPos[0] + 1);
+				edgeCoord.insert(edgeCoord.end(), m_coords.begin(), m_coords.begin() + m_cornerPos[0] * 2 + 2);
+			}
+			edgeCmd[0] = GL_MOVE_TO_NV;
+		} // end for iedge
 	}
 }

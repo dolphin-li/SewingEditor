@@ -33,9 +33,15 @@ namespace svg
 		void cacheNvPaths();
 		void renderSelection();
 		void configNvParams();
+		void updateEdgeRenderData();
 	protected:
 		std::vector<int> m_cornerPos;
 		int m_selectedCorner_arrayId;
 		int m_highlightedCorner_arrayId;
+
+		// corner-splitted path data, for rendering
+		std::vector<std::vector<GLubyte>> m_edgeCmds;
+		std::vector<std::vector<float>> m_edgeCoords;
+		std::vector<std::shared_ptr<GLPathResource>> m_edgeGLIds;
 	};
 }

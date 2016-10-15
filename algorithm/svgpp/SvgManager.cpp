@@ -62,6 +62,12 @@ namespace svg
 		return table.at(i%table.size());
 	}
 
+	static ldp::Float3 color_table()
+	{
+		static int a = 0;
+		return color_table(a++);
+	}
+
 	struct ConvertPathProcessor : PathSegmentProcessor
 	{
 		Path *p;
@@ -472,8 +478,10 @@ namespace svg
 				switch (op)
 				{
 				case svg::SvgManager::SelectThis:
-					if (id >= SvgAbstractObject::INDEX_BEGIN)
+					if (id >= SvgAbstractObject::INDEX_BEGIN){
+						obj->setSelected(obj->isMyValidIdRange(id), -1); // clear previous selection
 						obj->setSelected(obj->isMyValidIdRange(id), id);
+					}
 					break;
 				case svg::SvgManager::SelectUnion:
 					if (obj->isMyValidIdRange(id))
@@ -1641,9 +1649,8 @@ namespace svg
 				std::shared_ptr<SvgEdgeGroup> edgeGroup(new SvgEdgeGroup);
 				for (auto path : paths){
 					auto obj = (SvgPolyPath*)path.get();
-					int eid = obj->selectedEdgeId();
-					if (eid >= 0)
-					{
+					auto eids = obj->selectedEdgeIds();
+					for (auto eid : eids){
 						edgeGroup->group.insert(std::make_pair(obj, eid));
 						obj->setEdgeGroup(edgeGroup.get());
 					}
@@ -1651,10 +1658,18 @@ namespace svg
 
 				// a pair is valid only if more than one edges selected
 				if (edgeGroup->group.size() > 1){
-					edgeGroup->color = color_table(layer->edgeGroups.size());
+					auto tmp = layer->edgeGroups;
+					layer->edgeGroups.clear();
+					for (auto g : tmp){
+						if (g->intersect(*edgeGroup))
+							edgeGroup->mergeWith(*g);
+						else
+							layer->edgeGroups.push_back(g);
+					}
+					edgeGroup->color = color_table();
 					layer->edgeGroups.push_back(edgeGroup);
-				}
-			}
+				} // end if edgeGroup size > 1
+			} // end if paths.size() != 0
 		} // end for iter
 	}
 

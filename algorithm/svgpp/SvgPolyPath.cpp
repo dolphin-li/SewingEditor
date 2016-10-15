@@ -10,17 +10,33 @@ namespace svg
 
 	const static float CORNER_COS_ANGLE = cos(30.f * ldp::PI_S / 180.f);
 
+	bool SvgEdgeGroup::intersect(const SvgEdgeGroup& rhs)
+	{
+		for (auto g : group)
+		{
+			if (rhs.group.find(g) != rhs.group.end())
+				return true;
+		}
+		return false;
+	}
+	void SvgEdgeGroup::mergeWith(const SvgEdgeGroup& rhs)
+	{
+		for (auto g : rhs.group)
+		{
+			g.first->setEdgeGroup(this);
+			group.insert(g);
+		}
+	}
+
 	SvgPolyPath::SvgPolyPath() :SvgPath()
 	{
 		m_highlightedCorner_arrayId = -1;
-		m_selectedCorner_arrayId = -1;
 		m_edgeGroup = nullptr;
 	}
 
 	SvgPolyPath::SvgPolyPath(int id) : SvgPath()
 	{
 		m_highlightedCorner_arrayId = -1;
-		m_selectedCorner_arrayId = -1;
 		m_edgeGroup = nullptr;
 		m_id = id;
 	}
@@ -30,16 +46,22 @@ namespace svg
 	}
 
 	int SvgPolyPath::numId()const
-	{ 
+	{
 		return numCorners() + numCornerEdges();
 	}
 
 	void SvgPolyPath::setSelected(bool s, int idx)
 	{
 		SvgPath::setSelected(s, idx);
-		m_selectedCorner_arrayId = idx - m_id;
-		if (m_selectedCorner_arrayId < 0 || m_selectedCorner_arrayId >= numId() || !isSelected())
-			m_selectedCorner_arrayId = -1;
+		if (idx == -1)
+			m_selectedCorner_arrayIds.clear();
+		idx -= m_id;
+		if (idx < 0 || idx >= numId())
+			return;
+		if (s)
+			m_selectedCorner_arrayIds.insert(idx);
+		else
+			m_selectedCorner_arrayIds.clear();
 	}
 
 	void SvgPolyPath::setHighlighted(bool s, int idx)
@@ -66,12 +88,13 @@ namespace svg
 		}// end if invalid
 
 		configNvParams();
+		auto selectedEdges = selectedEdgeIds();
 		for (int i = 0; i < (int)m_edgeGLIds.size(); i++)
 		{
 			glColor3fv(attribute()->m_color.ptr());
 			if (isHighlighted() || isSelected() || ancestorSelected)
 				glColor3f(0, 0, 1);
-			if (selectedEdgeId() == i || highlighedEdgeId() == i)
+			if (selectedEdges.find(i) != selectedEdges.end())
 				glColor3f(1, 0, 0);
 			if (m_edgeGroup)
 			{
@@ -79,6 +102,8 @@ namespace svg
 				if (iter != m_edgeGroup->group.end())
 					glColor3fv(m_edgeGroup->color.ptr());
 			}
+			if (highlighedEdgeId() == i)
+				glColor3f(1, 0, 0);
 			glStencilStrokePathNV(m_edgeGLIds[i]->id, 1, ~0);
 			glCoverStrokePathNV(m_edgeGLIds[i]->id, GL_BOUNDING_BOX_NV);
 		}
@@ -145,6 +170,7 @@ namespace svg
 				glEnd();
 			}
 			glBegin(GL_QUADS);
+			auto selectedEdges = selectedEdgeIds();
 			int id = m_id + nEdges;
 			for (size_t i = 0; i < nVerts; i++)
 			{
@@ -153,7 +179,8 @@ namespace svg
 				else
 				{
 					glColor4f(1, 1, 1, 1);
-					if (m_highlightedCorner_arrayId == i+nEdges || m_selectedCorner_arrayId == i+nEdges)
+					if (m_highlightedCorner_arrayId == i + nEdges ||
+						selectedEdges.find(i + nEdges) != selectedEdges.end())
 						glColor4f(1, 0, 0, 1);
 				}
 				ldp::Float2 c = getCorner(i);
@@ -181,9 +208,10 @@ namespace svg
 	void SvgPolyPath::configNvParams()
 	{
 		int id = 0;
+		auto selectedEdges = selectedEdgeIds();
 		for (auto glRes : m_edgeGLIds)
 		{
-			float ss = 1 + (m_selectedCorner_arrayId == id) + (m_highlightedCorner_arrayId == id);
+			float ss = 1 + (selectedEdges.find(id) != selectedEdges.end()) + (m_highlightedCorner_arrayId == id);
 			glPathParameteriNV(glRes->id, GL_PATH_JOIN_STYLE_NV, lineJoinConverter(this));
 			glPathParameteriNV(glRes->id, GL_PATH_END_CAPS_NV, lineCapConverter(this));
 			glPathParameterfNV(glRes->id, GL_PATH_STROKE_WIDTH_NV, m_pathStyle.stroke_width * ss);
@@ -211,7 +239,7 @@ namespace svg
 			auto newTptr = (SvgPolyPath*)obj;
 			newTptr->m_cornerPos = m_cornerPos;
 			newTptr->m_highlightedCorner_arrayId = -1;
-			newTptr->m_selectedCorner_arrayId = m_selectedCorner_arrayId;
+			newTptr->m_selectedCorner_arrayIds = m_selectedCorner_arrayIds;
 			newTptr->m_edgeCmds = m_edgeCmds;
 			newTptr->m_edgeCoords = m_edgeCoords;
 			newTptr->m_edgeGLIds = m_edgeGLIds;
@@ -275,8 +303,8 @@ namespace svg
 	{
 		if (m_coords.size() < 4)
 			return false;
-		return m_coords[0] == m_coords[m_coords.size() - 2] && 
-			m_coords[1] == m_coords[m_coords.size()-1];
+		return m_coords[0] == m_coords[m_coords.size() - 2] &&
+			m_coords[1] == m_coords[m_coords.size() - 1];
 	}
 
 	void SvgPolyPath::findCorners()

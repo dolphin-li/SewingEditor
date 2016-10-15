@@ -42,6 +42,8 @@ void GroupEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 			int id = svg::SvgAbstractObject::index_from_color(color);
 			m_currentSelectedId = id;
 			if (ev->modifiers() & Qt::SHIFT)
+				op = svg::SvgManager::SelectUnion;
+			else if (ev->modifiers() & Qt::CTRL)
 				op = svg::SvgManager::SlectionUnionInverse;
 			m_viewer->getSvgManager()->selectGroupByIndex(id, op);
 			if (m_mainUI && id)
@@ -51,6 +53,8 @@ void GroupEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 		{
 			if (ev->modifiers() & Qt::SHIFT)
 				op = svg::SvgManager::SelectUnion;
+			else if (ev->modifiers() & Qt::CTRL)
+				op = svg::SvgManager::SlectionUnionInverse;
 			const QImage& I = m_viewer->fboImage();
 			std::set<int> ids;
 			float x0 = std::max(0, std::min(m_mouse_press_pt.x(), ev->pos().x()));

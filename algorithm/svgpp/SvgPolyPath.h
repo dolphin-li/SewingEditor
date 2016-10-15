@@ -10,6 +10,8 @@ namespace svg
 	{
 		std::set<std::pair<SvgPolyPath*, int>> group;
 		ldp::Float3 color;
+		bool intersect(const SvgEdgeGroup& rhs);
+		void mergeWith(const SvgEdgeGroup& rhs);
 	};
 
 	class SvgPolyPath : public SvgPath
@@ -39,15 +41,23 @@ namespace svg
 			return ldp::Float2(m_coords[m_cornerPos[i] * 2], 
 			m_coords[m_cornerPos[i] * 2 + 1]); 
 		}
-		int selectedEdgeId()const{
-			int id = m_selectedCorner_arrayId;
-			if (id < 0 || id >= numCornerEdges()) return -1;
-			return id;
+		std::set<int> selectedEdgeIds()const{
+			std::set<int> r;
+			for (auto c : m_selectedCorner_arrayIds)
+			{
+				if (c < 0 || c >= numCornerEdges()) continue;
+				r.insert(c);
+			}
+			return r;
 		}
-		int selectedCornerId()const{
-			int id = m_selectedCorner_arrayId;
-			if (id < numCornerEdges() || id >= numId()) return -1;
-			return id;
+		std::set<int> selectedCornerIds()const{
+			std::set<int> r;
+			for (auto c : m_selectedCorner_arrayIds)
+			{
+				if (c < numCornerEdges() || c >= numId()) continue;
+				r.insert(c - numCornerEdges());
+			}
+			return r;
 		}
 		int highlighedEdgeId()const{
 			int id = m_highlightedCorner_arrayId;
@@ -68,7 +78,7 @@ namespace svg
 		void updateEdgeRenderData();
 	protected:
 		std::vector<int> m_cornerPos;
-		int m_selectedCorner_arrayId; // LDP TO DO: enable multi-selection
+		std::set<int> m_selectedCorner_arrayIds; // LDP TO DO: enable multi-selection
 		int m_highlightedCorner_arrayId;
 
 		// corner-splitted path data, for rendering

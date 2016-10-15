@@ -35,6 +35,8 @@ void ShapeEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 		if (ev->pos() == m_mouse_press_pt)
 		{
 			if (ev->modifiers() & Qt::SHIFT)
+				op = svg::SvgManager::SelectUnion;
+			else if (ev->modifiers() & Qt::CTRL)
 				op = svg::SvgManager::SlectionUnionInverse;
 			QRgb cl = m_viewer->fboImage().pixel(ev->pos());
 			ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
@@ -49,6 +51,8 @@ void ShapeEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 		{
 			if (ev->modifiers() & Qt::SHIFT)
 				op = svg::SvgManager::SelectUnion;
+			else if (ev->modifiers() & Qt::CTRL)
+				op = svg::SvgManager::SlectionUnionInverse;
 			const QImage& I = m_viewer->fboImage();
 			std::set<int> ids;
 			float x0 = std::max(0, std::min(m_mouse_press_pt.x(), ev->pos().x()));

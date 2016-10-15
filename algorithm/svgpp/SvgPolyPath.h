@@ -49,7 +49,16 @@ namespace svg
 			if (id < numCornerEdges() || id >= numId()) return -1;
 			return id;
 		}
-
+		int highlighedEdgeId()const{
+			int id = m_highlightedCorner_arrayId;
+			if (id < 0 || id >= numCornerEdges()) return -1;
+			return id;
+		}		
+		int highlighedCornerId()const{
+			int id = m_highlightedCorner_arrayId;
+			if (id < numCornerEdges() || id >= numId()) return -1;
+			return id;
+		}
 		const SvgEdgeGroup* getEdgeGroup()const{ return m_edgeGroup; }
 		void setEdgeGroup(const SvgEdgeGroup* e){ m_edgeGroup = e; }
 	protected:

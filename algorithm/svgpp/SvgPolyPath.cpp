@@ -71,6 +71,8 @@ namespace svg
 			glColor3fv(attribute()->m_color.ptr());
 			if (isHighlighted() || isSelected() || ancestorSelected)
 				glColor3f(0, 0, 1);
+			if (selectedEdgeId() == i || highlighedEdgeId() == i)
+				glColor3f(1, 0, 0);
 			if (m_edgeGroup)
 			{
 				auto iter = m_edgeGroup->group.find(std::make_pair(this, i));

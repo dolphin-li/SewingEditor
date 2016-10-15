@@ -97,7 +97,7 @@ namespace svg
 
 	void SvgPolyPath::renderSelection()
 	{
-		const int nVerts = (int)m_cornerPos.size() - (!isClosed());
+		const int nVerts = (int)m_cornerPos.size();
 		bool ancestorSelected = false;
 		if (ancestorAfterRoot())
 			ancestorSelected = ancestorAfterRoot()->isSelected();

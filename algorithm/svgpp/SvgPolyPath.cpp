@@ -29,14 +29,14 @@ namespace svg
 	{ 
 		int nVerts = (int)m_cornerPos.size();
 		int nEdges = (int)m_cornerPos.size() - (!isClosed());
-		return nVerts + nEdges + 1; // 1 for the path itself
+		return nVerts + nEdges;
 	}
 
 	void SvgPolyPath::setSelected(bool s, int idx)
 	{
 		SvgPath::setSelected(s, idx);
 		m_selectedCorner_arrayId = idx - m_id;
-		if (m_selectedCorner_arrayId < 0 || m_selectedCorner_arrayId >= numId())
+		if (m_selectedCorner_arrayId < 0 || m_selectedCorner_arrayId >= numId() || !isSelected())
 			m_selectedCorner_arrayId = -1;
 	}
 
@@ -44,7 +44,7 @@ namespace svg
 	{
 		SvgPath::setHighlighted(s, idx);
 		m_highlightedCorner_arrayId = idx - m_id;
-		if (m_highlightedCorner_arrayId < 0 || m_highlightedCorner_arrayId >= numId())
+		if (m_highlightedCorner_arrayId < 0 || m_highlightedCorner_arrayId >= numId() || !isHighlighted())
 			m_highlightedCorner_arrayId = -1;
 	}
 
@@ -74,7 +74,7 @@ namespace svg
 			glStencilStrokePathNV(glRes->id, 1, ~0);
 			glCoverStrokePathNV(glRes->id, GL_BOUNDING_BOX_NV);
 		}
-		renderSelection();
+		renderSelection(false);
 	}
 
 	void SvgPolyPath::renderId()
@@ -94,11 +94,13 @@ namespace svg
 			glStencilStrokePathNV(glRes->id, 1, ~0);
 			glCoverStrokePathNV(glRes->id, GL_BOUNDING_BOX_NV);
 		}
+		renderSelection(true);
 	}
 
-	void SvgPolyPath::renderSelection()
+	void SvgPolyPath::renderSelection(bool idxMode)
 	{
-		const int nVerts = (int)m_cornerPos.size();
+		int nVerts = (int)m_cornerPos.size();
+		int nEdges = (int)m_cornerPos.size() - (!isClosed());
 		bool ancestorSelected = false;
 		if (ancestorAfterRoot())
 			ancestorSelected = ancestorAfterRoot()->isSelected();
@@ -110,29 +112,42 @@ namespace svg
 			// render control points
 			glPushAttrib(GL_ALL_ATTRIB_BITS);
 			glDisable(GL_STENCIL_TEST);
-			glLineWidth(2);
-			glBegin(GL_LINES);
-			for (size_t i = 0; i < nVerts; i++)
+
+			// draw edges of quads only when not idx mode
+			if (!idxMode)
 			{
-				ldp::Float2 c = getCorner(i);
+				glColor4f(0, 0, 1, 1);
+				glLineWidth(2);
+				glBegin(GL_LINES);
+				for (size_t i = 0; i < nVerts; i++)
+				{
+					ldp::Float2 c = getCorner(i);
+					glVertex2f(c[0] - sz, c[1] - sz);
+					glVertex2f(c[0] + sz, c[1] - sz);
 
-				glVertex2f(c[0] - sz, c[1] - sz);
-				glVertex2f(c[0] + sz, c[1] - sz);
+					glVertex2f(c[0] - sz, c[1] - sz);
+					glVertex2f(c[0] - sz, c[1] + sz);
 
-				glVertex2f(c[0] - sz, c[1] - sz);
-				glVertex2f(c[0] - sz, c[1] + sz);
+					glVertex2f(c[0] + sz, c[1] + sz);
+					glVertex2f(c[0] + sz, c[1] - sz);
 
-				glVertex2f(c[0] + sz, c[1] + sz);
-				glVertex2f(c[0] + sz, c[1] - sz);
-
-				glVertex2f(c[0] + sz, c[1] + sz);
-				glVertex2f(c[0] - sz, c[1] + sz);
+					glVertex2f(c[0] + sz, c[1] + sz);
+					glVertex2f(c[0] - sz, c[1] + sz);
+				}
+				glEnd();
 			}
-			glEnd();
 			glBegin(GL_QUADS);
-			glColor3f(1, 1, 1);
+			int id = m_id + nEdges;
 			for (size_t i = 0; i < nVerts; i++)
 			{
+				if (idxMode)
+					glColor4fv(color_from_index(id++).ptr());
+				else
+				{
+					glColor4f(1, 1, 1, 1);
+					if (m_highlightedCorner_arrayId == i+nEdges || m_selectedCorner_arrayId == i+nEdges)
+						glColor4f(1, 0, 0, 1);
+				}
 				ldp::Float2 c = getCorner(i);
 				glVertex2f(c[0] - sz, c[1] - sz);
 				glVertex2f(c[0] + sz, c[1] - sz);
@@ -157,11 +172,13 @@ namespace svg
 
 	void SvgPolyPath::configNvParams()
 	{
+		int id = 0;
 		for (auto glRes : m_edgeGLIds)
 		{
+			float ss = 1 + (m_selectedCorner_arrayId == id) + (m_highlightedCorner_arrayId == id);
 			glPathParameteriNV(glRes->id, GL_PATH_JOIN_STYLE_NV, lineJoinConverter(this));
 			glPathParameteriNV(glRes->id, GL_PATH_END_CAPS_NV, lineCapConverter(this));
-			glPathParameterfNV(glRes->id, GL_PATH_STROKE_WIDTH_NV, m_pathStyle.stroke_width);
+			glPathParameterfNV(glRes->id, GL_PATH_STROKE_WIDTH_NV, m_pathStyle.stroke_width * ss);
 			glPathParameterfNV(glRes->id, GL_PATH_MITER_LIMIT_NV, m_pathStyle.miter_limit);
 			if (m_pathStyle.dash_array.size())
 			{
@@ -174,6 +191,7 @@ namespace svg
 			{
 				glPathDashArrayNV(glRes->id, 0, NULL);
 			}
+			id++;
 		}
 	}
 

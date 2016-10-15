@@ -31,7 +31,7 @@ namespace svg
 			m_coords[m_cornerPos[i] * 2 + 1]); }
 	protected:
 		void cacheNvPaths();
-		void renderSelection();
+		void renderSelection(bool idxMode = false);
 		void configNvParams();
 		void updateEdgeRenderData();
 	protected:

@@ -620,10 +620,10 @@ namespace svg
 			if (!layer->selected) continue;
 			auto lastIt = layer->idxMap.find(lastId);
 			if (lastIt != layer->idxMap.end())
-				lastIt->second->setHighlighted(false);
+				lastIt->second->setHighlighted(false, -1);
 			auto thisIt = layer->idxMap.find(thisId);
 			if (thisIt != layer->idxMap.end())
-				thisIt->second->setHighlighted(true);
+				thisIt->second->setHighlighted(true, thisId);
 		}
 	}
 

@@ -162,7 +162,7 @@ Path::Path(const vector<char> &cmds, const vector<float> &coords)
     , has_logical_bbox(false)
     , cmd(cmds)
 	, coord(coords)
-	, is_ldp_poly(false)
+	, ldp_poly_id(-1)
 {
     owner = this;
 }
@@ -173,14 +173,14 @@ Path::Path(const PathStyle &s, const vector<char> &cmds, const vector<float> &co
     , cmd(cmds)
     , coord(coords)
 	, style(s)
-	, is_ldp_poly(false)
+	, ldp_poly_id(-1)
 {
 }
 
 Path::Path(const char *string)
     : HasRendererState<Path>(this)
 	, has_logical_bbox(false)
-	, is_ldp_poly(false)
+	, ldp_poly_id(-1)
 {
     int ok = parse_svg_path(string, cmd, coord);
     if (!ok) {
@@ -194,7 +194,7 @@ Path::Path(const PathStyle &s, const char *string)
     : HasRendererState<Path>(this)
     , has_logical_bbox(false)
     , style(s)
-	, is_ldp_poly(false)
+	, ldp_poly_id(-1)
 {
     int ok = parse_svg_path(string, cmd, coord);
     if (!ok) {

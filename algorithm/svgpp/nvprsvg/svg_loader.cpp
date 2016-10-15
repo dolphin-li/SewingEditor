@@ -2170,7 +2170,7 @@ NodePtr SVGParser::parsePath(TiXmlElement* elem)
 
     string path_string;
 
-	bool is_ldp_poly = false;
+	int ldp_poly = -1;
     for(TiXmlAttribute* a = elem->FirstAttribute(); a; a = a->Next()) {
         string name(a->Name());
         if(name == "d") {
@@ -2178,7 +2178,7 @@ NodePtr SVGParser::parsePath(TiXmlElement* elem)
             continue;
         }
 		if (name == "ldp_poly"){
-			is_ldp_poly = a->IntValue();
+			ldp_poly = a->IntValue();
 			continue;
 		}
         bool got_one = parseGenericShapeProperty(a, elem);
@@ -2187,7 +2187,7 @@ NodePtr SVGParser::parsePath(TiXmlElement* elem)
         }
     }
     PathPtr path = PathPtr(new Path(style().path, path_string.c_str()));
-	path->is_ldp_poly = is_ldp_poly;
+	path->ldp_poly_id = ldp_poly;
     if (!path->isEmpty()) {
         NodePtr shape = createShape(path, style());
         

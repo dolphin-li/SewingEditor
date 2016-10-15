@@ -18,6 +18,7 @@ namespace svg
 
 	SvgText::~SvgText()
 	{
+		
 	}
 
 	void SvgText::render()

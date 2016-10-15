@@ -25,7 +25,7 @@ namespace svg
 		};
 	public:
 		SvgAbstractObject();
-		~SvgAbstractObject();
+		virtual ~SvgAbstractObject();
 
 		virtual ObjectType objectType()const = 0;
 		virtual void render() = 0;

@@ -7,7 +7,7 @@ namespace svg
 	{
 	public:
 		SvgGroup();
-		~SvgGroup();
+		virtual ~SvgGroup();
 		ObjectType objectType()const { return ObjectType::Group; }
 
 		virtual void render();

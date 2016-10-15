@@ -136,8 +136,8 @@ namespace svg
 			shape->getPath()->processSegments(processor);
 			Cg::float4 bd = shape->getPath()->getBounds();
 			SvgPath* path = nullptr;
-			if (shape->getPath()->is_ldp_poly)
-				path = new SvgPolyPath();
+			if (shape->getPath()->ldp_poly_id >= 0)
+				path = new SvgPolyPath(shape->getPath()->ldp_poly_id);
 			else
 				path = new SvgPath();
 			path->m_gl_fill_rull = gl_fill_rull;
@@ -146,7 +146,7 @@ namespace svg
 			path->m_coords.insert(path->m_coords.end(), processor.coords.begin(), processor.coords.end());
 			path->setBound(ldp::Float4(bd.x, bd.z, bd.y, bd.w));
 			path->setParent(m_group);
-			if (shape->getPath()->is_ldp_poly)
+			if (path->objectType() == SvgAbstractObject::PolyPath)
 				((SvgPolyPath*)path)->findCorners();
 			m_group->m_children.push_back(std::shared_ptr<SvgAbstractObject>(path));
 		}

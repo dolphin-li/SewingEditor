@@ -77,7 +77,7 @@ public:
     vector<float> coord;
 
     PathStyle style;
-	bool is_ldp_poly;
+	int ldp_poly_id;
 
     Path(const PathStyle &style, const char *string);
     Path(const PathStyle &style, const vector<char> &cmds, const vector<float> &coords);

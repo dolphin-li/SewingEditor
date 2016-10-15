@@ -12,7 +12,12 @@ namespace svg
 
 	SvgPolyPath::SvgPolyPath() :SvgPath()
 	{
+		
+	}
 
+	SvgPolyPath::SvgPolyPath(int id)
+	{
+		m_id = id;
 	}
 
 	SvgPolyPath::~SvgPolyPath()
@@ -167,7 +172,7 @@ namespace svg
 		TiXmlElement* ele = new TiXmlElement("path");
 		parent->LinkEndChild(ele);
 		ele->SetAttribute("fill", strokeFillMap(m_pathStyle.fill_rule));
-		ele->SetAttribute("ldp_poly", 1);
+		ele->SetAttribute("ldp_poly", m_id);
 		ele->SetAttribute("stroke", "#231F20");
 		ele->SetDoubleAttribute("stroke-width", m_pathStyle.stroke_width);
 		ele->SetAttribute("stroke-linecap", strokeLineCapMap(m_pathStyle.line_cap));

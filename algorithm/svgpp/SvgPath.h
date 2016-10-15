@@ -8,7 +8,7 @@ namespace svg
 	{
 	public:
 		SvgPath();
-		~SvgPath();
+		virtual ~SvgPath();
 		ObjectType objectType()const { return ObjectType::Path; }
 
 		virtual void render();

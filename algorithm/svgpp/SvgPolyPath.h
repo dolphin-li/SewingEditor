@@ -2,13 +2,15 @@
 #include "GL\glew.h"
 #include "SvgPath.h"
 #include "PathStyle.hpp"
+#include <set>
 namespace svg
 {
 	class SvgPolyPath : public SvgPath
 	{
 	public:
 		SvgPolyPath();
-		~SvgPolyPath();
+		SvgPolyPath(int id);
+		virtual ~SvgPolyPath();
 		ObjectType objectType()const { return ObjectType::PolyPath; }
 
 		virtual void render();
@@ -17,11 +19,10 @@ namespace svg
 		virtual TiXmlElement* toXML(TiXmlNode* parent)const;
 		virtual void copyTo(SvgAbstractObject* obj)const;
 
-		bool isClosed()const;
-
 		// given this polygon (closed or non-closed), we find all the corners
 		void findCorners();
 
+		bool isClosed()const;
 		int numCorners()const{ return (int)m_cornerPos.size(); }
 		ldp::Float2 getCorner(int i)const{ return ldp::Float2(m_coords[m_cornerPos[i] * 2], 
 			m_coords[m_cornerPos[i] * 2 + 1]); }

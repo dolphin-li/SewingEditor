@@ -24,7 +24,7 @@ namespace svg
 	public:
 		SvgText();
 		SvgText(bool generate_resource);
-		~SvgText();
+		virtual ~SvgText();
 		ObjectType objectType()const { return ObjectType::Text; }
 
 		virtual void render();

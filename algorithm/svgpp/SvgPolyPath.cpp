@@ -14,10 +14,14 @@ namespace svg
 	{
 		m_highlightedCorner_arrayId = -1;
 		m_selectedCorner_arrayId = -1;
+		m_edgeGroup = nullptr;
 	}
 
-	SvgPolyPath::SvgPolyPath(int id)
+	SvgPolyPath::SvgPolyPath(int id) : SvgPath()
 	{
+		m_highlightedCorner_arrayId = -1;
+		m_selectedCorner_arrayId = -1;
+		m_edgeGroup = nullptr;
 		m_id = id;
 	}
 
@@ -27,9 +31,7 @@ namespace svg
 
 	int SvgPolyPath::numId()const
 	{ 
-		int nVerts = (int)m_cornerPos.size();
-		int nEdges = (int)m_cornerPos.size() - (!isClosed());
-		return nVerts + nEdges;
+		return numCorners() + numCornerEdges();
 	}
 
 	void SvgPolyPath::setSelected(bool s, int idx)
@@ -55,13 +57,8 @@ namespace svg
 		bool ancestorSelected = false;
 		if (ancestorAfterRoot())
 			ancestorSelected = ancestorAfterRoot()->isSelected();
-
-		glColor3fv(attribute()->m_color.ptr());
-		if (isHighlighted() || isSelected() || ancestorSelected)
-			glColor3f(0, 0, 1);
 		if (isSelected())
 			renderBounds(false);
-
 		if (m_invalid)
 		{
 			cacheNvPaths();
@@ -69,10 +66,19 @@ namespace svg
 		}// end if invalid
 
 		configNvParams();
-		for (auto glRes : m_edgeGLIds)
+		for (int i = 0; i < (int)m_edgeGLIds.size(); i++)
 		{
-			glStencilStrokePathNV(glRes->id, 1, ~0);
-			glCoverStrokePathNV(glRes->id, GL_BOUNDING_BOX_NV);
+			glColor3fv(attribute()->m_color.ptr());
+			if (isHighlighted() || isSelected() || ancestorSelected)
+				glColor3f(0, 0, 1);
+			if (m_edgeGroup)
+			{
+				auto iter = m_edgeGroup->group.find(std::make_pair(this, i));
+				if (iter != m_edgeGroup->group.end())
+					glColor3fv(m_edgeGroup->color.ptr());
+			}
+			glStencilStrokePathNV(m_edgeGLIds[i]->id, 1, ~0);
+			glCoverStrokePathNV(m_edgeGLIds[i]->id, GL_BOUNDING_BOX_NV);
 		}
 		renderSelection(false);
 	}
@@ -99,8 +105,8 @@ namespace svg
 
 	void SvgPolyPath::renderSelection(bool idxMode)
 	{
-		int nVerts = (int)m_cornerPos.size();
-		int nEdges = (int)m_cornerPos.size() - (!isClosed());
+		int nVerts = numCorners();
+		int nEdges = numCornerEdges();
 		bool ancestorSelected = false;
 		if (ancestorAfterRoot())
 			ancestorSelected = ancestorAfterRoot()->isSelected();
@@ -207,6 +213,7 @@ namespace svg
 			newTptr->m_edgeCmds = m_edgeCmds;
 			newTptr->m_edgeCoords = m_edgeCoords;
 			newTptr->m_edgeGLIds = m_edgeGLIds;
+			newTptr->m_edgeGroup = m_edgeGroup;
 		}
 	}
 
@@ -300,9 +307,8 @@ namespace svg
 
 	void SvgPolyPath::updateEdgeRenderData()
 	{
-		const bool closed = isClosed();
-		const int nCorners = m_cornerPos.size();
-		const int nEdges = nCorners - !closed;
+		const int nCorners = numCorners();
+		const int nEdges = numCornerEdges();
 		m_edgeCmds.clear();
 		m_edgeCoords.clear();
 		m_edgeCmds.resize(nEdges);

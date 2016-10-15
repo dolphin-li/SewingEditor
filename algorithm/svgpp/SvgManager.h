@@ -10,6 +10,7 @@ namespace svg
 {
 	class SvgGroup;
 	class SvgAbstractObject;
+	class SvgEdgeGroup;
 	class SvgManager
 	{
 	public:
@@ -30,6 +31,7 @@ namespace svg
 			std::shared_ptr<SvgAbstractObject> root;
 			std::map<int, SvgAbstractObject*> idxMap;
 			std::set<SvgAbstractObject*> groups_for_selection;
+			std::vector<std::shared_ptr<SvgEdgeGroup>> edgeGroups;
 			std::string name;
 			bool selected;
 		};

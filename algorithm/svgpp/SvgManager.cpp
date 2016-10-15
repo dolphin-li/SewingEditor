@@ -23,6 +23,44 @@ namespace svg
 	const static float PATH_CONTACT_DIST_THRE = 0.2f;
 	const static float PATH_COS_ANGLE_DIST_THRE = cos(15.f * ldp::PI_S / 180.f);
 #pragma region --helper
+	static std::vector<ldp::Float3> create_color_table()
+	{
+		std::vector<ldp::Float3> table;
+		table.push_back(ldp::Float3(0.8, 0.6, 0.4));
+		table.push_back(ldp::Float3(0.8, 0.4, 0.6));
+		table.push_back(ldp::Float3(0.6, 0.8, 0.4));
+		table.push_back(ldp::Float3(0.6, 0.4, 0.8));
+		table.push_back(ldp::Float3(0.4, 0.6, 0.8));
+		table.push_back(ldp::Float3(0.4, 0.8, 0.6));
+
+		table.push_back(ldp::Float3(0.2, 0.4, 0.6));
+		table.push_back(ldp::Float3(0.2, 0.6, 0.4));
+		table.push_back(ldp::Float3(0.4, 0.2, 0.6));
+		table.push_back(ldp::Float3(0.4, 0.6, 0.2));
+		table.push_back(ldp::Float3(0.6, 0.2, 0.4));
+		table.push_back(ldp::Float3(0.6, 0.4, 0.2));
+
+		table.push_back(ldp::Float3(0.7, 0.4, 0.1));
+		table.push_back(ldp::Float3(0.7, 0.1, 0.4));
+		table.push_back(ldp::Float3(0.4, 0.1, 0.7));
+		table.push_back(ldp::Float3(0.4, 0.7, 0.1));
+		table.push_back(ldp::Float3(0.1, 0.7, 0.4));
+		table.push_back(ldp::Float3(0.1, 0.4, 0.7));
+
+		table.push_back(ldp::Float3(0.7, 0.8, 0.9));
+		table.push_back(ldp::Float3(0.7, 0.9, 0.8));
+		table.push_back(ldp::Float3(0.9, 0.8, 0.7));
+		table.push_back(ldp::Float3(0.9, 0.7, 0.8));
+		table.push_back(ldp::Float3(0.8, 0.7, 0.9));
+		table.push_back(ldp::Float3(0.8, 0.9, 0.7));
+
+		return table;
+	}
+	static ldp::Float3 color_table(int i)
+	{
+		static std::vector<ldp::Float3> table = create_color_table();
+		return table.at(i%table.size());
+	}
 
 	struct ConvertPathProcessor : PathSegmentProcessor
 	{
@@ -349,8 +387,12 @@ namespace svg
 		int idx = SvgAbstractObject::INDEX_BEGIN;
 		for (auto iter : m_layers)
 		{
+			// LDP TO DO: make edgeGroups clonable
+
+			//
 			iter.second->idxMap.clear();
 			iter.second->groups_for_selection.clear();
+			iter.second->edgeGroups.clear();
 			iter.second->updateIndex(iter.second->root.get(), idx);
 		}
 	}
@@ -1588,7 +1630,32 @@ namespace svg
 	///// pair related
 	void SvgManager::makeSelectedToPair()
 	{
+		for (auto iter : m_layers)
+		{
+			auto layer = iter.second;
+			auto rootPtr = (SvgGroup*)layer->root.get();
+			std::vector<std::shared_ptr<SvgAbstractObject>> paths;
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, paths, true);
+			if (paths.size())
+			{
+				std::shared_ptr<SvgEdgeGroup> edgeGroup(new SvgEdgeGroup);
+				for (auto path : paths){
+					auto obj = (SvgPolyPath*)path.get();
+					int eid = obj->selectedEdgeId();
+					if (eid >= 0)
+					{
+						edgeGroup->group.insert(std::make_pair(obj, eid));
+						obj->setEdgeGroup(edgeGroup.get());
+					}
+				} //  end for path
 
+				// a pair is valid only if more than one edges selected
+				if (edgeGroup->group.size() > 1){
+					edgeGroup->color = color_table(layer->edgeGroups.size());
+					layer->edgeGroups.push_back(edgeGroup);
+				}
+			}
+		} // end for iter
 	}
 
 	void SvgManager::removeSelectedPairs()

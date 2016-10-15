@@ -1079,10 +1079,10 @@ namespace svg
 					break;
 				r_iter++;
 				my_iter++;
-				if (r_iter == r0_iter)
-					return true;
 				if (r_iter == r.nodes.end())
 					r_iter = r.nodes.begin();
+				if (r_iter == r0_iter)
+					return true;
 			}
 
 			// backward matching
@@ -1192,7 +1192,6 @@ namespace svg
 		std::vector<PolyPath>& groups)
 	{
 		groups.clear();
-
 		if (nNodes == 0)
 			return;
 
@@ -1208,8 +1207,6 @@ namespace svg
 		for (int nodeId = 0; nodeId < node_visited.size(); nodeId++)
 		{
 			if (node_visited[nodeId] || graph[nodeId].nbNodes.size() != 2) continue;
-			for (int i = 0; i < nNodes; i++)
-				graph[i].visited = false;
 			graph[nodeId].father = nullptr;
 			graph_find_cycles(&graph[nodeId], groups, node_visited);
 		} // end while
@@ -1237,11 +1234,13 @@ namespace svg
 			group.collectPoints(points);
 		}
 
-		for (auto& groupi : groups)
+		for (const auto& groupi : groups)
 		{
 			if (!groupi.closed) continue;
-			for (auto& groupj : groups)
+#pragma omp parallel for
+			for (int j_group = 0; j_group < (int)groups.size(); j_group++)
 			{
+				PolyPath& groupj = groups[j_group];
 				if (&groupi == &groupj) continue;
 				if (!groupj.closed) continue;
 				if (!groupi.intersected(groupj))
@@ -1322,7 +1321,6 @@ namespace svg
 				for (auto r : results){
 					if (r.first / 2 == p.idx / 2) continue;
 					mergePaths[p.idx].push_back(r.first);
-					mergePaths[r.first].push_back(p.idx);
 				}
 			}
 			for (int iPoint = 0; iPoint < (int)points.size(); iPoint++)
@@ -1347,11 +1345,27 @@ namespace svg
 					pointMapper[c] = i;
 			}
 
+			// debug
+			for (int i = 0; i < pointMapper.size(); i++)
+			{
+				if (pointMapper[i] == -1)
+				{
+					// the reason for this warning is due to current merge policy:
+					// if dist(A,B) < PATH_CONTACT_DIST_THRE, dist(B,C) < PATH_CONTACT_DIST_THRE
+					//		dist(A, C) >= PATH_CONTACT_DIST_THRE
+					// then this warning may occure
+					printf("warning: point %d seems invalid, results may be incorrecrt!\n", i);
+				}
+			}
+
 			// 3.1 finally we construct the connection graph
 			for (int i = 0; i < (int)points.size(); i += 2)
 			{
-				pathGraph.insert(ldp::Int2(pointMapper[i], pointMapper[i + 1]));
-				pathGraph.insert(ldp::Int2(pointMapper[i + 1], pointMapper[i]));
+				if (pointMapper[i] >= 0 && pointMapper[i + 1] >= 0)
+				{
+					pathGraph.insert(ldp::Int2(pointMapper[i], pointMapper[i + 1]));
+					pathGraph.insert(ldp::Int2(pointMapper[i + 1], pointMapper[i]));
+				}
 			}
 
 			// 4. group each polygons and associates

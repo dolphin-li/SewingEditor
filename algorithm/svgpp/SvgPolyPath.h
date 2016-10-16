@@ -43,8 +43,7 @@ namespace svg
 		}
 		std::set<int> selectedEdgeIds()const{
 			std::set<int> r;
-			for (auto c : m_selectedCorner_arrayIds)
-			{
+			for (auto c : m_selectedCorner_arrayIds){
 				if (c < 0 || c >= numCornerEdges()) continue;
 				r.insert(c);
 			}
@@ -52,25 +51,48 @@ namespace svg
 		}
 		std::set<int> selectedCornerIds()const{
 			std::set<int> r;
-			for (auto c : m_selectedCorner_arrayIds)
-			{
+			for (auto c : m_selectedCorner_arrayIds){
 				if (c < numCornerEdges() || c >= numId()) continue;
 				r.insert(c - numCornerEdges());
 			}
 			return r;
 		}
-		int highlighedEdgeId()const{
-			int id = m_highlightedCorner_arrayId;
+		std::set<int> highlighedEdgeIds()const{
+			std::set<int> r;
+			for (auto c : m_highlightedCorner_arrayIds){
+				if (c < 0 || c >= numCornerEdges()) continue;
+				r.insert(c);
+			}
+			return r;
+		}		
+		std::set<int> highlighedCornerIds()const{
+			std::set<int> r;
+			for (auto c : m_highlightedCorner_arrayIds){
+				if (c < numCornerEdges() || c >= numId()) continue;
+				r.insert(c - numCornerEdges());
+			}
+			return r;
+		}
+		int globalIdFromEdgeId(int id)const{
+			if (id < 0 || id >= numCornerEdges()) return -1;
+			return m_id + id;
+		}
+		int globalIdFromCornerId(int id)const{
+			if (id < 0 || id >= numCorners()) return -1;
+			return m_id + numCornerEdges() + id;
+		}
+		int edgeIdFromGlobalId(int id)const{
+			id -= m_id;
 			if (id < 0 || id >= numCornerEdges()) return -1;
 			return id;
-		}		
-		int highlighedCornerId()const{
-			int id = m_highlightedCorner_arrayId;
-			if (id < numCornerEdges() || id >= numId()) return -1;
+		}
+		int cornerIdFromGlobalId(int id)const{
+			id -= m_id + numCornerEdges();
+			if (id < 0 || id >= numCorners()) return -1;
 			return id;
 		}
-		const SvgEdgeGroup* getEdgeGroup()const{ return m_edgeGroup; }
-		void setEdgeGroup(const SvgEdgeGroup* e){ m_edgeGroup = e; }
+		const std::set<const SvgEdgeGroup*>& edgeGroups()const{ return m_edgeGroups; }
+		std::set<const SvgEdgeGroup*>& edgeGroups(){ return m_edgeGroups; }
 	protected:
 		void cacheNvPaths();
 		void renderSelection(bool idxMode = false);
@@ -79,7 +101,7 @@ namespace svg
 	protected:
 		std::vector<int> m_cornerPos;
 		std::set<int> m_selectedCorner_arrayIds; // LDP TO DO: enable multi-selection
-		int m_highlightedCorner_arrayId;
+		std::set<int> m_highlightedCorner_arrayIds;
 
 		// corner-splitted path data, for rendering
 		std::vector<std::vector<GLubyte>> m_edgeCmds;
@@ -87,6 +109,6 @@ namespace svg
 		std::vector<std::shared_ptr<GLPathResource>> m_edgeGLIds;
 
 		// is this edge related with others?
-		const SvgEdgeGroup* m_edgeGroup;
+		std::set<const SvgEdgeGroup*> m_edgeGroups;
 	};
 }

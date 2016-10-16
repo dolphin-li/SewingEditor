@@ -23,21 +23,17 @@ namespace svg
 	{
 		for (auto g : rhs.group)
 		{
-			g.first->setEdgeGroup(this);
+			g.first->edgeGroups().insert(this);
 			group.insert(g);
 		}
 	}
 
 	SvgPolyPath::SvgPolyPath() :SvgPath()
 	{
-		m_highlightedCorner_arrayId = -1;
-		m_edgeGroup = nullptr;
 	}
 
 	SvgPolyPath::SvgPolyPath(int id) : SvgPath()
 	{
-		m_highlightedCorner_arrayId = -1;
-		m_edgeGroup = nullptr;
 		m_id = id;
 	}
 
@@ -67,9 +63,15 @@ namespace svg
 	void SvgPolyPath::setHighlighted(bool s, int idx)
 	{
 		SvgPath::setHighlighted(s, idx);
-		m_highlightedCorner_arrayId = idx - m_id;
-		if (m_highlightedCorner_arrayId < 0 || m_highlightedCorner_arrayId >= numId() || !isHighlighted())
-			m_highlightedCorner_arrayId = -1;
+		if (idx == -1)
+			m_highlightedCorner_arrayIds.clear();
+		idx -= m_id;
+		if (idx < 0 || idx >= numId())
+			return;
+		if (s)
+			m_highlightedCorner_arrayIds.insert(idx);
+		else
+			m_highlightedCorner_arrayIds.clear();
 	}
 
 	void SvgPolyPath::render()
@@ -88,21 +90,24 @@ namespace svg
 		}// end if invalid
 
 		configNvParams();
-		auto selectedEdges = selectedEdgeIds();
+		auto sEdges = selectedEdgeIds();
+		auto hEdges = highlighedEdgeIds();
 		for (int i = 0; i < (int)m_edgeGLIds.size(); i++)
 		{
 			glColor3fv(attribute()->m_color.ptr());
 			if (isHighlighted() || isSelected() || ancestorSelected)
 				glColor3f(0, 0, 1);
-			if (selectedEdges.find(i) != selectedEdges.end())
+			if (sEdges.find(i) != sEdges.end())
 				glColor3f(1, 0, 0);
-			if (m_edgeGroup)
+			if (m_edgeGroups.size())
 			{
-				auto iter = m_edgeGroup->group.find(std::make_pair(this, i));
-				if (iter != m_edgeGroup->group.end())
-					glColor3fv(m_edgeGroup->color.ptr());
+				for (auto g : m_edgeGroups){
+					auto iter = g->group.find(std::make_pair(this, i));
+					if (iter != g->group.end())
+						glColor3fv(g->color.ptr());
+				}
 			}
-			if (highlighedEdgeId() == i)
+			if (hEdges.find(i) != hEdges.end())
 				glColor3f(1, 0, 0);
 			glStencilStrokePathNV(m_edgeGLIds[i]->id, 1, ~0);
 			glCoverStrokePathNV(m_edgeGLIds[i]->id, GL_BOUNDING_BOX_NV);
@@ -120,7 +125,7 @@ namespace svg
 		}// end if invalid
 
 		configNvParams();
-		int id = m_id;
+		int id = globalIdFromEdgeId(0);
 		for (auto glRes : m_edgeGLIds)
 		{
 			glColor4fv(color_from_index(id++).ptr());
@@ -170,8 +175,9 @@ namespace svg
 				glEnd();
 			}
 			glBegin(GL_QUADS);
-			auto selectedEdges = selectedEdgeIds();
-			int id = m_id + nEdges;
+			auto sCorners = selectedCornerIds();
+			auto hCorners= highlighedCornerIds();
+			int id = globalIdFromCornerId(0);
 			for (size_t i = 0; i < nVerts; i++)
 			{
 				if (idxMode)
@@ -179,8 +185,7 @@ namespace svg
 				else
 				{
 					glColor4f(1, 1, 1, 1);
-					if (m_highlightedCorner_arrayId == i + nEdges ||
-						selectedEdges.find(i + nEdges) != selectedEdges.end())
+					if (hCorners.find(i) != hCorners.end() || sCorners.find(i) != sCorners.end())
 						glColor4f(1, 0, 0, 1);
 				}
 				ldp::Float2 c = getCorner(i);
@@ -208,10 +213,11 @@ namespace svg
 	void SvgPolyPath::configNvParams()
 	{
 		int id = 0;
-		auto selectedEdges = selectedEdgeIds();
+		auto sEdges = selectedEdgeIds();
+		auto hEdges = highlighedEdgeIds();
 		for (auto glRes : m_edgeGLIds)
 		{
-			float ss = 1 + (selectedEdges.find(id) != selectedEdges.end()) + (m_highlightedCorner_arrayId == id);
+			float ss = 1 + (sEdges.find(id) != sEdges.end()) + (hEdges.find(id) != hEdges.end());
 			glPathParameteriNV(glRes->id, GL_PATH_JOIN_STYLE_NV, lineJoinConverter(this));
 			glPathParameteriNV(glRes->id, GL_PATH_END_CAPS_NV, lineCapConverter(this));
 			glPathParameterfNV(glRes->id, GL_PATH_STROKE_WIDTH_NV, m_pathStyle.stroke_width * ss);
@@ -238,12 +244,12 @@ namespace svg
 		{
 			auto newTptr = (SvgPolyPath*)obj;
 			newTptr->m_cornerPos = m_cornerPos;
-			newTptr->m_highlightedCorner_arrayId = -1;
+			newTptr->m_highlightedCorner_arrayIds = m_highlightedCorner_arrayIds;
 			newTptr->m_selectedCorner_arrayIds = m_selectedCorner_arrayIds;
 			newTptr->m_edgeCmds = m_edgeCmds;
 			newTptr->m_edgeCoords = m_edgeCoords;
 			newTptr->m_edgeGLIds = m_edgeGLIds;
-			newTptr->m_edgeGroup = m_edgeGroup;
+			newTptr->m_edgeGroups = m_edgeGroups;
 		}
 	}
 

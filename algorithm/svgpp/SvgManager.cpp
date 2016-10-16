@@ -664,17 +664,54 @@ namespace svg
 
 	void SvgManager::highlightShapeByIndex(int lastId, int thisId)
 	{
+		if (lastId == thisId)
+			return;
 		for (auto layer_iter : m_layers)
 		{
 			auto layer = layer_iter.second;
 			if (!layer->selected) continue;
 			auto lastIt = layer->idxMap.find(lastId);
 			if (lastIt != layer->idxMap.end())
+			{
 				lastIt->second->setHighlighted(false, -1);
+
+				// if in a pair, this make other members the same highlighting
+				if (lastIt->second->objectType() == SvgAbstractObject::PolyPath){
+					auto poly = (SvgPolyPath*)lastIt->second;
+					const int n = poly->numCornerEdges();
+					for (auto g : layer->edgeGroups){
+						bool found = false;
+						for (int i = 0; i < n; i++){
+							auto it = g->group.find(std::make_pair(poly, i));
+							if (it != g->group.end()){
+								for (auto np : g->group)
+									np.first->setHighlighted(false);
+								found = true;
+								break;
+							}
+							if (found) break;
+						} // end for i
+					} // end for g
+				} // end if polypath
+			} // end if lastIt
 			auto thisIt = layer->idxMap.find(thisId);
 			if (thisIt != layer->idxMap.end())
+			{
 				thisIt->second->setHighlighted(true, thisId);
-		}
+
+				// if in a pair, this make other members the same highlighting
+				if (thisIt->second->objectType() == SvgAbstractObject::PolyPath){
+					auto poly = (SvgPolyPath*)thisIt->second;
+					for (auto g : layer->edgeGroups){
+						auto it = g->group.find(std::make_pair(poly, poly->edgeIdFromGlobalId(thisId)));
+						if (it != g->group.end()){
+							for (auto np : g->group)
+								np.first->setHighlighted(true, np.first->globalIdFromEdgeId(np.second));
+						}
+					} // end for g
+				} // end if polypath
+			} // end if thisIt
+		} // end for layer_iter
 	}
 
 	bool SvgManager::groupSelected()
@@ -1646,28 +1683,35 @@ namespace svg
 			rootPtr->collectObjects(SvgAbstractObject::PolyPath, paths, true);
 			if (paths.size())
 			{
-				std::shared_ptr<SvgEdgeGroup> edgeGroup(new SvgEdgeGroup);
+				std::shared_ptr<SvgEdgeGroup> newEg(new SvgEdgeGroup);
 				for (auto path : paths){
 					auto obj = (SvgPolyPath*)path.get();
 					auto eids = obj->selectedEdgeIds();
-					for (auto eid : eids){
-						edgeGroup->group.insert(std::make_pair(obj, eid));
-						obj->setEdgeGroup(edgeGroup.get());
-					}
+					for (auto eid : eids)
+						newEg->group.insert(std::make_pair(obj, eid));
 				} //  end for path
 
 				// a pair is valid only if more than one edges selected
-				if (edgeGroup->group.size() > 1){
+				if (newEg->group.size() > 1){
+					// merge overlapped groups
 					auto tmp = layer->edgeGroups;
 					layer->edgeGroups.clear();
 					for (auto g : tmp){
-						if (g->intersect(*edgeGroup))
-							edgeGroup->mergeWith(*g);
+						if (g->intersect(*newEg))
+							newEg->mergeWith(*g);
 						else
 							layer->edgeGroups.push_back(g);
 					}
-					edgeGroup->color = color_table();
-					layer->edgeGroups.push_back(edgeGroup);
+					newEg->color = color_table();
+					layer->edgeGroups.push_back(newEg);
+
+					// re-link
+					for (auto eg : layer->edgeGroups)
+					for (auto g : eg->group)
+						g.first->edgeGroups().clear();
+					for (auto eg : layer->edgeGroups)
+					for (auto g : eg->group)
+						g.first->edgeGroups().insert(eg.get());
 				} // end if edgeGroup size > 1
 			} // end if paths.size() != 0
 		} // end for iter

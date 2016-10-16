@@ -28,6 +28,27 @@ namespace svg
 		}
 	}
 
+	TiXmlElement* SvgEdgeGroup::toXML(TiXmlNode* parent)const
+	{
+		TiXmlElement* ele = new TiXmlElement("ldp_poly_group");
+		parent->LinkEndChild(ele);
+		std::string cl = std::to_string(color[0]) + " " + std::to_string(color[1])
+			+ " " + std::to_string(color[2]);
+		std::string cmd;
+		for (auto g : group)
+		{
+			cmd += std::to_string(g.first->getId());
+			cmd += " ";
+			cmd += std::to_string(g.second);
+			cmd += " ";
+		}
+		cmd = cmd.substr(0, (int)cmd.size() - 1);
+		ele->SetAttribute("color", cl.c_str());
+		ele->SetAttribute("cmd", cmd.c_str());
+		return ele;
+
+	}
+
 	SvgPolyPath::SvgPolyPath() :SvgPath()
 	{
 	}

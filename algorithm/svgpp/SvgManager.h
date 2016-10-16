@@ -34,6 +34,10 @@ namespace svg
 			std::vector<std::shared_ptr<SvgEdgeGroup>> edgeGroups;
 			std::string name;
 			bool selected;
+
+			// for tmp usage, need not be pushed when layer clone
+			std::vector<std::set<std::pair<int, int>>> tmpLoadedEdgeGroups; // only used when loading
+			std::vector<ldp::Float3> tmpLoadedEdgeGroupsColor; // only used when loading
 		};
 		enum SelectOp{
 			SelectThis,

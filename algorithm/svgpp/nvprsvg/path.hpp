@@ -66,6 +66,18 @@ typedef shared_ptr<struct Node> NodePtr;
 
 typedef shared_ptr<RendererState<Path> > PathRendererStatePtr;
 
+struct LdpPolyGroup : enable_shared_from_this<LdpPolyGroup> {
+public:
+	float3 color;
+	std::vector<int> cmds;
+
+	LdpPolyGroup(){
+		color.x = color.y = color.z = 0;
+	}
+};
+
+typedef boost::shared_ptr<LdpPolyGroup> LdpPolyGroupPtr;
+
 struct Path : enable_shared_from_this<Path>, HasRendererState<Path> {
 private:
     bool has_logical_bbox;

@@ -12,6 +12,7 @@ namespace svg
 		ldp::Float3 color;
 		bool intersect(const SvgEdgeGroup& rhs);
 		void mergeWith(const SvgEdgeGroup& rhs);
+		TiXmlElement* toXML(TiXmlNode* parent)const;
 	};
 
 	class SvgPolyPath : public SvgPath

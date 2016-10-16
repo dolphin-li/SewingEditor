@@ -385,7 +385,8 @@ struct Shape : Node, HasRendererState<Shape>, enable_shared_from_this<Shape> {
 protected:
     PathPtr path;
     PaintPtr fill_paint, stroke_paint;
-
+public:
+	LdpPolyGroupPtr ldpPoly;
 public:
     float net_fill_opacity, net_stroke_opacity;
 

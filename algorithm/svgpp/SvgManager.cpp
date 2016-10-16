@@ -175,24 +175,38 @@ namespace svg
 		}
 		virtual void visit(ShapePtr shape)
 		{
-			GLenum gl_fill_rull = 0;
-			ConvertPathProcessor processor(shape->getPath().get(), gl_fill_rull);
-			shape->getPath()->processSegments(processor);
-			Cg::float4 bd = shape->getPath()->getBounds();
-			SvgPath* path = nullptr;
-			if (shape->getPath()->ldp_poly_id >= 0)
-				path = new SvgPolyPath(shape->getPath()->ldp_poly_id);
-			else
-				path = new SvgPath();
-			path->m_gl_fill_rull = gl_fill_rull;
-			path->m_pathStyle = shape->getPath()->style;
-			path->m_cmds.insert(path->m_cmds.end(), processor.cmds.begin(), processor.cmds.end());
-			path->m_coords.insert(path->m_coords.end(), processor.coords.begin(), processor.coords.end());
-			path->setBound(ldp::Float4(bd.x, bd.z, bd.y, bd.w));
-			path->setParent(m_group);
-			if (path->objectType() == SvgAbstractObject::PolyPath)
-				((SvgPolyPath*)path)->findCorners();
-			m_group->m_children.push_back(std::shared_ptr<SvgAbstractObject>(path));
+			// if has path
+			if (shape->getPath().get())
+			{
+				GLenum gl_fill_rull = 0;
+				ConvertPathProcessor processor(shape->getPath().get(), gl_fill_rull);
+				shape->getPath()->processSegments(processor);
+				Cg::float4 bd = shape->getPath()->getBounds();
+				SvgPath* path = nullptr;
+				if (shape->getPath()->ldp_poly_id >= 0)
+					path = new SvgPolyPath(shape->getPath()->ldp_poly_id);
+				else
+					path = new SvgPath();
+				path->m_gl_fill_rull = gl_fill_rull;
+				path->m_pathStyle = shape->getPath()->style;
+				path->m_cmds.insert(path->m_cmds.end(), processor.cmds.begin(), processor.cmds.end());
+				path->m_coords.insert(path->m_coords.end(), processor.coords.begin(), processor.coords.end());
+				path->setBound(ldp::Float4(bd.x, bd.z, bd.y, bd.w));
+				path->setParent(m_group);
+				if (path->objectType() == SvgAbstractObject::PolyPath)
+					((SvgPolyPath*)path)->findCorners();
+				m_group->m_children.push_back(std::shared_ptr<SvgAbstractObject>(path));
+			} // end if has path
+			// if has ldpPoly
+			if (shape->ldpPoly.get())
+			{
+				auto d = shape->ldpPoly->cmds;
+				auto c = shape->ldpPoly->color;
+				m_layer->tmpLoadedEdgeGroups.push_back(std::set<std::pair<int, int>>());
+				for (size_t i = 0; i < shape->ldpPoly->cmds.size(); i += 2)
+					m_layer->tmpLoadedEdgeGroups.back().insert(std::make_pair(d[i], d[i + 1]));
+				m_layer->tmpLoadedEdgeGroupsColor.push_back(ldp::Float3(c[0], c[1], c[2]));
+			} // end if has ldpPoly
 		}
 		virtual void visit(TextPtr text)
 		{
@@ -331,18 +345,40 @@ namespace svg
 			m_layers.clear();
 		ConvertTraversal traversal;
 		svg_scene->traverse(VisitorPtr(new ConvertVisitor(this)), traversal);
+
+		// clone edgeGroups: since we have not updated index yet, we can use index to match groups
+		for (auto layer_iter : m_layers)
+		{
+			auto layer = layer_iter.second;
+			auto rootPtr = (SvgGroup*)layer->root.get();
+			std::vector<std::shared_ptr<SvgAbstractObject>> paths;
+			std::map<int, SvgPolyPath*> pathsMap;
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, paths, false);
+			for (auto p : paths)
+				pathsMap.insert(std::make_pair(p->getId(), (SvgPolyPath*)p.get()));
+			for (size_t iEg = 0; iEg < layer->tmpLoadedEdgeGroups.size(); iEg++){
+				std::shared_ptr<SvgEdgeGroup> eg(new SvgEdgeGroup);
+				for (auto gId_iter : layer->tmpLoadedEdgeGroups[iEg]){
+					auto newg = pathsMap.at(gId_iter.first);
+					eg->group.insert(std::make_pair(newg, gId_iter.second));
+					newg->edgeGroups().insert(eg.get());
+				} // g
+				eg->color = layer->tmpLoadedEdgeGroupsColor.at(iEg);
+				layer->edgeGroups.push_back(eg);
+			} // egId_iter
+		} // layer_iter
+
+		// fix and update index and set render bounds
 		if (m_layers.size())
 		{
 			m_currentLayerName = m_layers.begin()->second->name;
 			removeSingleNodeAndEmptyNode();
-			updateIndex();
-			updateBound();
 			if (m_renderCam)
 			{
 				ldp::Float4 b = getBound();
 				m_renderCam->setFrustum(b[0], b[1], b[2], b[3], -1, 1);
 			}
-		}
+		}// end if m_layers.size()
 	}
 
 	void SvgManager::save(const char* svg_file, bool selectionOnly)
@@ -381,6 +417,8 @@ namespace svg
 			{
 				TiXmlElement* ele = root->toXML(root_ele);
 				ele->SetAttribute("ldp_layer_name", iter.second->name.c_str());
+				for (auto g : iter.second->edgeGroups)
+					g->toXML(ele);
 			}
 		} // end for layers
 		if (!doc.SaveFile(svg_file))

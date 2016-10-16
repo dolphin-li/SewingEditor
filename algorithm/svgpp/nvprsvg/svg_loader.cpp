@@ -25,6 +25,7 @@
 
 #include <string>
 #include <map>
+#include <sstream>
 
 using std::map;
 
@@ -384,7 +385,8 @@ struct SVGParser {
     NodePtr parsePolyline(TiXmlElement* elem);
     NodePtr parseLine(TiXmlElement* elem);
     NodePtr parseRect(TiXmlElement* elem);
-    NodePtr parsePath(TiXmlElement* elem);
+	NodePtr parsePath(TiXmlElement* elem);
+	NodePtr parseLdpPolyGroup(TiXmlElement* elem);
     NodePtr parseGroup(TiXmlElement *elem);
     NodePtr parseText(TiXmlElement* elem);
     NodePtr parseSwitch(TiXmlElement *elem);
@@ -2197,6 +2199,42 @@ NodePtr SVGParser::parsePath(TiXmlElement* elem)
     return style_stack.popAndReturn(NodePtr());
 }
 
+NodePtr SVGParser::parseLdpPolyGroup(TiXmlElement* elem)
+{
+	style_stack.pushChild();
+
+	string color_str, cmd_str;
+
+	for (TiXmlAttribute* a = elem->FirstAttribute(); a; a = a->Next()) {
+		string name(a->Name());
+		if (name == "color") {
+			color_str = a->Value();
+			continue;
+		}
+		if (name == "cmd"){
+			cmd_str = a->Value();
+			continue;
+		}
+	}
+	LdpPolyGroupPtr path(new LdpPolyGroup());
+	float3 c;
+	if (3 == sscanf_s(color_str.c_str(), "%f %f %f", &c[0], &c[1], &c[2]))
+		path->color = c;
+	std::stringstream stm(cmd_str);
+	while (!stm.eof()){
+		int p = 0;
+		stm >> p;
+		path->cmds.push_back(p);
+	}
+	if (path->cmds.size()) {
+		ShapePtr shape = ShapePtr(new Shape());
+		shape->ldpPoly = path;
+		return style_stack.popAndReturn(decorateNode(shape));
+	}
+
+	return style_stack.popAndReturn(NodePtr());
+}
+
 NodePtr SVGParser::parseText(TiXmlElement* elem)
 {
     style_stack.pushChild();
@@ -3304,7 +3342,11 @@ NodePtr SVGParser::parseNode(TiXmlElement *elem)
     if (name == "path") {
         NodePtr shape = parsePath(elem);
         return shape;
-    }
+	}
+	if (name == "ldp_poly_group") {
+		NodePtr shape = parseLdpPolyGroup(elem);
+		return shape;
+	}
     if (name == "image") {
         NodePtr image = parseImage(elem);
         return image;

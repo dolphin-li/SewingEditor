@@ -92,29 +92,7 @@ void SvgViewer::initializeGL()
 
 void SvgViewer::resizeGL(int w, int h)
 {
-	if (m_svgManager)
-	{
-		ldp::Float4 b = m_svgManager->getBound();
-		float vw = m_camera.getViewPortRight() - m_camera.getViewPortLeft();
-		float vh = m_camera.getViewPortBottom() - m_camera.getViewPortTop();
-		float vs = vw / vh;
-		float x0 = m_camera.getFrustumLeft(), x1 = m_camera.getFrustumRight();
-		float y0 = m_camera.getFrustumTop(), y1 = m_camera.getFrustumBottom();
-		float last_bh = (x1 - x0) / vs, last_bw = (y1 - y0) * vs;
-		float bw = (b[1] - b[0]) / 2, bh = (b[3] - b[2]) / 2, mx = (x0 + x1) / 2, my = (y1 + y0) / 2;
-		float s = w / float(h), s_twotimes = bw / last_bw;
-		if (bw / bh < s){
-			x0 = mx - bh * s * s_twotimes;
-			x1 = mx + bh * s * s_twotimes;
-		}
-		else{
-			y0 = my - bw / s * s_twotimes;
-			y1 = my + bw / s * s_twotimes;
-		}
-		m_camera.setFrustum(x0, x1, y0, y1, m_camera.getFrustumNear(), m_camera.getFrustumFar());
-	} // end if svgManager
-
-	m_camera.setViewPort(0, w, 0, h);
+	resetCamera();
 	if (m_fbo)
 		delete m_fbo;
 	QGLFramebufferObjectFormat fmt;

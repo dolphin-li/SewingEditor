@@ -62,6 +62,7 @@ namespace svg
 		const SvgAttribute* attribute()const{ return m_attribute.get(); }
 
 		ldp::Float4 getBound()const{ return m_bbox; }
+		ldp::Float2 getCenter()const{ return ldp::Float2(m_bbox[0]+m_bbox[1], m_bbox[2]+m_bbox[3]) * 0.5f; }
 		void setBound(ldp::Float4 b){ m_bbox = b; }
 		virtual void updateBoundFromGeometry(){  }
 		void resetBound(){ m_bbox = ldp::Float4(FLT_MAX, -FLT_MAX, FLT_MAX, -FLT_MAX); }

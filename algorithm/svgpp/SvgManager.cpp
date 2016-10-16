@@ -422,6 +422,7 @@ namespace svg
 		{
 			m_currentLayerName = m_layers.begin()->second->name;
 			removeSingleNodeAndEmptyNode();
+			m_one_pixel_is_how_many_meters = estimatePixelToMetersFromSelected();
 		}// end if m_layers.size()
 	}
 
@@ -1245,6 +1246,87 @@ namespace svg
 					poly->setSelected(true);
 			}
 		} // end for layer_iter
+	}
+
+	float SvgManager::estimatePixelToMetersFromSelected()const
+	{
+		float one_pixel_is_how_many_meters = 1;
+
+		std::vector<std::shared_ptr<SvgAbstractObject>> paths;
+
+		////// try selected paths
+		for (auto layer_iter : m_layers)
+		{
+			auto layer = layer_iter.second;
+			if (!layer->selected) continue;
+			auto rootPtr = (SvgGroup*)layer->root.get();
+			rootPtr->collectObjects(SvgAbstractObject::Path, paths, true);
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, paths, true);
+		} // end for layer_iter
+
+		if (paths.size() > 1)
+			throw std::exception("estimatePixelToMetersFromSelected: only one path allowed to be selected");
+
+		if (paths.size())
+		{
+			auto path = (SvgPath*)paths[0].get();
+			if (path->m_coords.size() < 4)
+				throw std::exception("estimatePixelToMetersFromSelected: selected path not valid");
+			ldp::Float2 a(path->m_coords[0], path->m_coords[1]);
+			ldp::Float2 b(path->m_coords[2], path->m_coords[3]);
+			float ten_cm_is_how_many_meters = (a - b).length();
+			one_pixel_is_how_many_meters = 0.1 / ten_cm_is_how_many_meters;
+		} // end if paths.size()
+
+		//// try automatically estimate
+		paths.clear();
+		std::vector<std::shared_ptr<SvgAbstractObject>> texts;
+		for (auto layer_iter : m_layers)
+		{
+			auto layer = layer_iter.second;
+			if (!layer->selected) continue;
+			auto rootPtr = (SvgGroup*)layer->root.get();
+			rootPtr->collectObjects(SvgAbstractObject::Path, paths, false);
+			rootPtr->collectObjects(SvgAbstractObject::Text, texts, false);
+		} // end for layer_iter
+
+		std::vector<ldp::Float2> texts_10cm;
+		for (auto t : texts)
+		{
+			auto text = (SvgText*)t.get();
+			if (text->m_text.find("10 cm") < text->m_text.size())
+				texts_10cm.push_back(text->getCenter());
+		}
+
+		for (auto p : paths)
+		{
+			auto path = (SvgPath*)p.get();
+			if (!path->isClosed()) continue;
+			if (path->m_cmds.size() != 5) continue;
+			if (path->m_coords.size() != 10) continue;
+			bool valid = true;
+			for (int k = 0; k < 4; k++){
+				if (path->m_cmds[k + 1] != GL_LINE_TO_NV){
+					valid = false;
+					break;
+				}		
+			}
+			if (!valid) continue;
+
+			std::vector<ldp::Float2> poly;
+			for (int k = 0; k < 8; k+=2)
+				poly.push_back(ldp::Float2(path->m_coords[k], path->m_coords[k + 1]));
+			float ten_cm_is_how_many_meters = (poly[1] - poly[0]).length();
+			
+			for (auto c : texts_10cm){
+				if (ldp::PointInPolygon(poly.size(), poly.data(), c)){
+					one_pixel_is_how_many_meters = 0.1 / ten_cm_is_how_many_meters;
+					return one_pixel_is_how_many_meters;
+				}
+			} // end for c
+		} // end for p
+
+		return one_pixel_is_how_many_meters;
 	}
 
 #pragma region --graph related

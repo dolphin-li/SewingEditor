@@ -74,6 +74,11 @@ namespace svg
 		void updateBound();
 		ldp::Float4 getBound()const;
 
+		// estimate the conversion from pixels to meters
+		float estimatePixelToMetersFromSelected()const;
+		void setPixelToMeters(float v){ m_one_pixel_is_how_many_meters = v; }
+		float getPixelToMeters()const{ return m_one_pixel_is_how_many_meters; }
+
 		// given an index, select shapes
 		void selectShapeByIndex(int id, SelectOp op = SelectThis);
 		void selectShapeByIndex(const std::set<int>& ids, SelectOp op = SelectThis);
@@ -119,5 +124,6 @@ namespace svg
 	private:
 		std::map<std::string, std::shared_ptr<Layer>> m_layers;
 		std::string m_currentLayerName;
+		float m_one_pixel_is_how_many_meters; // convert from pixels to meters
 	};
 }

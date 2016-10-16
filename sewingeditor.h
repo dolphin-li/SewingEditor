@@ -57,6 +57,8 @@ public:
 	void on_pbRemovePairs_clicked();
 	void on_pbClosePolygon_clicked();
 	void on_pbSelectClosed_clicked();
+	void on_pbPixelToMeter_clicked();
+	void on_sbPixelToMeter_valueChanged(double v);
 	void on_listWidgetEditEnd(QWidget *editor, QAbstractItemDelegate::EndEditHint hint);
 protected:
 //////////////////////////////////////////////////////////////////////////

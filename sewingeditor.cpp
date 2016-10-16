@@ -769,3 +769,37 @@ void SewingEditor::on_pbSymmetricCopy_clicked()
 	}
 }
 
+void SewingEditor::on_pbPixelToMeter_clicked()
+{
+	try
+	{
+		float one_pixel_is_how_many_meters = ui.widget->getSvgManager()->estimatePixelToMetersFromSelected();
+		ui.sbPixelToMeter->setValue(1.0 / one_pixel_is_how_many_meters);
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void SewingEditor::on_sbPixelToMeter_valueChanged(double v)
+{
+	try
+	{
+		ui.widget->getSvgManager()->setPixelToMeters(1.0 / v);
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+

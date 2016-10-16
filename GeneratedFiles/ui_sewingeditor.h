@@ -14,6 +14,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDockWidget>
+#include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
@@ -70,12 +71,14 @@ public:
     QPushButton *pbRemoveLayers;
     QGroupBox *gbParam;
     QGridLayout *gridLayout_4;
-    QPushButton *pbMakePair;
     QPushButton *pbToConnectedGroups;
-    QPushButton *pbRemovePairs;
+    QPushButton *pbSelectClosed;
     QPushButton *pbSymmetricCopy;
     QPushButton *pbClosePolygon;
-    QPushButton *pbSelectClosed;
+    QPushButton *pbMakePair;
+    QPushButton *pbRemovePairs;
+    QPushButton *pbPixelToMeter;
+    QDoubleSpinBox *sbPixelToMeter;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -323,20 +326,15 @@ public:
         gridLayout_4->setSpacing(6);
         gridLayout_4->setContentsMargins(11, 11, 11, 11);
         gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
-        pbMakePair = new QPushButton(gbParam);
-        pbMakePair->setObjectName(QStringLiteral("pbMakePair"));
-
-        gridLayout_4->addWidget(pbMakePair, 1, 0, 1, 1);
-
         pbToConnectedGroups = new QPushButton(gbParam);
         pbToConnectedGroups->setObjectName(QStringLiteral("pbToConnectedGroups"));
 
         gridLayout_4->addWidget(pbToConnectedGroups, 0, 1, 1, 1);
 
-        pbRemovePairs = new QPushButton(gbParam);
-        pbRemovePairs->setObjectName(QStringLiteral("pbRemovePairs"));
+        pbSelectClosed = new QPushButton(gbParam);
+        pbSelectClosed->setObjectName(QStringLiteral("pbSelectClosed"));
 
-        gridLayout_4->addWidget(pbRemovePairs, 1, 1, 1, 1);
+        gridLayout_4->addWidget(pbSelectClosed, 2, 1, 1, 1);
 
         pbSymmetricCopy = new QPushButton(gbParam);
         pbSymmetricCopy->setObjectName(QStringLiteral("pbSymmetricCopy"));
@@ -348,10 +346,27 @@ public:
 
         gridLayout_4->addWidget(pbClosePolygon, 2, 0, 1, 1);
 
-        pbSelectClosed = new QPushButton(gbParam);
-        pbSelectClosed->setObjectName(QStringLiteral("pbSelectClosed"));
+        pbMakePair = new QPushButton(gbParam);
+        pbMakePair->setObjectName(QStringLiteral("pbMakePair"));
 
-        gridLayout_4->addWidget(pbSelectClosed, 2, 1, 1, 1);
+        gridLayout_4->addWidget(pbMakePair, 1, 0, 1, 1);
+
+        pbRemovePairs = new QPushButton(gbParam);
+        pbRemovePairs->setObjectName(QStringLiteral("pbRemovePairs"));
+
+        gridLayout_4->addWidget(pbRemovePairs, 1, 1, 1, 1);
+
+        pbPixelToMeter = new QPushButton(gbParam);
+        pbPixelToMeter->setObjectName(QStringLiteral("pbPixelToMeter"));
+
+        gridLayout_4->addWidget(pbPixelToMeter, 3, 0, 1, 1);
+
+        sbPixelToMeter = new QDoubleSpinBox(gbParam);
+        sbPixelToMeter->setObjectName(QStringLiteral("sbPixelToMeter"));
+        sbPixelToMeter->setDecimals(4);
+        sbPixelToMeter->setMaximum(999999);
+
+        gridLayout_4->addWidget(sbPixelToMeter, 3, 1, 1, 1);
 
 
         gridLayout_3->addWidget(gbParam, 2, 0, 1, 1);
@@ -449,20 +464,14 @@ public:
         pbRemoveLayers->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+R", 0));
         gbParam->setTitle(QApplication::translate("SewingEditorClass", "param", 0));
 #ifndef QT_NO_TOOLTIP
-        pbMakePair->setToolTip(QApplication::translate("SewingEditorClass", "make selected poly edges to pairs (ALT+M)", 0));
-#endif // QT_NO_TOOLTIP
-        pbMakePair->setText(QApplication::translate("SewingEditorClass", "Make pair", 0));
-        pbMakePair->setShortcut(QApplication::translate("SewingEditorClass", "Alt+M", 0));
-#ifndef QT_NO_TOOLTIP
         pbToConnectedGroups->setToolTip(QApplication::translate("SewingEditorClass", "convert selected path to polygons (ALT+C)", 0));
 #endif // QT_NO_TOOLTIP
         pbToConnectedGroups->setText(QApplication::translate("SewingEditorClass", "Connected groups", 0));
         pbToConnectedGroups->setShortcut(QApplication::translate("SewingEditorClass", "Alt+C", 0));
 #ifndef QT_NO_TOOLTIP
-        pbRemovePairs->setToolTip(QApplication::translate("SewingEditorClass", "remove selected pairs", 0));
+        pbSelectClosed->setToolTip(QApplication::translate("SewingEditorClass", "select closed polygons", 0));
 #endif // QT_NO_TOOLTIP
-        pbRemovePairs->setText(QApplication::translate("SewingEditorClass", "Remove pairs", 0));
-        pbRemovePairs->setShortcut(QApplication::translate("SewingEditorClass", "Alt+R", 0));
+        pbSelectClosed->setText(QApplication::translate("SewingEditorClass", "select closed", 0));
 #ifndef QT_NO_TOOLTIP
         pbSymmetricCopy->setToolTip(QApplication::translate("SewingEditorClass", "symmetrically copy selected polygons (ALT+S)", 0));
 #endif // QT_NO_TOOLTIP
@@ -474,9 +483,19 @@ public:
         pbClosePolygon->setText(QApplication::translate("SewingEditorClass", "cLose polygon", 0));
         pbClosePolygon->setShortcut(QApplication::translate("SewingEditorClass", "Alt+L", 0));
 #ifndef QT_NO_TOOLTIP
-        pbSelectClosed->setToolTip(QApplication::translate("SewingEditorClass", "select closed polygons", 0));
+        pbMakePair->setToolTip(QApplication::translate("SewingEditorClass", "make selected poly edges to pairs (ALT+M)", 0));
 #endif // QT_NO_TOOLTIP
-        pbSelectClosed->setText(QApplication::translate("SewingEditorClass", "select closed", 0));
+        pbMakePair->setText(QApplication::translate("SewingEditorClass", "Make pair", 0));
+        pbMakePair->setShortcut(QApplication::translate("SewingEditorClass", "Alt+M", 0));
+#ifndef QT_NO_TOOLTIP
+        pbRemovePairs->setToolTip(QApplication::translate("SewingEditorClass", "remove selected pairs", 0));
+#endif // QT_NO_TOOLTIP
+        pbRemovePairs->setText(QApplication::translate("SewingEditorClass", "Remove pairs", 0));
+        pbRemovePairs->setShortcut(QApplication::translate("SewingEditorClass", "Alt+R", 0));
+#ifndef QT_NO_TOOLTIP
+        pbPixelToMeter->setToolTip(QApplication::translate("SewingEditorClass", "1 meter  == ? pixels", 0));
+#endif // QT_NO_TOOLTIP
+        pbPixelToMeter->setText(QApplication::translate("SewingEditorClass", "pixel to meter", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

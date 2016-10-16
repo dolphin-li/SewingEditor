@@ -357,7 +357,15 @@ namespace svg
 	{
 		if (m_cmds.size() == 0)
 			return false;
-		return m_cmds.back() == GL_CLOSE_PATH_NV;
+		if (m_coords.size() < 6)
+			return false;
+		if (m_cmds.back() == GL_CLOSE_PATH_NV)
+			return true;
+
+		if (m_coords[0] == m_coords[m_coords.size() - 2]
+			&& m_coords[1] == m_coords[m_coords.size() - 1])
+			return true;
+		return false;
 	}
 
 	ldp::Float2 SvgPath::getStartPoint()const

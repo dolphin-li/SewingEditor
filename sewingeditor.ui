@@ -965,19 +965,6 @@
         <string>param</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="1">
-         <widget class="QPushButton" name="pbToConnectedGroups">
-          <property name="toolTip">
-           <string>convert selected path to polygons (ALT+C)</string>
-          </property>
-          <property name="text">
-           <string>Connected groups</string>
-          </property>
-          <property name="shortcut">
-           <string>Alt+C</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QPushButton" name="pbMakePair">
           <property name="toolTip">
@@ -988,6 +975,19 @@
           </property>
           <property name="shortcut">
            <string>Alt+M</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="pbToConnectedGroups">
+          <property name="toolTip">
+           <string>convert selected path to polygons (ALT+C)</string>
+          </property>
+          <property name="text">
+           <string>Connected groups</string>
+          </property>
+          <property name="shortcut">
+           <string>Alt+C</string>
           </property>
          </widget>
         </item>
@@ -1014,6 +1014,29 @@
           </property>
           <property name="shortcut">
            <string>Alt+S</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="pbClosePolygon">
+          <property name="toolTip">
+           <string>make selected polygon closed (ALT+L)</string>
+          </property>
+          <property name="text">
+           <string>cLose polygon</string>
+          </property>
+          <property name="shortcut">
+           <string>Alt+L</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="pbSelectClosed">
+          <property name="toolTip">
+           <string>select closed polygons</string>
+          </property>
+          <property name="text">
+           <string>select closed</string>
           </property>
          </widget>
         </item>

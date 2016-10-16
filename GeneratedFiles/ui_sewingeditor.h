@@ -70,10 +70,12 @@ public:
     QPushButton *pbRemoveLayers;
     QGroupBox *gbParam;
     QGridLayout *gridLayout_4;
-    QPushButton *pbToConnectedGroups;
     QPushButton *pbMakePair;
+    QPushButton *pbToConnectedGroups;
     QPushButton *pbRemovePairs;
     QPushButton *pbSymmetricCopy;
+    QPushButton *pbClosePolygon;
+    QPushButton *pbSelectClosed;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -321,15 +323,15 @@ public:
         gridLayout_4->setSpacing(6);
         gridLayout_4->setContentsMargins(11, 11, 11, 11);
         gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
-        pbToConnectedGroups = new QPushButton(gbParam);
-        pbToConnectedGroups->setObjectName(QStringLiteral("pbToConnectedGroups"));
-
-        gridLayout_4->addWidget(pbToConnectedGroups, 0, 1, 1, 1);
-
         pbMakePair = new QPushButton(gbParam);
         pbMakePair->setObjectName(QStringLiteral("pbMakePair"));
 
         gridLayout_4->addWidget(pbMakePair, 1, 0, 1, 1);
+
+        pbToConnectedGroups = new QPushButton(gbParam);
+        pbToConnectedGroups->setObjectName(QStringLiteral("pbToConnectedGroups"));
+
+        gridLayout_4->addWidget(pbToConnectedGroups, 0, 1, 1, 1);
 
         pbRemovePairs = new QPushButton(gbParam);
         pbRemovePairs->setObjectName(QStringLiteral("pbRemovePairs"));
@@ -340,6 +342,16 @@ public:
         pbSymmetricCopy->setObjectName(QStringLiteral("pbSymmetricCopy"));
 
         gridLayout_4->addWidget(pbSymmetricCopy, 0, 0, 1, 1);
+
+        pbClosePolygon = new QPushButton(gbParam);
+        pbClosePolygon->setObjectName(QStringLiteral("pbClosePolygon"));
+
+        gridLayout_4->addWidget(pbClosePolygon, 2, 0, 1, 1);
+
+        pbSelectClosed = new QPushButton(gbParam);
+        pbSelectClosed->setObjectName(QStringLiteral("pbSelectClosed"));
+
+        gridLayout_4->addWidget(pbSelectClosed, 2, 1, 1, 1);
 
 
         gridLayout_3->addWidget(gbParam, 2, 0, 1, 1);
@@ -437,15 +449,15 @@ public:
         pbRemoveLayers->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+R", 0));
         gbParam->setTitle(QApplication::translate("SewingEditorClass", "param", 0));
 #ifndef QT_NO_TOOLTIP
-        pbToConnectedGroups->setToolTip(QApplication::translate("SewingEditorClass", "convert selected path to polygons (ALT+C)", 0));
-#endif // QT_NO_TOOLTIP
-        pbToConnectedGroups->setText(QApplication::translate("SewingEditorClass", "Connected groups", 0));
-        pbToConnectedGroups->setShortcut(QApplication::translate("SewingEditorClass", "Alt+C", 0));
-#ifndef QT_NO_TOOLTIP
         pbMakePair->setToolTip(QApplication::translate("SewingEditorClass", "make selected poly edges to pairs (ALT+M)", 0));
 #endif // QT_NO_TOOLTIP
         pbMakePair->setText(QApplication::translate("SewingEditorClass", "Make pair", 0));
         pbMakePair->setShortcut(QApplication::translate("SewingEditorClass", "Alt+M", 0));
+#ifndef QT_NO_TOOLTIP
+        pbToConnectedGroups->setToolTip(QApplication::translate("SewingEditorClass", "convert selected path to polygons (ALT+C)", 0));
+#endif // QT_NO_TOOLTIP
+        pbToConnectedGroups->setText(QApplication::translate("SewingEditorClass", "Connected groups", 0));
+        pbToConnectedGroups->setShortcut(QApplication::translate("SewingEditorClass", "Alt+C", 0));
 #ifndef QT_NO_TOOLTIP
         pbRemovePairs->setToolTip(QApplication::translate("SewingEditorClass", "remove selected pairs", 0));
 #endif // QT_NO_TOOLTIP
@@ -456,6 +468,15 @@ public:
 #endif // QT_NO_TOOLTIP
         pbSymmetricCopy->setText(QApplication::translate("SewingEditorClass", "Symmetric copy", 0));
         pbSymmetricCopy->setShortcut(QApplication::translate("SewingEditorClass", "Alt+S", 0));
+#ifndef QT_NO_TOOLTIP
+        pbClosePolygon->setToolTip(QApplication::translate("SewingEditorClass", "make selected polygon closed (ALT+L)", 0));
+#endif // QT_NO_TOOLTIP
+        pbClosePolygon->setText(QApplication::translate("SewingEditorClass", "cLose polygon", 0));
+        pbClosePolygon->setShortcut(QApplication::translate("SewingEditorClass", "Alt+L", 0));
+#ifndef QT_NO_TOOLTIP
+        pbSelectClosed->setToolTip(QApplication::translate("SewingEditorClass", "select closed polygons", 0));
+#endif // QT_NO_TOOLTIP
+        pbSelectClosed->setText(QApplication::translate("SewingEditorClass", "select closed", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

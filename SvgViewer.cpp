@@ -111,7 +111,6 @@ void SvgViewer::resizeGL(int w, int h)
 			y0 = my - bw / s * s_twotimes;
 			y1 = my + bw / s * s_twotimes;
 		}
-
 		m_camera.setFrustum(x0, x1, y0, y1, m_camera.getFrustumNear(), m_camera.getFrustumFar());
 	} // end if svgManager
 

@@ -38,6 +38,7 @@ namespace svg
 		void findCorners();
 
 		bool isClosed()const;
+		void makeClosed();
 		int numCorners()const{ return (int)m_cornerPos.size(); }
 		const int numCornerEdges()const{ return numCorners() - !isClosed(); }
 		ldp::Float2 getCorner(int i)const{ 

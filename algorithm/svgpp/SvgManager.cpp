@@ -1212,6 +1212,41 @@ namespace svg
 		}
 	}
 
+	void SvgManager::closeSelectedPolygons()
+	{
+		for (auto layer_iter : m_layers)
+		{
+			auto layer = layer_iter.second;
+			if (!layer->selected) continue;
+			auto rootPtr = (SvgGroup*)layer->root.get();
+			std::vector<std::shared_ptr<SvgAbstractObject>> polys;
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, polys, true);
+			for (auto p : polys){
+				auto poly = (SvgPolyPath*)p.get();
+				poly->makeClosed();
+			}
+		} // end for layer_iter
+		updateIndex();
+		updateBound();
+	}
+
+	void SvgManager::selectClosedPolygons()
+	{
+		for (auto layer_iter : m_layers)
+		{
+			auto layer = layer_iter.second;
+			if (!layer->selected) continue;
+			auto rootPtr = (SvgGroup*)layer->root.get();
+			std::vector<std::shared_ptr<SvgAbstractObject>> polys;
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, polys, false);
+			for (auto p : polys){
+				auto poly = (SvgPolyPath*)p.get();
+				if (poly->isClosed())
+					poly->setSelected(true);
+			}
+		} // end for layer_iter
+	}
+
 #pragma region --graph related
 	typedef kdtree::PointTree<float, 2> Tree;
 	typedef Tree::Point Point;

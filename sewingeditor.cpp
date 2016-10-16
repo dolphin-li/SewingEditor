@@ -715,6 +715,42 @@ void SewingEditor::on_pbRemovePairs_clicked()
 	}
 }
 
+void SewingEditor::on_pbClosePolygon_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->closeSelectedPolygons();
+		ui.widget->updateGL();
+		pushHistory("close selected polygons");
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void SewingEditor::on_pbSelectClosed_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->selectClosedPolygons();
+		ui.widget->updateGL();
+		pushHistory("select closed polygons");
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
 void SewingEditor::on_pbSymmetricCopy_clicked()
 {
 	try

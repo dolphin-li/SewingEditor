@@ -55,6 +55,8 @@ public:
 	void on_pbRemoveLayers_clicked(); 
 	void on_pbMakePair_clicked();
 	void on_pbRemovePairs_clicked();
+	void on_pbClosePolygon_clicked();
+	void on_pbSelectClosed_clicked();
 	void on_listWidgetEditEnd(QWidget *editor, QAbstractItemDelegate::EndEditHint hint);
 protected:
 //////////////////////////////////////////////////////////////////////////

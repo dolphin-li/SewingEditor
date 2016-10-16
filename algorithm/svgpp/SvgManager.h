@@ -98,6 +98,8 @@ namespace svg
 		void splitSelectedPath(); // split selected, non-closed paths
 		bool mergeSelectedPath(); // merge will fail if the paths have been in different groups
 		void convertSelectedPathToConnectedGroups();
+		void closeSelectedPolygons();
+		void selectClosedPolygons();
 
 		///// pair operations
 		void makeSelectedToPair();

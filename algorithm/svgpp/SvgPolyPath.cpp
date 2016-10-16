@@ -358,6 +358,15 @@ namespace svg
 			m_coords[1] == m_coords[m_coords.size() - 1];
 	}
 
+	void SvgPolyPath::makeClosed()
+	{
+		if (isClosed()) return;
+		m_cmds.push_back(GL_LINE_TO_NV);
+		m_coords.insert(m_coords.end(), m_coords.begin(), m_coords.begin() + 2);
+		findCorners();
+		invalid();
+	}
+
 	void SvgPolyPath::findCorners()
 	{
 		m_cornerPos.clear();

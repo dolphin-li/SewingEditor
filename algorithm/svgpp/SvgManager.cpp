@@ -285,11 +285,30 @@ namespace svg
 		manager->m_currentLayerName = m_currentLayerName;
 		for (auto iter : m_layers)
 		{
-			auto layer = manager->addLayer(iter.second->name);
-			layer->root = iter.second->root->clone();
-			layer->name = iter.second->name;
-			layer->selected = iter.second->selected;
-		}
+			const auto old_layer = iter.second;
+			auto new_layer = manager->addLayer(old_layer->name);
+			new_layer->root = old_layer->root->clone();
+			new_layer->name = old_layer->name;
+			new_layer->selected = old_layer->selected;
+
+			// clone edgeGroups: since we have not updated index yet, we can use index to match groups
+			auto newRootPtr = (SvgGroup*)new_layer->root.get();
+			std::vector<std::shared_ptr<SvgAbstractObject>> newPaths;
+			std::map<int, SvgPolyPath*> newPathsMap;
+			newRootPtr->collectObjects(SvgAbstractObject::PolyPath, newPaths, false);
+			for (auto p : newPaths)
+				newPathsMap.insert(std::make_pair(p->getId(), (SvgPolyPath*)p.get()));
+			for (auto oldEg : old_layer->edgeGroups){
+				std::shared_ptr<SvgEdgeGroup> newEg(new SvgEdgeGroup);
+				for (auto oldg : oldEg->group){
+					auto newg = newPathsMap.at(oldg.first->getId());
+					newEg->group.insert(std::make_pair(newg, oldg.second));
+					newg->edgeGroups().insert(newEg.get());
+				} // g
+				newEg->color = oldEg->color;
+				new_layer->edgeGroups.push_back(newEg);
+			} // eg
+		} // end for layers
 		manager->updateIndex();
 		manager->updateBound();
 		return manager;
@@ -393,12 +412,8 @@ namespace svg
 		int idx = SvgAbstractObject::INDEX_BEGIN;
 		for (auto iter : m_layers)
 		{
-			// LDP TO DO: make edgeGroups clonable
-
-			//
 			iter.second->idxMap.clear();
 			iter.second->groups_for_selection.clear();
-			iter.second->edgeGroups.clear();
 			iter.second->updateIndex(iter.second->root.get(), idx);
 		}
 	}

@@ -264,6 +264,9 @@ namespace svg
 
 		copyTo(newTptr);
 
+		// edgeGroups are not clonable
+		newTptr->m_edgeGroups.clear();
+
 		return newT;
 	}
 

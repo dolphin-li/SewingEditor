@@ -95,20 +95,21 @@ namespace svg
 		// undo highlight for lastid and do highlight for this id
 		void highlightShapeByIndex(int lastId, int thisId);
 
-		// group may fail when the selected have been in different groups
+		///// group may fail when the selected have been in different groups
 		bool groupSelected();
 		void ungroupSelected();
 		void removeSelected();
 		void removeSingleNodeAndEmptyNode();
 
-		// path operations
+		///// path operations
 		void splitSelectedPath(); // split selected, non-closed paths
 		bool mergeSelectedPath(); // merge will fail if the paths have been in different groups
 		void convertSelectedPathToConnectedGroups();
 
-		// pair operations
+		///// pair operations
 		void makeSelectedToPair();
-		void removeSelectedPairs();
+		// if not onlyUse.., then pairs on selected poly will be removed
+		void removeSelectedPairs(bool onlyUseSelectedEdges = true); 
 	protected:
 		void removeSelected(SvgAbstractObject* obj);
 		void removeInvalidPaths(SvgAbstractObject* obj);

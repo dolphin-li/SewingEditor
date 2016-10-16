@@ -488,7 +488,7 @@ namespace svg
 
 	ldp::Float4 SvgManager::getBound()const
 	{
-		ldp::Float4 box;
+		ldp::Float4 box(FLT_MAX, -FLT_MAX, FLT_MAX, -FLT_MAX);
 		for (auto iter : m_layers)
 		{
 			box = iter.second->root->unionBound(box);
@@ -867,6 +867,7 @@ namespace svg
 
 	void SvgManager::removeSingleNodeAndEmptyNode()
 	{
+		removeSelectedPairs(false);
 		for (auto iter : m_layers)
 			removeInvalidPaths(iter.second->root.get());
 		for (auto iter : m_layers)
@@ -877,6 +878,7 @@ namespace svg
 
 	void SvgManager::removeSelected()
 	{
+		removeSelectedPairs(false);
 		for (auto layer_iter : m_layers)
 		{
 			auto layer = layer_iter.second;
@@ -1786,7 +1788,7 @@ namespace svg
 		} // end for iter
 	}
 
-	void SvgManager::removeSelectedPairs()
+	void SvgManager::removeSelectedPairs(bool onlyUseSelectedEdges)
 	{
 		for (auto iter : m_layers)
 		{
@@ -1800,7 +1802,7 @@ namespace svg
 				bool selected = false;
 				for (auto g : eg->group){
 					auto eSet = g.first->selectedEdgeIds();
-					if (g.first->isSelected() && eSet.find(g.second) != eSet.end()){
+					if (g.first->isSelected() && (eSet.find(g.second) != eSet.end() || !onlyUseSelectedEdges)){
 						selected = true;
 						g.first->setSelected(true, -1);
 					}

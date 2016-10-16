@@ -97,16 +97,15 @@ namespace svg
 			glColor3fv(attribute()->m_color.ptr());
 			if (isHighlighted() || isSelected() || ancestorSelected)
 				glColor3f(0, 0, 1);
-			if (sEdges.find(i) != sEdges.end())
-				glColor3f(1, 0, 0);
-			if (m_edgeGroups.size())
-			{
+			if (m_edgeGroups.size()){
 				for (auto g : m_edgeGroups){
 					auto iter = g->group.find(std::make_pair(this, i));
 					if (iter != g->group.end())
 						glColor3fv(g->color.ptr());
 				}
 			}
+			if (sEdges.find(i) != sEdges.end())
+				glColor3f(1, 0, 0);
 			if (hEdges.find(i) != hEdges.end())
 				glColor3f(1, 0, 0);
 			glStencilStrokePathNV(m_edgeGLIds[i]->id, 1, ~0);

@@ -469,6 +469,7 @@ namespace svg
 	{
 		for (auto layer_iter : m_layers)
 		{
+			std::set<SvgPolyPath*> selectedPoly;
 			auto layer = layer_iter.second;
 			if (!layer->selected) continue;
 			for (auto iter : layer->idxMap)
@@ -481,11 +482,15 @@ namespace svg
 					if (id >= SvgAbstractObject::INDEX_BEGIN){
 						obj->setSelected(obj->isMyValidIdRange(id), -1); // clear previous selection
 						obj->setSelected(obj->isMyValidIdRange(id), id);
+						if (obj->objectType() == SvgAbstractObject::PolyPath && obj->isMyValidIdRange(id))
+							selectedPoly.insert((SvgPolyPath*)obj);
 					}
 					break;
 				case svg::SvgManager::SelectUnion:
 					if (obj->isMyValidIdRange(id))
 						obj->setSelected(true, id);
+					if (obj->objectType() == SvgAbstractObject::PolyPath && obj->isMyValidIdRange(id))
+						selectedPoly.insert((SvgPolyPath*)obj);
 					break;
 				case svg::SvgManager::SlectionUnionInverse:
 					if (obj->isMyValidIdRange(id) && firstVisit)
@@ -503,9 +508,20 @@ namespace svg
 					break;
 				default:
 					break;
-				}
+				} // end switch
+			} // end for iter
+
+			for (auto poly : selectedPoly)
+			{
+				for (auto g : layer->edgeGroups){
+					auto it = g->group.find(std::make_pair(poly, poly->edgeIdFromGlobalId(id)));
+					if (it != g->group.end()){
+						for (auto np : g->group)
+							np.first->setSelected(true, np.first->globalIdFromEdgeId(np.second));
+					}
+				} // end for g
 			}
-		}
+		} // end for layer_iter
 	}
 
 	void SvgManager::selectShapeByIndex(const std::set<int>& ids, SelectOp op)
@@ -1734,7 +1750,6 @@ namespace svg
 					if (g.first->isSelected() && eSet.find(g.second) != eSet.end()){
 						selected = true;
 						g.first->setSelected(true, -1);
-						break;
 					}
 				} // end for g
 				if (!selected)

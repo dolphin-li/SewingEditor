@@ -1696,11 +1696,11 @@ namespace svg
 					// merge overlapped groups
 					auto tmp = layer->edgeGroups;
 					layer->edgeGroups.clear();
-					for (auto g : tmp){
-						if (g->intersect(*newEg))
-							newEg->mergeWith(*g);
+					for (auto eg : tmp){
+						if (eg->intersect(*newEg))
+							newEg->mergeWith(*eg);
 						else
-							layer->edgeGroups.push_back(g);
+							layer->edgeGroups.push_back(eg);
 					}
 					newEg->color = color_table();
 					layer->edgeGroups.push_back(newEg);
@@ -1719,6 +1719,35 @@ namespace svg
 
 	void SvgManager::removeSelectedPairs()
 	{
+		for (auto iter : m_layers)
+		{
+			auto layer = iter.second;
+			auto rootPtr = (SvgGroup*)layer->root.get();
 
+			// remove selected groups
+			auto tmp = layer->edgeGroups;
+			layer->edgeGroups.clear();
+			for (auto eg : tmp){
+				bool selected = false;
+				for (auto g : eg->group){
+					auto eSet = g.first->selectedEdgeIds();
+					if (g.first->isSelected() && eSet.find(g.second) != eSet.end()){
+						selected = true;
+						g.first->setSelected(true, -1);
+						break;
+					}
+				} // end for g
+				if (!selected)
+					layer->edgeGroups.push_back(eg);
+			}
+
+			// re-link
+			for (auto eg : tmp)
+			for (auto g : eg->group)
+				g.first->edgeGroups().clear();
+			for (auto eg : layer->edgeGroups)
+			for (auto g : eg->group)
+				g.first->edgeGroups().insert(eg.get());
+		} // end for iter
 	}
 } // namespace svg

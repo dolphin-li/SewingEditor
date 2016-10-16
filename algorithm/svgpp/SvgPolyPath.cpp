@@ -291,6 +291,28 @@ namespace svg
 		return newT;
 	}
 
+	std::shared_ptr<SvgAbstractObject> SvgPolyPath::deepclone(bool selectedOnly)const
+	{
+		if (selectedOnly)
+		{
+			if (!(hasSelectedChildren() || isSelected()))
+				throw std::exception("ERROR: SvgPolyPath::clone(), mis-called");
+		}
+		std::shared_ptr<SvgAbstractObject> newT(new SvgPolyPath());
+		auto newTptr = (SvgPolyPath*)newT.get();
+
+		copyTo(newTptr);
+
+		newTptr->m_gl_path_res.reset(new GLPathResource());
+		newTptr->m_edgeGLIds.clear();
+
+		// edgeGroups are not clonable
+		newTptr->m_edgeGroups.clear();
+
+		newTptr->invalid();
+		return newT;
+	}
+
 	TiXmlElement* SvgPolyPath::toXML(TiXmlNode* parent)const
 	{
 		std::string cmdStr;

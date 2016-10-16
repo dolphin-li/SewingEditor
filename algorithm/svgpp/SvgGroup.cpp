@@ -98,6 +98,33 @@ namespace svg
 		return g;
 	}
 
+	std::shared_ptr<SvgAbstractObject> SvgGroup::deepclone(bool selectedOnly)const
+	{
+		std::shared_ptr<SvgAbstractObject> g(new SvgGroup());
+		auto gptr = (SvgGroup*)g.get();
+		if (selectedOnly)
+		{
+			if (!(hasSelectedChildren() || isSelected()))
+				throw std::exception("ERROR: SvgGroup::clone(), mis-called");
+		}
+
+		copyTo(gptr);
+		gptr->m_children.clear();
+		for (auto c : m_children)
+		{
+			if (selectedOnly)
+			{
+				if (!(c->hasSelectedChildren() || c->isSelected()))
+					continue;
+			}
+			auto newC = c->deepclone(selectedOnly);
+			newC->setParent(gptr);
+			gptr->m_children.push_back(newC);
+		}
+
+		return g;
+	}
+
 	void SvgGroup::collectObjects(ObjectType type, 
 		std::vector<std::shared_ptr<SvgAbstractObject>>& objects,
 		bool selectedOnly)const

@@ -25,7 +25,6 @@
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
-#include "squarewidget.h"
 #include "svgviewer.h"
 
 QT_BEGIN_NAMESPACE
@@ -50,7 +49,6 @@ public:
     QAction *actionSelect_connected;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
-    SquareWidget *squareWidget;
     SvgViewer *widget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -75,6 +73,7 @@ public:
     QPushButton *pbToConnectedGroups;
     QPushButton *pbMakePair;
     QPushButton *pbRemovePairs;
+    QPushButton *pbSymmetricCopy;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -190,13 +189,10 @@ public:
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        squareWidget = new SquareWidget(centralWidget);
-        squareWidget->setObjectName(QStringLiteral("squareWidget"));
-        widget = new SvgViewer(squareWidget);
+        widget = new SvgViewer(centralWidget);
         widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(130, 60, 621, 511));
 
-        gridLayout->addWidget(squareWidget, 0, 0, 1, 1);
+        gridLayout->addWidget(widget, 0, 0, 1, 1);
 
         SewingEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(SewingEditorClass);
@@ -340,6 +336,11 @@ public:
 
         gridLayout_4->addWidget(pbRemovePairs, 1, 1, 1, 1);
 
+        pbSymmetricCopy = new QPushButton(gbParam);
+        pbSymmetricCopy->setObjectName(QStringLiteral("pbSymmetricCopy"));
+
+        gridLayout_4->addWidget(pbSymmetricCopy, 0, 0, 1, 1);
+
 
         gridLayout_3->addWidget(gbParam, 2, 0, 1, 1);
 
@@ -450,6 +451,11 @@ public:
 #endif // QT_NO_TOOLTIP
         pbRemovePairs->setText(QApplication::translate("SewingEditorClass", "Remove pairs", 0));
         pbRemovePairs->setShortcut(QApplication::translate("SewingEditorClass", "Alt+R", 0));
+#ifndef QT_NO_TOOLTIP
+        pbSymmetricCopy->setToolTip(QApplication::translate("SewingEditorClass", "symmetrically copy selected polygons (ALT+S)", 0));
+#endif // QT_NO_TOOLTIP
+        pbSymmetricCopy->setText(QApplication::translate("SewingEditorClass", "Symmetric copy", 0));
+        pbSymmetricCopy->setShortcut(QApplication::translate("SewingEditorClass", "Alt+S", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

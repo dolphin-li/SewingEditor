@@ -59,8 +59,19 @@ void SvgViewer::resetCamera()
 	if (m_svgManager)
 	{
 		ldp::Float4 b = m_svgManager->getBound();
-		m_camera.setFrustum(b[0], b[1], b[2], b[3], -1, 1);
-	}
+		float x0 = b[0], x1 = b[1], y0 = b[2], y1 = b[3];
+		float bw = (x1 - x0) / 2, bh = (y1 - y0) / 2, mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+		float s = width() / float(height());
+		if (bw / bh < s){
+			x0 = mx - bh * s;
+			x1 = mx + bh * s;
+		}
+		else{
+			y0 = my - bw / s;
+			y1 = my + bw / s;
+		}
+		m_camera.setFrustum(x0, x1, y0, y1, -1, 1);
+	} // end if svgManager
 }
 
 void SvgViewer::initializeGL()
@@ -77,14 +88,34 @@ void SvgViewer::initializeGL()
 		printf("error: invalid depth fbo!\n");
 	if (glGetError() != GL_NO_ERROR)
 		printf("%s\n", gluErrorString(glGetError()));
-
-	m_svgManager->init(&m_camera);
 }
 
 void SvgViewer::resizeGL(int w, int h)
 {
-	m_camera.setViewPort(0, w, 0, h);
+	if (m_svgManager)
+	{
+		ldp::Float4 b = m_svgManager->getBound();
+		float vw = m_camera.getViewPortRight() - m_camera.getViewPortLeft();
+		float vh = m_camera.getViewPortBottom() - m_camera.getViewPortTop();
+		float vs = vw / vh;
+		float x0 = m_camera.getFrustumLeft(), x1 = m_camera.getFrustumRight();
+		float y0 = m_camera.getFrustumTop(), y1 = m_camera.getFrustumBottom();
+		float last_bh = (x1 - x0) / vs, last_bw = (y1 - y0) * vs;
+		float bw = (b[1] - b[0]) / 2, bh = (b[3] - b[2]) / 2, mx = (x0 + x1) / 2, my = (y1 + y0) / 2;
+		float s = w / float(h), s_twotimes = bw / last_bw;
+		if (bw / bh < s){
+			x0 = mx - bh * s * s_twotimes;
+			x1 = mx + bh * s * s_twotimes;
+		}
+		else{
+			y0 = my - bw / s * s_twotimes;
+			y1 = my + bw / s * s_twotimes;
+		}
 
+		m_camera.setFrustum(x0, x1, y0, y1, m_camera.getFrustumNear(), m_camera.getFrustumFar());
+	} // end if svgManager
+
+	m_camera.setViewPort(0, w, 0, h);
 	if (m_fbo)
 		delete m_fbo;
 	QGLFramebufferObjectFormat fmt;

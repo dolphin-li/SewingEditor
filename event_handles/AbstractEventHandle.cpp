@@ -130,8 +130,7 @@ void AbstractEventHandle::wheelEvent(QWheelEvent *ev)
 	b = dy + t + (b - t - dy) * s;
 	t = dy + t - dy * s;
 	m_viewer->camera().setFrustum(l, r, t, b, 
-		m_viewer->camera().getFrustumNear(), m_viewer->camera()
-		.getFrustumFar());
+		m_viewer->camera().getFrustumNear(), m_viewer->camera().getFrustumFar());
 }
 
 void AbstractEventHandle::keyPressEvent(QKeyEvent *ev)

@@ -491,18 +491,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="SquareWidget" name="squareWidget" native="true">
-      <widget class="SvgViewer" name="widget" native="true">
-       <property name="geometry">
-        <rect>
-         <x>130</x>
-         <y>60</y>
-         <width>621</width>
-         <height>511</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
+     <widget class="SvgViewer" name="widget" native="true"/>
     </item>
    </layout>
   </widget>
@@ -1015,6 +1004,19 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pbSymmetricCopy">
+          <property name="toolTip">
+           <string>symmetrically copy selected polygons (ALT+S)</string>
+          </property>
+          <property name="text">
+           <string>Symmetric copy</string>
+          </property>
+          <property name="shortcut">
+           <string>Alt+S</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
@@ -1168,12 +1170,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>SquareWidget</class>
-   <extends>QWidget</extends>
-   <header>squarewidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>SvgViewer</class>
    <extends>QWidget</extends>

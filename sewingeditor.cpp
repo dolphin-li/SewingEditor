@@ -7,8 +7,6 @@ SewingEditor::SewingEditor(QWidget *parent)
 {
 	ui.setupUi(this);
 
-	ui.squareWidget->setChildWidget(ui.widget);
-
 	new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(showFullScreen()));
 	new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(showNormal()));
 
@@ -47,9 +45,6 @@ void SewingEditor::dropEvent(QDropEvent* event)
 	{
 		ui.widget->loadSvg(name);
 		pushHistory("load svg");
-		float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
-		ui.squareWidget->setAspect(asp);
-		ui.squareWidget->adjustChildWidget();
 		ui.widget->updateGL();
 	}
 	catch (std::exception e)
@@ -124,9 +119,7 @@ void SewingEditor::on_actionLoad_svg_triggered()
 			return;
 		ui.widget->loadSvg(name);
 		pushHistory("load svg");
-		float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
-		ui.squareWidget->setAspect(asp);
-		ui.squareWidget->adjustChildWidget();
+		ui.widget->resetCamera();
 		ui.widget->updateGL();
 		initLayerList();
 		setWindowTitle(name);
@@ -426,12 +419,7 @@ void SewingEditor::rollBackTo(int pos)
 		ui.widget->setSvgManager(m_rollBackControls[m_rollPos].data->clone());
 		ldp::Float4 thisBound = ui.widget->getSvgManager()->getBound();
 		if (lastBound != thisBound)
-		{
-			float asp = ui.widget->getSvgManager()->width() / (float)ui.widget->getSvgManager()->height();
-			ui.squareWidget->setAspect(asp);
-			ui.squareWidget->adjustChildWidget();
 			ui.widget->resetCamera();
-		}
 		ui.widget->updateGL();
 
 		updateHistoryList();
@@ -716,6 +704,24 @@ void SewingEditor::on_pbRemovePairs_clicked()
 		ui.widget->getSvgManager()->removeSelectedPairs();
 		ui.widget->updateGL();
 		pushHistory("remove pairs");
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void SewingEditor::on_pbSymmetricCopy_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->symmetryCopySelectedPoly();
+		ui.widget->updateGL();
+		pushHistory("symmetric copy");
 	}
 	catch (std::exception e)
 	{

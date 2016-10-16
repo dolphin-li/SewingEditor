@@ -31,6 +31,7 @@ public:
 	void on_actionUndo_triggered();
 	void on_actionRedo_triggered();
 	void on_pbToConnectedGroups_clicked();
+	void on_pbSymmetricCopy_clicked();
 	void leftDocButtonsClicked(int i);
 public:
 	void initLeftDockActions();

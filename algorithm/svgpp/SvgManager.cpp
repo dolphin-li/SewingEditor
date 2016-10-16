@@ -3,7 +3,6 @@
 
 #include "SvgManager.h"
 
-#include "Camera.h"
 #include "util.h"
 #include "kdtree\PointTree.h"
 
@@ -18,6 +17,7 @@
 #include "SvgText.h"
 #include "SvgGroup.h"
 
+using namespace ldp;
 namespace svg
 {
 	const static float PATH_CONTACT_DIST_THRE = 0.2f;
@@ -282,11 +282,6 @@ namespace svg
 		selected = false;
 	}
 
-	SvgManager::SvgManager()
-	{
-		m_renderCam = nullptr;
-	}
-
 	SvgManager::~SvgManager()
 	{
 
@@ -295,7 +290,6 @@ namespace svg
 	std::shared_ptr<SvgManager> SvgManager::clone()const
 	{
 		std::shared_ptr<SvgManager> manager(new SvgManager());
-		manager->m_renderCam = m_renderCam;
 		manager->m_currentLayerName = m_currentLayerName;
 		for (auto iter : m_layers)
 		{
@@ -304,33 +298,88 @@ namespace svg
 			new_layer->root = old_layer->root->clone();
 			new_layer->name = old_layer->name;
 			new_layer->selected = old_layer->selected;
-
-			// clone edgeGroups: since we have not updated index yet, we can use index to match groups
-			auto newRootPtr = (SvgGroup*)new_layer->root.get();
-			std::vector<std::shared_ptr<SvgAbstractObject>> newPaths;
-			std::map<int, SvgPolyPath*> newPathsMap;
-			newRootPtr->collectObjects(SvgAbstractObject::PolyPath, newPaths, false);
-			for (auto p : newPaths)
-				newPathsMap.insert(std::make_pair(p->getId(), (SvgPolyPath*)p.get()));
-			for (auto oldEg : old_layer->edgeGroups){
-				std::shared_ptr<SvgEdgeGroup> newEg(new SvgEdgeGroup);
-				for (auto oldg : oldEg->group){
-					auto newg = newPathsMap.at(oldg.first->getId());
-					newEg->group.insert(std::make_pair(newg, oldg.second));
-					newg->edgeGroups().insert(newEg.get());
-				} // g
-				newEg->color = oldEg->color;
-				new_layer->edgeGroups.push_back(newEg);
-			} // eg
+			cloneEdgeGroup(old_layer.get(), new_layer, false);
 		} // end for layers
 		manager->updateIndex();
 		manager->updateBound();
 		return manager;
 	}
 
-	void SvgManager::init(Camera* cam)
+	void SvgManager::cloneEdgeGroup(const Layer* old_layer, Layer* new_layer, bool selectionOnly)const
 	{
-		m_renderCam = cam;
+		// clone edgeGroups: since we have not updated index yet, we can use index to match groups
+		auto newRootPtr = (SvgGroup*)new_layer->root.get();
+		std::vector<std::shared_ptr<SvgAbstractObject>> newPaths;
+		std::map<int, SvgPolyPath*> newPathsMap;
+		newRootPtr->collectObjects(SvgAbstractObject::PolyPath, newPaths, selectionOnly);
+		for (auto p : newPaths)
+			newPathsMap.insert(std::make_pair(p->getId(), (SvgPolyPath*)p.get()));
+		for (auto oldEg : old_layer->edgeGroups){
+			std::shared_ptr<SvgEdgeGroup> newEg(new SvgEdgeGroup);
+			for (auto oldg : oldEg->group){
+				auto newg_iter = newPathsMap.find(oldg.first->getId());
+				if (newg_iter != newPathsMap.end()){
+					auto newg = newg_iter->second;
+					newEg->group.insert(std::make_pair(newg, oldg.second));
+					newg->edgeGroups().insert(newEg.get());
+				}
+			} // g
+			if (newEg->group.size() > 1){
+				newEg->color = oldEg->color;
+				new_layer->edgeGroups.push_back(newEg);
+			}
+		} // eg
+	}
+
+	void SvgManager::symmetryCopySelectedPoly(int axis)
+	{
+		if (axis == -1)
+			axis = width() > height();
+		if (axis < 0 || axis > 1)
+			throw std::exception("invalid axis configuration!");
+
+		for (auto layer_iter : m_layers)
+		{
+			auto layer = layer_iter.second;
+			if (!layer->selected) continue;
+			
+			ldp::Float4 box = layer->root->getBound();
+			const float axis_sympos = box[axis * 2 + 1];
+			// clone edgeGroups: since we have not updated index yet, we can use index to match groups
+			auto rootPtr = (SvgGroup*)layer->root.get();
+			std::vector<std::shared_ptr<SvgAbstractObject>> oldPaths;
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, oldPaths, true);
+			std::map<int, SvgPolyPath*> newPathsMap;
+
+			for (const auto& oldp : oldPaths){
+				auto newp = ((SvgPolyPath*)oldp.get())->deepclone();
+				auto newpoly = (SvgPolyPath*)newp.get();
+				newPathsMap.insert(std::make_pair(newp->getId(), newpoly));
+				for (size_t i = 0; i < newpoly->m_coords.size(); i += 2){
+					float* coord = newpoly->m_coords.data() + i;
+					coord[axis] = 2 * axis_sympos - coord[axis];
+				}
+				rootPtr->m_children.push_back(newp);
+			}// end for p
+
+			std::vector<std::shared_ptr<SvgEdgeGroup>> newEgs;
+			for (const auto& oldEg : layer->edgeGroups){
+				std::shared_ptr<SvgEdgeGroup> newEg(new SvgEdgeGroup);
+				for (const auto& oldg : oldEg->group){
+					auto newg_iter = newPathsMap.find(oldg.first->getId());
+					if (newg_iter != newPathsMap.end()){
+						newEg->group.insert(std::make_pair(newg_iter->second, oldg.second));
+						newg_iter->second->edgeGroups().insert(newEg.get());
+					}
+				} // g
+				newEg->color = oldEg->color;
+				newEgs.push_back(newEg);
+			} // eg
+			layer->edgeGroups.insert(layer->edgeGroups.end(), newEgs.begin(), newEgs.end());
+		} // end for layers
+
+		updateIndex();
+		updateBound();
 	}
 
 	void SvgManager::load(const char* svg_file, bool clearOld)
@@ -373,11 +422,6 @@ namespace svg
 		{
 			m_currentLayerName = m_layers.begin()->second->name;
 			removeSingleNodeAndEmptyNode();
-			if (m_renderCam)
-			{
-				ldp::Float4 b = getBound();
-				m_renderCam->setFrustum(b[0], b[1], b[2], b[3], -1, 1);
-			}
 		}// end if m_layers.size()
 	}
 
@@ -796,8 +840,7 @@ namespace svg
 			if (commonParent.get() == nullptr)
 				continue;
 
-			if (ret == false)
-			{
+			if (ret == false){
 				printf("error in grouping: all selected must be not in different groups previously!\n");
 				return false;
 			}
@@ -813,10 +856,8 @@ namespace svg
 			std::shared_ptr<SvgAbstractObject> newGroup(new SvgGroup());
 			newGroup->setSelected(true);
 			newGroup->setParent(commonParentG);
-			for (auto c : tmp)
-			{
-				if (c->isSelected())
-				{
+			for (auto c : tmp){
+				if (c->isSelected()){
 					c->setParent((SvgGroup*)newGroup.get());
 					c->setSelected(false);
 					((SvgGroup*)newGroup.get())->m_children.push_back(c);
@@ -825,7 +866,7 @@ namespace svg
 					commonParentG->m_children.push_back(c);
 			}
 			commonParentG->m_children.push_back(newGroup);
-		}
+		} // end for layer_iter
 
 		updateIndex();
 		updateBound();
@@ -841,26 +882,22 @@ namespace svg
 			std::set<SvgGroup*> groups;
 			ungroupSelected_collect(layer->root.get(), groups);
 
-			for (auto g : groups)
-			{
+			for (auto g : groups){
 				assert(g->parent()->objectType() == g->Group);
 				SvgGroup* pg = (SvgGroup*)g->parent();
-				for (auto child : g->m_children)
-				{
+				for (auto child : g->m_children){
 					child->setParent(g->parent());
 					child->setSelected(true);
 					pg->m_children.push_back(child);
 				}
-				for (auto it = pg->m_children.begin(); it != pg->m_children.end(); ++it)
-				{
-					if (it->get() == g)
-					{
+				for (auto it = pg->m_children.begin(); it != pg->m_children.end(); ++it){
+					if (it->get() == g){
 						pg->m_children.erase(it);
 						break;
 					}
 				}
-			}
-		}
+			} // end for g
+		} // end for layer_iter
 		updateIndex();
 		updateBound();
 	}
@@ -1069,9 +1106,7 @@ namespace svg
 			std::shared_ptr<SvgAbstractObject> path;
 			for (auto c : tmpChildren)
 			{
-				if ((c->objectType() != SvgAbstractObject::Path
-					&& c->objectType() != SvgAbstractObject::PolyPath)
-					|| !c->isSelected())
+				if (c->objectType() != SvgAbstractObject::Path || !c->isSelected())
 					parentPtr->m_children.push_back(c);
 				else
 				{
@@ -1117,7 +1152,7 @@ namespace svg
 			for (auto& c : g->m_children)
 				splitPath(c, to_single_seg);
 		}
-		else if ((obj->objectType() == obj->Path || obj->objectType() ==obj->PolyPath) && obj->isSelected())
+		else if (obj->objectType() == obj->Path && obj->isSelected())
 		{
 			SvgPath* p = (SvgPath*)obj.get();
 			auto newGroup = p->splitToSegments(to_single_seg);
@@ -1688,6 +1723,8 @@ namespace svg
 				c->setParent(g0);
 				g0->m_children.push_back(c);
 			}
+			iter0->second->edgeGroups.insert(iter0->second->edgeGroups.end(),
+				iter.second->edgeGroups.begin(), iter.second->edgeGroups.end());
 		}
 		m_layers.insert(*iter0);
 
@@ -1703,43 +1740,42 @@ namespace svg
 		if (iter == m_layers.end())
 			throw std::exception(("rename layer, not found: " + oldname).c_str());
 
+		auto oldLayer = iter->second;
 		auto newLayer = addLayer(newname);
-		newLayer->selected = iter->second->selected;
-		newLayer->root = iter->second->root->clone();
+		newLayer->selected = oldLayer->selected;
+		newLayer->root = oldLayer->root->clone();
+		cloneEdgeGroup(oldLayer.get(), newLayer, false);
 
 		removeLayer(oldname);
-		updateIndex();
-		updateBound();
 	}
 
 	SvgManager::Layer* SvgManager::selectedToNewLayer()
 	{
 		auto newRoot = std::shared_ptr<SvgAbstractObject>(new SvgGroup);
 		auto newRootPtr = (SvgGroup*)newRoot.get();
+		auto newLayer = addLayer();
+		newLayer->root = newRoot;
 		for (auto layer_iter : m_layers)
 		{
 			auto layer = layer_iter.second;
 			if (!layer->selected) continue;
-			if (layer->root->hasSelectedChildren() || layer->root->isSelected())
-			{
-				auto g = layer->root->clone(true);
+			if (layer->root->hasSelectedChildren() || layer->root->isSelected()){
+				auto g = layer->root->deepclone(true);
 				auto gptr = (SvgGroup*)g.get();
-				for (auto c : gptr->m_children)
-				{
+				for (auto c : gptr->m_children){
 					c->setParent(newRootPtr);
 					newRootPtr->m_children.push_back(c);
 				}
-			}
-		}
+				cloneEdgeGroup(layer.get(), newLayer, true);
+			} // end if 
+		} // end for layer iter
 
-		auto layer = addLayer();
-		layer->root = newRoot;
 		if (newRootPtr->m_children.size())
 		{
 			updateIndex();
 			updateBound();
 		}
-		return layer;
+		return newLayer;
 	}
 
 	////////////////////////////////////////////////////////////////

@@ -299,6 +299,24 @@ namespace svg
 		return newT;
 	}
 
+	std::shared_ptr<SvgAbstractObject> SvgPath::deepclone(bool selectedOnly)const
+	{
+		if (selectedOnly)
+		{
+			if (!(hasSelectedChildren() || isSelected()))
+				throw std::exception("ERROR: SvgPath::clone(), mis-called");
+		}
+		std::shared_ptr<SvgAbstractObject> newT(new SvgPath());
+		auto newTptr = (SvgPath*)newT.get();
+
+		copyTo(newTptr);
+
+		newTptr->m_gl_path_res.reset(new GLPathResource());
+		newTptr->invalid();
+
+		return newT;
+	}
+
 	TiXmlElement* SvgPath::toXML(TiXmlNode* parent)const
 	{
 		std::string cmdStr;

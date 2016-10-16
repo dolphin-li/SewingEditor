@@ -26,6 +26,8 @@ namespace svg
 		virtual void render();
 		virtual void renderId();
 		virtual std::shared_ptr<SvgAbstractObject> clone(bool selectedOnly = false)const;
+		// similar with clone, bug GL context also cloned.
+		virtual std::shared_ptr<SvgAbstractObject> deepclone(bool selectedOnly = false)const;
 		virtual TiXmlElement* toXML(TiXmlNode* parent)const;
 		virtual void copyTo(SvgAbstractObject* obj)const;
 		virtual int numId()const;

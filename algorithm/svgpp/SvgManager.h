@@ -17,15 +17,6 @@ namespace svg
 		struct Layer
 		{
 			Layer();
-
-			bool operator < (const Layer& rhs)
-			{
-				return name < rhs.name;
-			}
-			bool operator == (const Layer& rhs)
-			{
-				return name == rhs.name;
-			}
 			void updateIndex(SvgAbstractObject* obj, int &idx);
 
 			std::shared_ptr<SvgAbstractObject> root;
@@ -48,10 +39,9 @@ namespace svg
 			SelectInverse,
 		};
 	public:
-		SvgManager();
+		SvgManager(){}
 		~SvgManager();
 
-		void init(Camera* cam);
 		void load(const char* svg_file, bool clearOld = true);
 		void save(const char* svg_file, bool selectionOnly=false);
 		void render();
@@ -70,6 +60,9 @@ namespace svg
 		Layer* selectedToNewLayer();
 		const std::map<std::string, std::shared_ptr<Layer>>& layers()const { return m_layers; }
 		
+		// extend all polyPaths symmetrically
+		// axis: 0=x, 1=y, -1=auto
+		void symmetryCopySelectedPoly(int axis = -1);
 
 		int width()const;
 		int height()const;
@@ -120,8 +113,8 @@ namespace svg
 		void ungroupSelected_collect(SvgAbstractObject* obj, std::set<SvgGroup*>& groups);
 		void removeSingleNodeAndEmptyNode(std::shared_ptr<SvgAbstractObject>& obj);
 		void splitPath(std::shared_ptr<SvgAbstractObject>& obj, bool to_single_segs);
+		void cloneEdgeGroup(const Layer* oldlayer, Layer* newlayer, bool selectionOnly)const;
 	private:
-		Camera* m_renderCam;
 		std::map<std::string, std::shared_ptr<Layer>> m_layers;
 		std::string m_currentLayerName;
 	};

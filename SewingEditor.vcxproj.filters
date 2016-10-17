@@ -925,6 +925,9 @@
     <ClCompile Include="algorithm\SC\DelFEM\src\com\vector3d.cpp">
       <Filter>algorithm\SC\DelFEM\com</Filter>
     </ClCompile>
+    <ClCompile Include="event_handles\ClothMeshEventHandle.cpp">
+      <Filter>event_handles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="sewingeditor.ui">
@@ -1588,6 +1591,9 @@
     </ClInclude>
     <ClInclude Include="algorithm\SC\DelFEM\include\delfem\rigid\rigidbody.h">
       <Filter>algorithm\SC\DelFEM\rigid</Filter>
+    </ClInclude>
+    <ClInclude Include="event_handles\ClothMeshEventHandle.h">
+      <Filter>event_handles</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_meshwindow.h"
+
 class MeshWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -10,10 +11,14 @@ class MeshWindow : public QMainWindow
 public:
 	MeshWindow(QWidget *parent = 0);
 	~MeshWindow();
+
+	BaseMeshViewer* getViewer();
+	const BaseMeshViewer* getViewer()const;
+protected:
 	void dragEnterEvent(QDragEnterEvent* ev);
 	void dropEvent(QDropEvent* ev);
-public:
 	void initLeftDockActions();
+	virtual void timerEvent(QTimerEvent* ev);
 private:
 	Ui_MeshWindow ui;
 };

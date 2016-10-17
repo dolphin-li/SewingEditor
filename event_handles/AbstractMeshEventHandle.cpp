@@ -1,16 +1,13 @@
 #include <QEvent>
 #include <GL\glew.h>
-#include "SewingEditor.h"
 #include "BaseMeshViewer.h"
-#include "svgpp\SvgManager.h"
-#include "svgpp\SvgAbstractObject.h"
 
 #include "AbstractMeshEventHandle.h"
+#include "ClothMeshEventHandle.h"
 
 AbstractMeshEventHandle::AbstractMeshEventHandle(BaseMeshViewer* v)
 {
 	m_viewer = v;
-	m_mainUI = nullptr;
 	m_lastHighlightShapeId = -1;
 	m_currentSelectedId = -1;
 	m_cursor = QCursor(Qt::CursorShape::ArrowCursor);
@@ -21,11 +18,6 @@ AbstractMeshEventHandle::AbstractMeshEventHandle(BaseMeshViewer* v)
 AbstractMeshEventHandle::~AbstractMeshEventHandle()
 {
 
-}
-
-void AbstractMeshEventHandle::setMainUI(MainUI* ui)
-{
-	m_mainUI = ui;
 }
 
 QString AbstractMeshEventHandle::iconFile()const
@@ -44,6 +36,8 @@ AbstractMeshEventHandle* AbstractMeshEventHandle::create(ProcessorType type, Bas
 	{
 	case AbstractMeshEventHandle::ProcessorTypeGeneral:
 		return new AbstractMeshEventHandle(v);
+	case AbstractMeshEventHandle::ProcessorTypeCloth:
+		return new ClothMeshEventHandle(v);
 	case AbstractMeshEventHandle::ProcessorTypeEnd:
 	default:
 		return nullptr;
@@ -53,6 +47,9 @@ AbstractMeshEventHandle* AbstractMeshEventHandle::create(ProcessorType type, Bas
 void AbstractMeshEventHandle::mousePressEvent(QMouseEvent *ev)
 {
 	m_mouse_press_pt = ev->pos();
+
+	if (ev->buttons() == Qt::LeftButton)
+		m_viewer->camera().arcballClick(ldp::Float2(ev->x(), ev->y()));
 }
 
 void AbstractMeshEventHandle::mouseReleaseEvent(QMouseEvent *ev)
@@ -63,20 +60,13 @@ void AbstractMeshEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 void AbstractMeshEventHandle::mouseDoubleClickEvent(QMouseEvent *ev)
 {
 	if (ev->button() == Qt::MouseButton::MiddleButton)
-	{
 		m_viewer->resetCamera();
-	}
 }
 
 void AbstractMeshEventHandle::mouseMoveEvent(QMouseEvent *ev)
 {
-	if (m_viewer->buttons() == Qt::NoButton)
-	{
-	}
-
-	if (m_viewer->buttons() == Qt::MidButton)
-	{
-	}
+	if (ev->buttons() == Qt::LeftButton)
+		m_viewer->camera().arcballDrag(ldp::Float2(ev->x(), ev->y()));
 }
 
 void AbstractMeshEventHandle::wheelEvent(QWheelEvent *ev)

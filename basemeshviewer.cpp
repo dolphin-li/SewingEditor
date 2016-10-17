@@ -1,8 +1,7 @@
 #include <GL\glew.h>
 #include "basemeshviewer.h"
-#include "glut.h"
-#include "global_data_holder.h"
-#include "Renderable.h"
+#include "designer2d_cloth.h"
+#include "analysis2d_cloth_static.h"
 
 BaseMeshViewer::BaseMeshViewer(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -18,7 +17,14 @@ BaseMeshViewer::BaseMeshViewer(QWidget *parent)
 		m_eventHandles[i] = std::shared_ptr<AbstractMeshEventHandle>(
 			AbstractMeshEventHandle::create(AbstractMeshEventHandle::ProcessorType(i), this));
 	}
-	setEventHandleType(AbstractMeshEventHandle::ProcessorTypeGeneral);
+	setEventHandleType(AbstractMeshEventHandle::ProcessorTypeCloth);
+
+
+	m_pAnalysis = nullptr;
+	m_pListener = nullptr;
+	m_fps = 0;
+	m_computeTimer = startTimer(1);
+	m_renderTimer = startTimer(30);
 }
 
 BaseMeshViewer::~BaseMeshViewer()
@@ -29,8 +35,16 @@ BaseMeshViewer::~BaseMeshViewer()
 void BaseMeshViewer::resetCamera()
 {
 	m_camera.setPerspective(60, float(width()) / float(height()), 0.1, 100);
-	m_camera.setScalar(1);
-	m_camera.lookAt(ldp::Float3(0, 0, 0), ldp::Float3(0, 0, -1), ldp::Float3(0, 1, 0));
+	ldp::Float3 c = 0.f;
+	float l = 1.f;
+	if (m_pAnalysis)
+	{
+		auto box = m_pAnalysis->GetBoundingBox(nullptr);
+		c = ldp::Float3(box.x_max + box.x_min, box.y_min + box.y_max, box.z_min + box.z_max) / 2.f;
+		l = ldp::Float3(box.x_max - box.x_min, box.y_min - box.y_max, box.z_min - box.z_max).length() / 2.f / sqrt(3.f);
+	}
+	m_camera.lookAt(ldp::Float3(-l, -l, -l) + c, c, ldp::Float3(0, 1, 0));
+	m_camera.arcballSetCenter(c);
 }
 
 void BaseMeshViewer::initializeGL()
@@ -45,16 +59,9 @@ void BaseMeshViewer::initializeGL()
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 
-	float diffuse[3] = { 0, 0, 0 };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, diffuse);
-
-	m_showType = Renderable::SW_E | Renderable::SW_F | Renderable::SW_V | Renderable::SW_LIGHTING
-		| Renderable::SW_FLAT | Renderable::SW_TEXTURE;
-
 	resetCamera();
 
 	m_shaderManager.create("./Shader");
-
 	// fbo
 	QGLFramebufferObjectFormat fmt;
 	fmt.setAttachment(QGLFramebufferObject::CombinedDepthStencil);
@@ -80,15 +87,42 @@ void BaseMeshViewer::resizeGL(int w, int h)
 	m_fbo = new QGLFramebufferObject(width(), height(), fmt);
 }
 
+void BaseMeshViewer::timerEvent(QTimerEvent* ev)
+{
+	if (!m_pListener || !m_pAnalysis)
+		return;
+	if (ev->timerId() == m_computeTimer)
+	{
+		gtime_t t1 = ldp::gtime_now();
+		m_pListener->FollowMshToCad_ifNeeded();
+		m_pListener->Solve_ifNeeded();
+		if (m_pAnalysis->IsBlowUp())
+		{
+			std::cout << "BlowUp" << std::endl;
+			m_pListener->LoadTimeStamp();
+		}
+		gtime_t t2 = ldp::gtime_now();
+		double sec = ldp::gtime_seconds(t1, t2);
+		m_fps = 1 / sec;
+	}
+	if (ev->timerId() == m_renderTimer)
+		updateGL();
+}
+
 void BaseMeshViewer::paintGL()
 {
 	// we first render for selection
 	renderSelectionOnFbo();
 
 	// then we do formal rendering=========================
-	glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
+	glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	// show cloth simulation=============================
+	m_camera.apply();
+	glColor3f(0.8, 0.8, 0.8);
+	if (m_pListener)
+		m_pListener->Draw(4);
 }
 
 void BaseMeshViewer::renderSelectionOnFbo()
@@ -203,6 +237,14 @@ void BaseMeshViewer::renderDragBox()
 	glEnd();
 
 	glPopAttrib();
+}
+
+void BaseMeshViewer::initCloth(CAnalysis2D_Cloth_Static* pAnalysis, CDesigner2D_Cloth* pListener)
+{
+	if (pAnalysis == nullptr || pListener == nullptr)
+		throw std::exception("initCloth(): nullptr error");
+	m_pAnalysis = pAnalysis;
+	m_pListener = pListener;
 }
 
 

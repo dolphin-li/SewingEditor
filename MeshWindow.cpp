@@ -1,15 +1,36 @@
 #include "MeshWindow.h"
-#include "global_data_holder.h"
 
 MeshWindow::MeshWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
-	ui.setupUi(this);
+	ui.setupUi(this);	
+	new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(showFullScreen()));
+	new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(showNormal()));
+	setAcceptDrops(true);
+	initLeftDockActions();
+
+	startTimer(200);
 }
 
 MeshWindow::~MeshWindow()
 {
 
+}
+
+BaseMeshViewer* MeshWindow::getViewer()
+{
+	return ui.widget;
+}
+
+const BaseMeshViewer* MeshWindow::getViewer()const
+{
+	return ui.widget;
+}
+
+void MeshWindow::timerEvent(QTimerEvent* ev)
+{
+	float fps = ui.widget->getFps();
+	setWindowTitle(QString().sprintf("fps = %.1f", fps));
 }
 
 void MeshWindow::dragEnterEvent(QDragEnterEvent* event)
@@ -44,4 +65,9 @@ void MeshWindow::dropEvent(QDropEvent* event)
 	//}
 
 	//event->acceptProposedAction();
+}
+
+void MeshWindow::initLeftDockActions()
+{
+
 }

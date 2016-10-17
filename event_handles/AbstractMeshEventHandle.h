@@ -8,20 +8,17 @@ class BaseMeshViewer;
 class QMouseEvent;
 class QWheelEvent;
 class QKeyEvent;
-class SewingEditor;
-typedef SewingEditor MainUI;
 class AbstractMeshEventHandle
 {
 public:
 	enum ProcessorType{
 		ProcessorTypeGeneral = 0,
-
+		ProcessorTypeCloth,
 		ProcessorTypeEnd, // the end, no processor for this
 	};
 public:
 	AbstractMeshEventHandle(BaseMeshViewer* v);
 	~AbstractMeshEventHandle();
-	void setMainUI(MainUI* ui);
 	virtual ProcessorType type() { return ProcessorTypeGeneral; }
 	static AbstractMeshEventHandle* create(ProcessorType type, BaseMeshViewer* v);
 	QCursor& cursor(){ return m_cursor; }
@@ -44,6 +41,4 @@ protected:
 	QCursor m_cursor;
 	QString m_iconFile;
 	QString m_toolTips;
-
-	MainUI* m_mainUI;
 };

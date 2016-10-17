@@ -20,6 +20,7 @@ SewingEditor::SewingEditor(QWidget *parent)
 	{
 		g_dataholder.init();
 		ui.widget->setSvgManager(g_dataholder.m_svgManager.get());
+		m_meshWindow->getViewer()->initCloth(g_dataholder.m_clothManger.get(), g_dataholder.m_clothUiListener.get());
 		initLayerList();
 		resetRoll();
 		initHistoryList();

@@ -36,9 +36,9 @@ public:
     QMenu *menuFile;
     QStatusBar *statusbar;
     QDockWidget *dockWidgetRight;
-    QWidget *dockWidgetContents;
+    QWidget *dockWidgetRightContents;
     QDockWidget *dockWidgetLeft;
-    QWidget *dockWidgetContents_2;
+    QWidget *dockWidgetLeftContents;
 
     void setupUi(QMainWindow *MeshWindow)
     {
@@ -70,18 +70,18 @@ public:
         dockWidgetRight->setObjectName(QStringLiteral("dockWidgetRight"));
         dockWidgetRight->setMinimumSize(QSize(200, 200));
         dockWidgetRight->setFeatures(QDockWidget::NoDockWidgetFeatures);
-        dockWidgetContents = new QWidget();
-        dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
-        dockWidgetRight->setWidget(dockWidgetContents);
+        dockWidgetRightContents = new QWidget();
+        dockWidgetRightContents->setObjectName(QStringLiteral("dockWidgetRightContents"));
+        dockWidgetRight->setWidget(dockWidgetRightContents);
         MeshWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
         dockWidgetLeft = new QDockWidget(MeshWindow);
         dockWidgetLeft->setObjectName(QStringLiteral("dockWidgetLeft"));
-        dockWidgetLeft->setMinimumSize(QSize(50, 38));
-        dockWidgetLeft->setMaximumSize(QSize(50, 524287));
+        dockWidgetLeft->setMinimumSize(QSize(100, 38));
+        dockWidgetLeft->setMaximumSize(QSize(100, 524287));
         dockWidgetLeft->setFeatures(QDockWidget::NoDockWidgetFeatures);
-        dockWidgetContents_2 = new QWidget();
-        dockWidgetContents_2->setObjectName(QStringLiteral("dockWidgetContents_2"));
-        dockWidgetLeft->setWidget(dockWidgetContents_2);
+        dockWidgetLeftContents = new QWidget();
+        dockWidgetLeftContents->setObjectName(QStringLiteral("dockWidgetLeftContents"));
+        dockWidgetLeft->setWidget(dockWidgetLeftContents);
         MeshWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(1), dockWidgetLeft);
 
         menubar->addAction(menuFile->menuAction());

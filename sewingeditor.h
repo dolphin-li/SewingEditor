@@ -1,5 +1,4 @@
-#ifndef SEWINGEDITOR_H
-#define SEWINGEDITOR_H
+#pragma once
 
 #include <QtWidgets/QMainWindow>
 #include "ui_sewingeditor.h"
@@ -14,8 +13,7 @@ class SewingEditor : public QMainWindow
 public:
 	SewingEditor(QWidget *parent = 0);
 	~SewingEditor();
-	void dragEnterEvent(QDragEnterEvent* ev);
-	void dropEvent(QDropEvent* ev);
+
 	public slots:
 	void on_actionLoad_svg_triggered();
 	void on_actionSave_svg_triggered();
@@ -33,19 +31,22 @@ public:
 	void on_actionRedo_triggered();
 	void on_pbToConnectedGroups_clicked();
 	void on_pbSymmetricCopy_clicked();
-	void leftDocButtonsClicked(int i);
-public:
-	void initLeftDockActions();
+	void leftDocButtonsClicked(int i); 
+protected:
+	void dragEnterEvent(QDragEnterEvent* ev);
+	void dropEvent(QDropEvent* ev);
+	void closeEvent(QCloseEvent* ev);
 private:
 	Ui::SewingEditorClass ui;
+	QSharedPointer<MeshWindow> m_meshWindow;
+//////////////////////////////////////////////////////////////////////////
+protected:
 	QMap<AbstractEventHandle::ProcessorType, QSharedPointer<QPushButton>> m_leftDockButtons;
 	QSharedPointer<QSignalMapper> m_ldbSignalMapper;
-	QSharedPointer<MeshWindow> m_meshWindow;
-protected:
-	void addLeftDockWidgetButton(AbstractEventHandle::ProcessorType type, QString iconImage, QString toolTip="");
-
+	void initLeftDockActions();
+	void addLeftDockWidgetButton(AbstractEventHandle::ProcessorType type, QString iconImage, QString toolTip = "");
 //////////////////////////////////////////////////////////////////////////
-public:
+protected:
 	void initLayerList();
 	void updateLayerList();
 	void on_listLayers_rename();
@@ -93,4 +94,3 @@ public:
 	void on_listHistory_currentRowChanged(int r);
 };
 
-#endif // SEWINGEDITOR_H

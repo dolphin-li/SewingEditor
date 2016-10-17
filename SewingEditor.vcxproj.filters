@@ -925,7 +925,13 @@
     <ClCompile Include="algorithm\SC\DelFEM\src\com\vector3d.cpp">
       <Filter>algorithm\SC\DelFEM\com</Filter>
     </ClCompile>
-    <ClCompile Include="event_handles\ClothMeshEventHandle.cpp">
+    <ClCompile Include="event_handles\ClothSelectEventHandle.cpp">
+      <Filter>event_handles</Filter>
+    </ClCompile>
+    <ClCompile Include="event_handles\ClothRotateEventHandle.cpp">
+      <Filter>event_handles</Filter>
+    </ClCompile>
+    <ClCompile Include="event_handles\ClothTranslateEventHandle.cpp">
       <Filter>event_handles</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1592,7 +1598,13 @@
     <ClInclude Include="algorithm\SC\DelFEM\include\delfem\rigid\rigidbody.h">
       <Filter>algorithm\SC\DelFEM\rigid</Filter>
     </ClInclude>
-    <ClInclude Include="event_handles\ClothMeshEventHandle.h">
+    <ClInclude Include="event_handles\ClothSelectEventHandle.h">
+      <Filter>event_handles</Filter>
+    </ClInclude>
+    <ClInclude Include="event_handles\ClothRotateEventHandle.h">
+      <Filter>event_handles</Filter>
+    </ClInclude>
+    <ClInclude Include="event_handles\ClothTranslateEventHandle.h">
       <Filter>event_handles</Filter>
     </ClInclude>
   </ItemGroup>

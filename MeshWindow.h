@@ -14,13 +14,20 @@ public:
 
 	BaseMeshViewer* getViewer();
 	const BaseMeshViewer* getViewer()const;
+	public slots:
+	void leftDocButtonsClicked(int i);
 protected:
 	void dragEnterEvent(QDragEnterEvent* ev);
 	void dropEvent(QDropEvent* ev);
-	void initLeftDockActions();
 	virtual void timerEvent(QTimerEvent* ev);
 private:
 	Ui_MeshWindow ui;
+//////////////////////////////////////////////////////////////////////////
+protected:
+	QMap<AbstractMeshEventHandle::ProcessorType, QSharedPointer<QPushButton>> m_leftDockButtons;
+	QSharedPointer<QSignalMapper> m_ldbSignalMapper;
+	void initLeftDockActions();
+	void addLeftDockWidgetButton(AbstractMeshEventHandle::ProcessorType type, QString iconImage, QString toolTip = "");
 };
 
 #endif // SEWINGEDITOR_H

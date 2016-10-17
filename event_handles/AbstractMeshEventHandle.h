@@ -13,7 +13,9 @@ class AbstractMeshEventHandle
 public:
 	enum ProcessorType{
 		ProcessorTypeGeneral = 0,
-		ProcessorTypeCloth,
+		ProcessorTypeClothSelect,
+		ProcessorTypeClothTranslate,
+		ProcessorTypeClothRotate,
 		ProcessorTypeEnd, // the end, no processor for this
 	};
 public:

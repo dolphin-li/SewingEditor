@@ -9,6 +9,7 @@ BaseMeshViewer::BaseMeshViewer(QWidget *parent)
 	setMouseTracking(true);
 	m_buttons = Qt::MouseButton::NoButton;
 	m_isDragBox = false;
+	m_isEdgeMode = false;
 
 	m_eventHandles.resize((size_t)AbstractMeshEventHandle::ProcessorTypeEnd, nullptr);
 	for (size_t i = (size_t)AbstractMeshEventHandle::ProcessorTypeGeneral;
@@ -17,7 +18,7 @@ BaseMeshViewer::BaseMeshViewer(QWidget *parent)
 		m_eventHandles[i] = std::shared_ptr<AbstractMeshEventHandle>(
 			AbstractMeshEventHandle::create(AbstractMeshEventHandle::ProcessorType(i), this));
 	}
-	setEventHandleType(AbstractMeshEventHandle::ProcessorTypeCloth);
+	setEventHandleType(AbstractMeshEventHandle::ProcessorTypeClothSelect);
 
 
 	m_pAnalysis = nullptr;
@@ -57,7 +58,7 @@ void BaseMeshViewer::initializeGL()
 	glEnable(GL_LIGHT0);
 	glEnable(GL_FRONT_AND_BACK);
 	//glEnable(GL_CULL_FACE);
-	glEnable(GL_COLOR_MATERIAL);
+	//glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 
 	resetCamera();
@@ -121,9 +122,14 @@ void BaseMeshViewer::paintGL()
 
 	// show cloth simulation=============================
 	m_camera.apply();
-	glColor3f(0.8, 0.8, 0.8);
 	if (m_pListener)
+	{
+		if (isEdgeMode())
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		m_pListener->Draw(4);
+	}
 }
 
 void BaseMeshViewer::renderSelectionOnFbo()
@@ -145,11 +151,13 @@ void BaseMeshViewer::mousePressEvent(QMouseEvent *ev)
 void BaseMeshViewer::keyPressEvent(QKeyEvent*ev)
 {
 	m_currentEventHandle->keyPressEvent(ev);
+	updateGL();
 }
 
 void BaseMeshViewer::keyReleaseEvent(QKeyEvent*ev)
 {
 	m_currentEventHandle->keyReleaseEvent(ev);
+	updateGL();
 }
 
 void BaseMeshViewer::mouseReleaseEvent(QMouseEvent *ev)

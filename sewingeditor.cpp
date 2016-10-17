@@ -11,7 +11,7 @@ SewingEditor::SewingEditor(QWidget *parent)
 	new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(showNormal()));
 	setAcceptDrops(true);
 	initLeftDockActions();
-	connect(ui.listLayers->itemDelegate(), SIGNAL(closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint)), 
+	connect(ui.listLayers->itemDelegate(), SIGNAL(closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint)),
 		this, SLOT(on_listWidgetEditEnd(QWidget*, QAbstractItemDelegate::EndEditHint)));
 	m_meshWindow.reset(new MeshWindow);
 	m_meshWindow->setWindowTitle("mesh window");
@@ -33,6 +33,11 @@ SewingEditor::SewingEditor(QWidget *parent)
 SewingEditor::~SewingEditor()
 {
 
+}
+
+void SewingEditor::closeEvent(QCloseEvent* ev)
+{
+	m_meshWindow->close();
 }
 
 void SewingEditor::dragEnterEvent(QDragEnterEvent* event)

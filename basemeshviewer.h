@@ -23,6 +23,8 @@ public:
 	const CDesigner2D_Cloth* pListener()const { return m_pListener; }
 
 	float getFps()const{ return m_fps; }
+	bool isEdgeMode()const{ return m_isEdgeMode; }
+	void setEdgeMode(bool b){ m_isEdgeMode = b; }
 	const Camera& camera()const{ return m_camera; }
 	Camera& camera(){ return m_camera; }
 	void resetCamera();
@@ -67,5 +69,6 @@ protected:
 	ldp::Float3 m_modelBound[2];
 	int m_computeTimer, m_renderTimer;
 	float m_fps;
+	bool m_isEdgeMode;
 };
 

@@ -2,48 +2,48 @@
 #include <GL\glew.h>
 #include "BaseMeshViewer.h"
 
-#include "ClothMeshEventHandle.h"
+#include "ClothSelectEventHandle.h"
 #include "designer2d_cloth.h"
 #include "analysis2d_cloth_static.h"
 
-ClothMeshEventHandle::ClothMeshEventHandle(BaseMeshViewer* v) : AbstractMeshEventHandle(v)
+ClothSelectEventHandle::ClothSelectEventHandle(BaseMeshViewer* v) : AbstractMeshEventHandle(v)
 {
 	m_cursor = QCursor(Qt::CursorShape::ArrowCursor);
-	m_iconFile = "";
+	m_iconFile = "icons/selection.png";
 	m_toolTips = "cloth handle";
 }
 
-ClothMeshEventHandle::~ClothMeshEventHandle()
+ClothSelectEventHandle::~ClothSelectEventHandle()
 {
 
 }
 
-void ClothMeshEventHandle::mousePressEvent(QMouseEvent *ev)
+void ClothSelectEventHandle::mousePressEvent(QMouseEvent *ev)
 {
 	AbstractMeshEventHandle::mousePressEvent(ev);
 }
 
-void ClothMeshEventHandle::mouseReleaseEvent(QMouseEvent *ev)
+void ClothSelectEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 {
 	AbstractMeshEventHandle::mouseReleaseEvent(ev);
 }
 
-void ClothMeshEventHandle::mouseDoubleClickEvent(QMouseEvent *ev)
+void ClothSelectEventHandle::mouseDoubleClickEvent(QMouseEvent *ev)
 {
 	AbstractMeshEventHandle::mouseDoubleClickEvent(ev);
 }
 
-void ClothMeshEventHandle::mouseMoveEvent(QMouseEvent *ev)
+void ClothSelectEventHandle::mouseMoveEvent(QMouseEvent *ev)
 {
 	AbstractMeshEventHandle::mouseMoveEvent(ev);
 }
 
-void ClothMeshEventHandle::wheelEvent(QWheelEvent *ev)
+void ClothSelectEventHandle::wheelEvent(QWheelEvent *ev)
 {
 	AbstractMeshEventHandle::wheelEvent(ev);
 }
 
-void ClothMeshEventHandle::keyPressEvent(QKeyEvent *ev)
+void ClothSelectEventHandle::keyPressEvent(QKeyEvent *ev)
 {
 	AbstractMeshEventHandle::keyPressEvent(ev);
 	switch (ev->key())
@@ -64,7 +64,7 @@ void ClothMeshEventHandle::keyPressEvent(QKeyEvent *ev)
 	}
 }
 
-void ClothMeshEventHandle::keyReleaseEvent(QKeyEvent *ev)
+void ClothSelectEventHandle::keyReleaseEvent(QKeyEvent *ev)
 {
 	AbstractMeshEventHandle::keyReleaseEvent(ev);
 }

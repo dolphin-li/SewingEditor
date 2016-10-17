@@ -2,8 +2,13 @@
 #include <GL\glew.h>
 #include "BaseMeshViewer.h"
 
+#include "designer2d_cloth.h"
+#include "analysis2d_cloth_static.h"
+
 #include "AbstractMeshEventHandle.h"
-#include "ClothMeshEventHandle.h"
+#include "ClothSelectEventHandle.h"
+#include "ClothTranslateEventHandle.h"
+#include "ClothRotateEventHandle.h"
 
 AbstractMeshEventHandle::AbstractMeshEventHandle(BaseMeshViewer* v)
 {
@@ -36,8 +41,12 @@ AbstractMeshEventHandle* AbstractMeshEventHandle::create(ProcessorType type, Bas
 	{
 	case AbstractMeshEventHandle::ProcessorTypeGeneral:
 		return new AbstractMeshEventHandle(v);
-	case AbstractMeshEventHandle::ProcessorTypeCloth:
-		return new ClothMeshEventHandle(v);
+	case AbstractMeshEventHandle::ProcessorTypeClothSelect:
+		return new ClothSelectEventHandle(v);
+	case AbstractMeshEventHandle::ProcessorTypeClothTranslate:
+		return new ClothTranslateEventHandle(v);
+	case AbstractMeshEventHandle::ProcessorTypeClothRotate:
+		return new ClothRotateEventHandle(v);
 	case AbstractMeshEventHandle::ProcessorTypeEnd:
 	default:
 		return nullptr;
@@ -92,7 +101,26 @@ void AbstractMeshEventHandle::wheelEvent(QWheelEvent *ev)
 
 void AbstractMeshEventHandle::keyPressEvent(QKeyEvent *ev)
 {
-
+	switch (ev->key())
+	{
+	default:
+		break;
+	case Qt::Key_E:
+		if (ev->modifiers() == Qt::NoModifier)
+			m_viewer->setEdgeMode(!m_viewer->isEdgeMode());
+		break;
+	case Qt::Key_B:
+		if (ev->modifiers() == Qt::NoModifier && m_viewer->pAnalysis() && m_viewer->pListener())
+		{
+			if (m_viewer->pAnalysis()->GetMode() == CLOTH_INITIAL_LOCATION){
+				m_viewer->pListener()->Solve_fromCad_InitValue();
+				m_viewer->pAnalysis()->PerformStaticSolver();
+			}
+			else
+				m_viewer->pAnalysis()->SetClothPiecePlacingMode();
+		}
+		break;
+	}
 }
 
 void AbstractMeshEventHandle::keyReleaseEvent(QKeyEvent *ev)

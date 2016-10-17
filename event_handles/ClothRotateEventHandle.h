@@ -4,12 +4,12 @@
 #include <QCursor>
 #include <QString>
 #include "AbstractMeshEventHandle.h"
-class ClothMeshEventHandle : public AbstractMeshEventHandle
+class ClothRotateEventHandle : public AbstractMeshEventHandle
 {
 public:
-	ClothMeshEventHandle(BaseMeshViewer* v);
-	~ClothMeshEventHandle();
-	virtual ProcessorType type() { return ProcessorTypeCloth; }
+	ClothRotateEventHandle(BaseMeshViewer* v);
+	~ClothRotateEventHandle();
+	virtual ProcessorType type() { return ProcessorTypeClothRotate; }
 	virtual void mousePressEvent(QMouseEvent *);
 	virtual void mouseReleaseEvent(QMouseEvent *);
 	virtual void mouseDoubleClickEvent(QMouseEvent *);

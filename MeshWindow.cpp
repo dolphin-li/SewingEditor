@@ -69,5 +69,47 @@ void MeshWindow::dropEvent(QDropEvent* event)
 
 void MeshWindow::initLeftDockActions()
 {
+	m_ldbSignalMapper.reset(new QSignalMapper(this));
+	connect(m_ldbSignalMapper.data(), SIGNAL(mapped(int)), this, SLOT(leftDocButtonsClicked(int)));
+	ui.dockWidgetLeftContents->setLayout(new QGridLayout(ui.dockWidgetLeftContents));
+	ui.dockWidgetLeftContents->layout()->setAlignment(Qt::AlignTop);
 
+	// add buttons
+	for (size_t i = (size_t)AbstractMeshEventHandle::ProcessorTypeClothSelect;
+		i < (size_t)AbstractMeshEventHandle::ProcessorTypeEnd; i++)
+	{
+		auto type = AbstractMeshEventHandle::ProcessorType(i);
+		addLeftDockWidgetButton(type, ui.widget->getEventHandle(type)->iconFile(),
+			ui.widget->getEventHandle(type)->toolTips());
+	}
+
+	// do connections
+	for (auto it : m_leftDockButtons.toStdMap())
+	{
+		m_ldbSignalMapper->setMapping(it.second.data(), it.first);
+		connect(it.second.data(), SIGNAL(clicked()), m_ldbSignalMapper.data(), SLOT(map()));
+	}
+}
+
+void MeshWindow::addLeftDockWidgetButton(AbstractMeshEventHandle::ProcessorType type, 
+	QString iconImage, QString toolTip)
+{
+	auto colorStr = QString("background-color: rgb(73, 73, 73)");
+	QIcon icon(iconImage);
+	QSharedPointer<QPushButton> btn(new QPushButton(ui.dockWidgetLeftContents));
+	btn->setIconSize(QSize(80, 80));
+	btn->setIcon(icon);
+	btn->setAutoFillBackground(true);
+	btn->setCheckable(true);
+	btn->setStyleSheet(colorStr);
+	btn->setAutoExclusive(true);
+	btn->setToolTip(toolTip);
+	m_leftDockButtons.insert(type, btn);
+	ui.dockWidgetLeftContents->layout()->addWidget(btn.data());
+}
+
+void MeshWindow::leftDocButtonsClicked(int i)
+{
+	AbstractMeshEventHandle::ProcessorType type = (AbstractMeshEventHandle::ProcessorType)i;
+	ui.widget->setEventHandleType(type);
 }

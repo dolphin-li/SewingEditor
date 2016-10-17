@@ -102,8 +102,8 @@ namespace svg
 		bool ancestorSelected = false;
 		if (ancestorAfterRoot())
 			ancestorSelected = ancestorAfterRoot()->isSelected();
-		if (isSelected())
-			renderBounds(false);
+		//if (isSelected())
+		//	renderBounds(false);
 		if (m_invalid)
 		{
 			cacheNvPaths();

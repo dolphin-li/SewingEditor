@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1086</width>
-    <height>873</height>
+    <width>1176</width>
+    <height>949</height>
    </rect>
   </property>
   <property name="palette">
@@ -503,7 +503,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1086</width>
+     <width>1176</width>
      <height>21</height>
     </rect>
    </property>
@@ -860,7 +860,7 @@
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetRightContents">
-    <layout class="QGridLayout" name="gridLayout_3">
+    <layout class="QGridLayout" name="gridLayout_4">
      <item row="0" column="0">
       <widget class="QListWidget" name="listHistory">
        <property name="styleSheet">
@@ -958,36 +958,13 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>300</height>
+         <height>200</height>
         </size>
        </property>
        <property name="title">
         <string>param</string>
        </property>
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="1">
-         <widget class="QPushButton" name="pbToConnectedGroups">
-          <property name="toolTip">
-           <string>convert selected path to polygons (ALT+C)</string>
-          </property>
-          <property name="text">
-           <string>Connected groups</string>
-          </property>
-          <property name="shortcut">
-           <string>Alt+C</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QPushButton" name="pbSelectClosed">
-          <property name="toolTip">
-           <string>select closed polygons</string>
-          </property>
-          <property name="text">
-           <string>select closed</string>
-          </property>
-         </widget>
-        </item>
+       <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
          <widget class="QPushButton" name="pbSymmetricCopy">
           <property name="toolTip">
@@ -1001,16 +978,16 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="pbClosePolygon">
+        <item row="0" column="1">
+         <widget class="QPushButton" name="pbToConnectedGroups">
           <property name="toolTip">
-           <string>make selected polygon closed (ALT+L)</string>
+           <string>convert selected path to polygons (ALT+C)</string>
           </property>
           <property name="text">
-           <string>cLose polygon</string>
+           <string>Connected groups</string>
           </property>
           <property name="shortcut">
-           <string>Alt+L</string>
+           <string>Alt+C</string>
           </property>
          </widget>
         </item>
@@ -1040,6 +1017,29 @@
           </property>
          </widget>
         </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="pbClosePolygon">
+          <property name="toolTip">
+           <string>make selected polygon closed (ALT+L)</string>
+          </property>
+          <property name="text">
+           <string>cLose polygon</string>
+          </property>
+          <property name="shortcut">
+           <string>Alt+L</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="pbSelectClosed">
+          <property name="toolTip">
+           <string>select closed polygons</string>
+          </property>
+          <property name="text">
+           <string>select closed</string>
+          </property>
+         </widget>
+        </item>
         <item row="3" column="0">
          <widget class="QPushButton" name="pbPixelToMeter">
           <property name="toolTip">
@@ -1061,6 +1061,19 @@
          </widget>
         </item>
        </layout>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QGroupBox" name="groupBox">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>mesh</string>
+       </property>
       </widget>
      </item>
     </layout>

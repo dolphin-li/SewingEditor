@@ -17,6 +17,7 @@ public:
 
 	void initCloth(CAnalysis2D_Cloth_Static* pAnalysis, CDesigner2D_Cloth* pListener);
 	CAnalysis2D_Cloth_Static* pAnalysis() { return m_pAnalysis; }
+	void getModelBound(ldp::Float3& bmin, ldp::Float3& bmax);
 	const CAnalysis2D_Cloth_Static* pAnalysis()const { return m_pAnalysis; }
 	CDesigner2D_Cloth* pListener() { return m_pListener; }
 	const CDesigner2D_Cloth* pListener()const { return m_pListener; }
@@ -41,6 +42,7 @@ protected:
 	void mousePressEvent(QMouseEvent *);
 	void mouseReleaseEvent(QMouseEvent *);
 	void mouseMoveEvent(QMouseEvent*);
+	void mouseDoubleClickEvent(QMouseEvent *ev);
 	void wheelEvent(QWheelEvent*);
 	void keyPressEvent(QKeyEvent*);
 	void keyReleaseEvent(QKeyEvent*);
@@ -62,6 +64,7 @@ protected:
 
 	CAnalysis2D_Cloth_Static* m_pAnalysis;
 	CDesigner2D_Cloth* m_pListener;
+	ldp::Float3 m_modelBound[2];
 	int m_computeTimer, m_renderTimer;
 	float m_fps;
 };

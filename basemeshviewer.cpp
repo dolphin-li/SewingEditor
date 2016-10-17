@@ -39,9 +39,10 @@ void BaseMeshViewer::resetCamera()
 	float l = 1.f;
 	if (m_pAnalysis)
 	{
-		auto box = m_pAnalysis->GetBoundingBox(nullptr);
-		c = ldp::Float3(box.x_max + box.x_min, box.y_min + box.y_max, box.z_min + box.z_max) / 2.f;
-		l = ldp::Float3(box.x_max - box.x_min, box.y_min - box.y_max, box.z_min - box.z_max).length() / 2.f / sqrt(3.f);
+		ldp::Float3 bmin, bmax;
+		getModelBound(bmin, bmax);
+		c = (bmax + bmin) / 2.f;
+		l = (bmax - bmin).length() / 2.f / sqrt(3.f);
 	}
 	m_camera.lookAt(ldp::Float3(-l, -l, -l) + c, c, ldp::Float3(0, 1, 0));
 	m_camera.arcballSetCenter(c);
@@ -169,6 +170,13 @@ void BaseMeshViewer::mouseMoveEvent(QMouseEvent*ev)
 	updateGL();
 }
 
+void BaseMeshViewer::mouseDoubleClickEvent(QMouseEvent *ev)
+{
+	m_currentEventHandle->mouseDoubleClickEvent(ev);
+
+	updateGL();
+}
+
 void BaseMeshViewer::wheelEvent(QWheelEvent*ev)
 {
 	m_currentEventHandle->wheelEvent(ev);
@@ -247,4 +255,15 @@ void BaseMeshViewer::initCloth(CAnalysis2D_Cloth_Static* pAnalysis, CDesigner2D_
 	m_pListener = pListener;
 }
 
+void BaseMeshViewer::getModelBound(ldp::Float3& bmin, ldp::Float3& bmax)
+{
+	bmin = FLT_MAX;
+	bmax = -FLT_MAX;
+	if (m_pAnalysis)
+	{
+		auto box = m_pAnalysis->GetBoundingBox(nullptr);
+		bmin = ldp::Float3(box.x_min, box.y_min, box.z_min);
+		bmax = ldp::Float3(box.x_max, box.y_max, box.z_max);
+	}
+}
 

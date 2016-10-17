@@ -67,6 +67,16 @@ void AbstractMeshEventHandle::mouseMoveEvent(QMouseEvent *ev)
 {
 	if (ev->buttons() == Qt::LeftButton)
 		m_viewer->camera().arcballDrag(ldp::Float2(ev->x(), ev->y()));
+	if (ev->buttons() == Qt::MidButton)
+	{
+		QPoint dif = ev->pos() - m_viewer->lastMousePos();
+		ldp::Float3 bmin, bmax;
+		m_viewer->getModelBound(bmin, bmax);
+		float len = (bmax - bmin).length() / sqrt(3.f);
+		ldp::Float3 t(-(float)dif.x() / m_viewer->width(), (float)dif.y() / m_viewer->height(), 0);
+		m_viewer->camera().translate(t * len);
+		m_viewer->camera().arcballSetCenter((bmin + bmax) / 2.f + t * len);
+	}
 }
 
 void AbstractMeshEventHandle::wheelEvent(QWheelEvent *ev)
@@ -75,7 +85,7 @@ void AbstractMeshEventHandle::wheelEvent(QWheelEvent *ev)
 	if (ev->delta() < 0)
 		s = 1.f / s;
 
-	float fov = std::max(1e-3f, std::min(90.f, m_viewer->camera().getFov()*s));
+	float fov = std::max(1e-3f, std::min(160.f, m_viewer->camera().getFov()*s));
 	m_viewer->camera().setPerspective(fov, m_viewer->camera().getAspect(),
 		m_viewer->camera().getFrustumNear(), m_viewer->camera().getFrustumFar());
 }

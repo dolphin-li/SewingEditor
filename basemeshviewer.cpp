@@ -1,30 +1,24 @@
+#include <GL\glew.h>
 #include "basemeshviewer.h"
 #include "glut.h"
 #include "global_data_holder.h"
 #include "Renderable.h"
-
-const static int N_COLOR_TABLE = 10;
-const static ldp::Float3 COLOR_TABLE[] = 
-{
-	ldp::Float3(1, 0, 0),
-	ldp::Float3(0, 0, 1),
-	ldp::Float3(1, 0, 1),
-	ldp::Float3(0, 1, 1),
-	ldp::Float3(1, 0.7, 0.4),
-	ldp::Float3(1, 0.4, 0.7),
-	ldp::Float3(0.7, 1, 0.4),
-	ldp::Float3(0.7, 0.4, 1),
-	ldp::Float3(0.4, 1, 0.7),
-	ldp::Float3(0.4, 0.7, 1),
-};
 
 BaseMeshViewer::BaseMeshViewer(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
 	setMouseTracking(true);
 	m_buttons = Qt::MouseButton::NoButton;
-	m_meshOperationMode = ObjectMode;
-	m_isBoxMode = false;
+	m_isDragBox = false;
+
+	m_eventHandles.resize((size_t)AbstractMeshEventHandle::ProcessorTypeEnd, nullptr);
+	for (size_t i = (size_t)AbstractMeshEventHandle::ProcessorTypeGeneral;
+		i < (size_t)AbstractMeshEventHandle::ProcessorTypeEnd; i++)
+	{
+		m_eventHandles[i] = std::shared_ptr<AbstractMeshEventHandle>(
+			AbstractMeshEventHandle::create(AbstractMeshEventHandle::ProcessorType(i), this));
+	}
+	setEventHandleType(AbstractMeshEventHandle::ProcessorTypeGeneral);
 }
 
 BaseMeshViewer::~BaseMeshViewer()
@@ -61,7 +55,7 @@ void BaseMeshViewer::initializeGL()
 
 	m_shaderManager.create("./Shader");
 
-	// depth fbo
+	// fbo
 	QGLFramebufferObjectFormat fmt;
 	fmt.setAttachment(QGLFramebufferObject::CombinedDepthStencil);
 	fmt.setMipmap(true);
@@ -86,28 +80,19 @@ void BaseMeshViewer::resizeGL(int w, int h)
 	m_fbo = new QGLFramebufferObject(width(), height(), fmt);
 }
 
-void BaseMeshViewer::setMeshOpMode(MeshOperationMode mode)
-{ 
-	m_meshOperationMode = mode;
-}
-
 void BaseMeshViewer::paintGL()
 {
-	//// we first render for selection
-	//renderSelectionOnFbo();
+	// we first render for selection
+	renderSelectionOnFbo();
 
 	// then we do formal rendering=========================
-	if (m_meshOperationMode == ObjectMode)
-	{
-		glClearColor(1.f, 1.f, 1.f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-	else
-	{
-		glClearColor(0.f, 0.f, 0.f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
+	glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+}
+
+void BaseMeshViewer::renderSelectionOnFbo()
+{
 
 }
 
@@ -117,111 +102,33 @@ void BaseMeshViewer::mousePressEvent(QMouseEvent *ev)
 	m_lastPos = ev->pos();
 	m_buttons = ev->buttons();
 
-	// move operation
-	if (ev->button() == Qt::MouseButton::LeftButton)
-	{
+	m_currentEventHandle->mousePressEvent(ev);
 
-	}
-	if (ev->button() == Qt::MouseButton::MiddleButton)
-	{
-		resetCamera();
-		updateGL();
-	}
+	updateGL();
 }
 
 void BaseMeshViewer::keyPressEvent(QKeyEvent*ev)
 {
-	bool noMod = ((ev->modifiers() & Qt::SHIFT) == 0)
-		&& ((ev->modifiers() & Qt::CTRL) == 0)
-		& ((ev->modifiers() & Qt::ALT) == 0);
-	switch (ev->key())
-	{
-	case Qt::Key_Shift:
-		break;
-	case Qt::Key_B:
-		m_isBoxMode = true;
-		m_boxBegin = m_boxEnd = m_lastPos;
-		break;
-	case Qt::Key_Escape:
-		m_isBoxMode = false;
-		break;
-	case Qt::Key_F:
-		if (noMod)
-		{
-			toggleShowType(Renderable::SW_F);
-			//toggleShowType(Renderable::SW_E);
-		}
-		break;
-	case Qt::Key_L:
-		if (noMod)
-		{
-			//toggleShowType(Renderable::SW_F);
-			toggleShowType(Renderable::SW_E);
-		}
-		break;
-	case Qt::Key_V:
-		if (noMod)
-			toggleShowType(Renderable::SW_V);
-		break;
-	case Qt::Key_T:
-		if (noMod)
-			toggleShowType(Renderable::SW_TEXTURE);
-		break;
-	case Qt::Key_S:
-		if (1)
-		{
-			QString name = QFileDialog::getSaveFileName(this, "grab gl buffer", "data_test", "*.png");
-			if (!name.isEmpty())
-			{
-				if (!name.toLower().endsWith(".png"))
-					name.append(".png");
-				QImage img = grabFrameBuffer();
-				img.save(name);
-			}
-		}
-		break;
-	case Qt::Key_Space:
-		toggleMeshOperationMode();
-		break;
-	default:
-		break;
-	}
-	updateGL();
+	m_currentEventHandle->keyPressEvent(ev);
 }
 
 void BaseMeshViewer::keyReleaseEvent(QKeyEvent*ev)
 {
-
+	m_currentEventHandle->keyReleaseEvent(ev);
 }
 
 void BaseMeshViewer::mouseReleaseEvent(QMouseEvent *ev)
 {
+	m_currentEventHandle->mouseReleaseEvent(ev);
+
 	// clear buttons
-	m_isBoxMode = false;
 	m_buttons = Qt::NoButton;
 	updateGL();
 }
 
 void BaseMeshViewer::mouseMoveEvent(QMouseEvent*ev)
 {
-	if (m_buttons == Qt::NoButton)
-	{
-		if (m_isBoxMode)
-		{
-			m_boxEnd = ev->pos();
-			ldp::Float2 bMin(m_boxBegin.x(), height() - 1 - m_boxBegin.y());
-			ldp::Float2 bMax(m_boxEnd.x(), height() - 1 - m_boxEnd.y());
-			if (bMin[0] > bMax[0]) std::swap(bMin[0], bMax[0]);
-			if (bMin[1] > bMax[1]) std::swap(bMin[1], bMax[1]);
-		}
-	}
-
-	if (m_buttons & Qt::LeftButton)
-	{
-	}
-	if (m_buttons & Qt::RightButton)
-	{
-	}
+	m_currentEventHandle->mouseMoveEvent(ev);
 
 	// backup last position
 	m_lastPos = ev->pos();
@@ -230,28 +137,72 @@ void BaseMeshViewer::mouseMoveEvent(QMouseEvent*ev)
 
 void BaseMeshViewer::wheelEvent(QWheelEvent*ev)
 {
-	float s = 1.1;
-	if (ev->delta() < 0)
-		s = 1.f / s;
+	m_currentEventHandle->wheelEvent(ev);
 
-	float fov = std::max(1e-3f, std::min(90.f, m_camera.getFov()*s));
-	m_camera.setPerspective(fov, m_camera.getAspect(), 
-		m_camera.getFrustumNear(), m_camera.getFrustumFar());
 	updateGL();
 }
 
-void BaseMeshViewer::toggleMeshOperationMode()
+AbstractMeshEventHandle::ProcessorType BaseMeshViewer::getEventHandleType()const
 {
-	if (m_meshOperationMode == ObjectMode)
-	{
-		m_meshOperationMode = EditMode;
-		printf("EditMode\n");
-	}
-	else
-	{
-		m_meshOperationMode = ObjectMode;
-		printf("ObjectMode\n");
-	}
+	return m_currentEventHandle->type();
+}
+
+void BaseMeshViewer::setEventHandleType(AbstractMeshEventHandle::ProcessorType type)
+{
+	m_currentEventHandle = m_eventHandles[size_t(type)].get();
+	setCursor(m_currentEventHandle->cursor());
+}
+
+const AbstractMeshEventHandle* BaseMeshViewer::getEventHandle(AbstractMeshEventHandle::ProcessorType type)const
+{
+	return m_eventHandles[size_t(type)].get();
+}
+
+AbstractMeshEventHandle* BaseMeshViewer::getEventHandle(AbstractMeshEventHandle::ProcessorType type)
+{
+	return m_eventHandles[size_t(type)].get();
+}
+
+void BaseMeshViewer::beginDragBox(QPoint p)
+{
+	m_dragBoxBegin = p;
+	m_isDragBox = true;
+}
+
+void BaseMeshViewer::endDragBox()
+{
+	m_isDragBox = false;
+}
+
+void BaseMeshViewer::renderDragBox()
+{
+	if (!m_isDragBox)
+		return;
+
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+	float l = camera().getFrustumLeft();
+	float r = camera().getFrustumRight();
+	float t = camera().getFrustumTop();
+	float b = camera().getFrustumBottom();
+	float x0 = std::min(m_dragBoxBegin.x(), m_lastPos.x()) / float(width()) * (r - l) + l;
+	float x1 = std::max(m_dragBoxBegin.x(), m_lastPos.x()) / float(width()) * (r - l) + l;
+	float y0 = std::min(m_dragBoxBegin.y(), m_lastPos.y()) / float(height()) * (b - t) + t;
+	float y1 = std::max(m_dragBoxBegin.y(), m_lastPos.y()) / float(height()) * (b - t) + t;
+
+	glDisable(GL_STENCIL_TEST);
+	glColor3f(0, 1, 0);
+	glLineWidth(2);
+	//glEnable(GL_LINE_STIPPLE);
+	glLineStipple(0xAAAA, 1);
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(x0, y0);
+	glVertex2f(x0, y1);
+	glVertex2f(x1, y1);
+	glVertex2f(x1, y0);
+	glEnd();
+
+	glPopAttrib();
 }
 
 

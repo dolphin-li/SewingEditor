@@ -83,6 +83,39 @@
     <Filter Include="event_handles">
       <UniqueIdentifier>{8047cc94-d4d4-44ff-bd92-eeb8ec035b97}</UniqueIdentifier>
     </Filter>
+    <Filter Include="algorithm\SC">
+      <UniqueIdentifier>{1e5bfadf-901c-4635-9ac3-1e680c3b9df8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\SC\DelFEM">
+      <UniqueIdentifier>{45cc2882-359b-44e5-9c1e-faa86f431ddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\SC\DelFEM\cad">
+      <UniqueIdentifier>{f032b8c9-3e8e-4ba7-9e04-3aa486819b59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\SC\DelFEM\femeqn">
+      <UniqueIdentifier>{9e468d87-5e07-47b4-a639-ec71479d29a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\SC\DelFEM\femls">
+      <UniqueIdentifier>{f75ef685-ec18-469c-8361-4fd171dffb0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\SC\DelFEM\ls">
+      <UniqueIdentifier>{2d2e10eb-e16b-4c68-a960-4edbc502fbc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\SC\DelFEM\matvec">
+      <UniqueIdentifier>{a856ee18-96a3-4766-af3b-359efbc77f63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\SC\DelFEM\msh">
+      <UniqueIdentifier>{974365dc-f5c6-4952-ba15-7fa82e414d30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\SC\DelFEM\rigid">
+      <UniqueIdentifier>{8b4264ed-da4a-43d9-a951-c197d77a96ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\SC\DelFEM\femfield">
+      <UniqueIdentifier>{df088cda-85c0-402e-b397-100bc6b44bb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\SC\DelFEM\com">
+      <UniqueIdentifier>{740d2522-b51c-4dba-b4ef-767362b7f55f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -589,6 +622,309 @@
     <ClCompile Include="algorithm\svgpp\SvgPolyPath.cpp">
       <Filter>algorithm\svgpp</Filter>
     </ClCompile>
+    <ClCompile Include="MeshWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MeshWindow.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MeshWindow.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="event_handles\AbstractMeshEventHandle.cpp">
+      <Filter>event_handles</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\analysis2d_cloth_static.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\cloth_handler.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\cloth_utility.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\contact_target_adf.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\contact_target_mesh.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\designer2d_cloth.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\emat_cst.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\emat_glue.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\emat_quad_bend.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\eqn_contact3d.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\eqn_glue.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\eqn_quad_bend.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\stitch_array.cpp">
+      <Filter>algorithm\SC</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\brep.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\brep2d.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_edge2d_polyline.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_elem2d.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_elem3d.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_obj2d.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_obj2d_move.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_obj3d.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\contact_target_cad3d.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\drawer_cad.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\drawer_cad3d.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\truss2d.cpp">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_advection_diffusion.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_diffusion.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_dkt.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_helmholtz.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_hyper.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_linear_solid2d.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_linear_solid3d.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_navier_stokes.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_poisson.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_st_venant.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_stokes.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqnsys.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqnsys_fluid.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqnsys_scalar.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqnsys_shell.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqnsys_solid.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\ker_emat_tri.cpp">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femls\linearsystem_field.cpp">
+      <Filter>algorithm\SC\DelFEM\femls</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femls\linearsystem_fieldsave.cpp">
+      <Filter>algorithm\SC\DelFEM\femls</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femls\zlinearsystem.cpp">
+      <Filter>algorithm\SC\DelFEM\femls</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femls\zsolver_ls_iter.cpp">
+      <Filter>algorithm\SC\DelFEM\femls</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\ls\eigen_lanczos.cpp">
+      <Filter>algorithm\SC\DelFEM\ls</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\ls\linearsystem.cpp">
+      <Filter>algorithm\SC\DelFEM\ls</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\ls\preconditioner.cpp">
+      <Filter>algorithm\SC\DelFEM\ls</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\ls\solver_ls_iter.cpp">
+      <Filter>algorithm\SC\DelFEM\ls</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\mat_blkcrs.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\matdia_blkcrs.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\matdiafrac_blkcrs.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\matdiainv_blkdia.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\matfrac_blkcrs.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\matprolong_blkcrs.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\ordering_blk.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\solver_mat_iter.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\solver_mg.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\vector_blk.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\zmat_blkcrs.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\zmatdia_blkcrs.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\zmatdiafrac_blkcrs.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\zsolver_mat_iter.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\zvector_blk.cpp">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\drawer_msh.cpp">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\mesh3d.cpp">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\mesh3d_extrude.cpp">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\mesher2d.cpp">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\mesher2d_edit.cpp">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\mesher3d.cpp">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\meshkernel2d.cpp">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\meshkernel3d.cpp">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\surface_mesh_reader.cpp">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\rigid\linearsystem_rigid.cpp">
+      <Filter>algorithm\SC\DelFEM\rigid</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\rigid\linearsystem_rigidfield.cpp">
+      <Filter>algorithm\SC\DelFEM\rigid</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\rigid\rigidbody.cpp">
+      <Filter>algorithm\SC\DelFEM\rigid</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field_edge.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field_face.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field_image_based_flow_vis.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field_streamline.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field_vector.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\elem_ary.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\eval.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\field.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\field_value_setter.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\field_world.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\node_ary.cpp">
+      <Filter>algorithm\SC\DelFEM\femfield</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\drawer.cpp">
+      <Filter>algorithm\SC\DelFEM\com</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\drawer_gl_utility.cpp">
+      <Filter>algorithm\SC\DelFEM\com</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\quaternion.cpp">
+      <Filter>algorithm\SC\DelFEM\com</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\spatial_hash_grid2d.cpp">
+      <Filter>algorithm\SC\DelFEM\com</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\spatial_hash_grid3d.cpp">
+      <Filter>algorithm\SC\DelFEM\com</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\tri_ary_topology.cpp">
+      <Filter>algorithm\SC\DelFEM\com</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\uglyfont.cpp">
+      <Filter>algorithm\SC\DelFEM\com</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\vector3d.cpp">
+      <Filter>algorithm\SC\DelFEM\com</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="sewingeditor.ui">
@@ -608,6 +944,12 @@
     </CustomBuild>
     <CustomBuild Include="qdarkstyle\style.qrc">
       <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MeshWindow.h">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="meshwindow.ui">
+      <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -883,6 +1225,369 @@
     </ClInclude>
     <ClInclude Include="algorithm\svgpp\SvgPolyPath.h">
       <Filter>algorithm\svgpp</Filter>
+    </ClInclude>
+    <ClInclude Include="event_handles\AbstractMeshEventHandle.h">
+      <Filter>event_handles</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\analysis2d_cloth_static.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\cloth_handler.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\cloth_utility.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\contact_target.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\designer2d_cloth.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\emat_cst.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\emat_glue.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\emat_quad_bend.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\eqn_contact3d.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\eqn_glue.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\eqn_quad_bend.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\slider_deform.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\stitch_array.h">
+      <Filter>algorithm\SC</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad_com.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad_obj2d.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad_obj2d_move.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad_obj3d.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad2d_interface.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\camera.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\complex.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\designer2d_analysis.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_cad.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_cad3d.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field_edge.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field_face.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field_image_based_flow_vis.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field_streamline.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field_vector.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_gl_utility.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_msh.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\elem_ary.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eqnsys.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eqnsys_fluid.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eqnsys_scalar.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eqnsys_shell.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eqnsys_solid.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eval.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\field.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\field_value_setter.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\field_world.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\glut_utility.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\indexed_array.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\linearsystem_interface_eqnsys.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\mesh_interface.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\mesh_primitive.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\mesh3d.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\mesher2d.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\mesher2d_edit.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\node_ary.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\objset.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\quaternion.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\serialize.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\spatial_hash_grid2d.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\spatial_hash_grid3d.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\tri_ary_topology.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\uglyfont.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\vector2d.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\vector3d.h">
+      <Filter>algorithm\SC\DelFEM</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\brep.h">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\brep2d.h">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\cad_edge2d_polyline.h">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\cad_elem2d.h">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\cad_elem3d.h">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\contact_target_cad3d.h">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\objset_cad.h">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\truss2d.h">
+      <Filter>algorithm\SC\DelFEM\cad</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_advection_diffusion.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_diffusion.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_dkt.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_helmholtz.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_hyper.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_linear_solid2d.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_linear_solid3d.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_navier_stokes.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_poisson.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_st_venant.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_stokes.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\ker_emat_bar.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\ker_emat_hex.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\ker_emat_quad.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\ker_emat_tet.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\ker_emat_tri.h">
+      <Filter>algorithm\SC\DelFEM\femeqn</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femls\linearsystem_field.h">
+      <Filter>algorithm\SC\DelFEM\femls</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femls\linearsystem_fieldsave.h">
+      <Filter>algorithm\SC\DelFEM\femls</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femls\zlinearsystem.h">
+      <Filter>algorithm\SC\DelFEM\femls</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femls\zpreconditioner.h">
+      <Filter>algorithm\SC\DelFEM\femls</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femls\zsolver_ls_iter.h">
+      <Filter>algorithm\SC\DelFEM\femls</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\ls\eigen_lanczos.h">
+      <Filter>algorithm\SC\DelFEM\ls</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\ls\linearsystem.h">
+      <Filter>algorithm\SC\DelFEM\ls</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\ls\linearsystem_interface_solver.h">
+      <Filter>algorithm\SC\DelFEM\ls</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\ls\preconditioner.h">
+      <Filter>algorithm\SC\DelFEM\ls</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\ls\solver_ls_iter.h">
+      <Filter>algorithm\SC\DelFEM\ls</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\bcflag_blk.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\diamat_blk.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\ker_mat.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\mat_blkcrs.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matdia_blkcrs.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matdiafrac_blkcrs.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matdiainv_blkdia.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matfrac_blkcrs.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matprecond_blk.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matprolong_blkcrs.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\ordering_blk.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\solver_mat_iter.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\solver_mg.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\vector_blk.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zmat_blkcrs.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zmatdia_blkcrs.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zmatdiafrac_blkcrs.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zmatprecond_blk.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zsolver_mat_iter.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zvector_blk.h">
+      <Filter>algorithm\SC\DelFEM\matvec</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\msh\meshkernel2d.h">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\msh\meshkernel3d.h">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\msh\surface_mesh_reader.h">
+      <Filter>algorithm\SC\DelFEM\msh</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\rigid\linearsystem_rigid.h">
+      <Filter>algorithm\SC\DelFEM\rigid</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\rigid\linearsystem_rigidfield.h">
+      <Filter>algorithm\SC\DelFEM\rigid</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\rigid\rigidbody.h">
+      <Filter>algorithm\SC\DelFEM\rigid</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

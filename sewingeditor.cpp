@@ -1,4 +1,5 @@
 #include "SvgManager.h"
+#include "MeshWindow.h"
 #include "sewingeditor.h"
 #include "global_data_holder.h"
 #include "svgpp\SvgAbstractObject.h"
@@ -12,7 +13,9 @@ SewingEditor::SewingEditor(QWidget *parent)
 	initLeftDockActions();
 	connect(ui.listLayers->itemDelegate(), SIGNAL(closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint)), 
 		this, SLOT(on_listWidgetEditEnd(QWidget*, QAbstractItemDelegate::EndEditHint)));
-
+	m_meshWindow.reset(new MeshWindow);
+	m_meshWindow->setWindowTitle("mesh window");
+	m_meshWindow->show();
 	try
 	{
 		g_dataholder.init();

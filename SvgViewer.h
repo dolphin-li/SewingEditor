@@ -2,7 +2,7 @@
 #define SvgViewer_H
 
 #include <QtOpenGL>
-#include "camera.h"
+#include "Camera\camera.h"
 #include "event_handles\AbstractEventHandle.h"
 namespace svg{
 	class SvgManager;

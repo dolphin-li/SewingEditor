@@ -2,7 +2,7 @@
 
 #include <math.h>
 #include "ldp_basic_mat.h"
-#include "Quaternion.h"
+#include "ldpMat\Quaternion.h"
 #include <vector>
 #include "eigen\Dense"
 #include "eigen\SVD"

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ldp_basic_mat.h"
-#include "Camera.h"
+#include "camera\Camera.h"
 class CreaseMesh
 {
 public:

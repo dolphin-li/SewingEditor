@@ -93,7 +93,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;UNICODE;WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\SC\DelFEM\include\delfem;$(ProjectDir)\algorithm\SC;$(ProjectDir)\algorithm\SC\DelFEM\include;$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -126,7 +126,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\SC\DelFEM\include\delfem;$(ProjectDir)\algorithm\SC;$(ProjectDir)\algorithm\SC\DelFEM\include;$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -161,6 +161,103 @@
     <ClCompile Include="algorithm\Renderable\CreaseMesh.cpp" />
     <ClCompile Include="algorithm\Renderable\GLNode.cpp" />
     <ClCompile Include="algorithm\Renderable\ObjMesh.cpp" />
+    <ClCompile Include="algorithm\SC\analysis2d_cloth_static.cpp" />
+    <ClCompile Include="algorithm\SC\cloth_handler.cpp" />
+    <ClCompile Include="algorithm\SC\cloth_utility.cpp" />
+    <ClCompile Include="algorithm\SC\contact_target_adf.cpp" />
+    <ClCompile Include="algorithm\SC\contact_target_mesh.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\brep.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\brep2d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_edge2d_polyline.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_elem2d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_elem3d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_obj2d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_obj2d_move.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\cad_obj3d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\contact_target_cad3d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\drawer_cad.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\drawer_cad3d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\cad\truss2d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\drawer.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\drawer_gl_utility.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\quaternion.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\spatial_hash_grid2d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\spatial_hash_grid3d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\tri_ary_topology.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\uglyfont.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\com\vector3d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqnsys.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqnsys_fluid.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqnsys_scalar.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqnsys_shell.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqnsys_solid.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_advection_diffusion.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_diffusion.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_dkt.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_helmholtz.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_hyper.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_linear_solid2d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_linear_solid3d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_navier_stokes.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_poisson.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_stokes.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\eqn_st_venant.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femeqn\ker_emat_tri.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field_edge.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field_face.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field_image_based_flow_vis.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field_streamline.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\drawer_field_vector.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\elem_ary.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\eval.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\field.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\field_value_setter.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\field_world.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femfield\node_ary.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femls\linearsystem_field.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femls\linearsystem_fieldsave.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femls\zlinearsystem.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\femls\zsolver_ls_iter.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\ls\eigen_lanczos.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\ls\linearsystem.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\ls\preconditioner.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\ls\solver_ls_iter.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\matdiafrac_blkcrs.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\matdiainv_blkdia.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\matdia_blkcrs.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\matfrac_blkcrs.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\matprolong_blkcrs.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\mat_blkcrs.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\ordering_blk.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\solver_mat_iter.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\solver_mg.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\vector_blk.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\zmatdiafrac_blkcrs.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\zmatdia_blkcrs.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\zmat_blkcrs.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\zsolver_mat_iter.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\matvec\zvector_blk.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\drawer_msh.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\mesh3d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\mesh3d_extrude.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\mesher2d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\mesher2d_edit.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\mesher3d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\meshkernel2d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\meshkernel3d.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\msh\surface_mesh_reader.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\rigid\linearsystem_rigid.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\rigid\linearsystem_rigidfield.cpp" />
+    <ClCompile Include="algorithm\SC\DelFEM\src\rigid\rigidbody.cpp" />
+    <ClCompile Include="algorithm\SC\designer2d_cloth.cpp" />
+    <ClCompile Include="algorithm\SC\emat_cst.cpp" />
+    <ClCompile Include="algorithm\SC\emat_glue.cpp" />
+    <ClCompile Include="algorithm\SC\emat_quad_bend.cpp" />
+    <ClCompile Include="algorithm\SC\eqn_contact3d.cpp" />
+    <ClCompile Include="algorithm\SC\eqn_glue.cpp" />
+    <ClCompile Include="algorithm\SC\eqn_quad_bend.cpp" />
+    <ClCompile Include="algorithm\SC\stitch_array.cpp" />
     <ClCompile Include="algorithm\Shader\glsl.cpp" />
     <ClCompile Include="algorithm\Shader\glslprogram.cpp" />
     <ClCompile Include="algorithm\Shader\ShaderManager.cpp" />
@@ -294,10 +391,15 @@
     <ClCompile Include="algorithm\util.cpp" />
     <ClCompile Include="basemeshviewer.cpp" />
     <ClCompile Include="event_handles\AbstractEventHandle.cpp" />
+    <ClCompile Include="event_handles\AbstractMeshEventHandle.cpp" />
     <ClCompile Include="event_handles\GroupEventHandle.cpp" />
     <ClCompile Include="event_handles\ShapeEventHandle.cpp" />
     <ClCompile Include="event_handles\ZoomEventHandle.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_basemeshviewer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MeshWindow.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -333,6 +435,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MeshWindow.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_sewingeditor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -342,6 +448,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MeshWindow.cpp" />
     <ClCompile Include="sewingeditor.cpp" />
     <ClCompile Include="SquareWidget.cpp" />
     <ClCompile Include="SvgViewer.cpp" />
@@ -423,6 +530,126 @@
     <ClInclude Include="algorithm\Renderable\GLNode.h" />
     <ClInclude Include="algorithm\Renderable\ObjMesh.h" />
     <ClInclude Include="algorithm\Renderable\Renderable.h" />
+    <ClInclude Include="algorithm\SC\analysis2d_cloth_static.h" />
+    <ClInclude Include="algorithm\SC\cloth_handler.h" />
+    <ClInclude Include="algorithm\SC\cloth_utility.h" />
+    <ClInclude Include="algorithm\SC\contact_target.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad2d_interface.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\brep.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\brep2d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\cad_edge2d_polyline.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\cad_elem2d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\cad_elem3d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\contact_target_cad3d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\objset_cad.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad\truss2d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad_com.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad_obj2d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad_obj2d_move.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\cad_obj3d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\camera.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\complex.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\designer2d_analysis.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_cad.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_cad3d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field_edge.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field_face.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field_image_based_flow_vis.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field_streamline.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_field_vector.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_gl_utility.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\drawer_msh.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\elem_ary.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eqnsys.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eqnsys_fluid.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eqnsys_scalar.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eqnsys_shell.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eqnsys_solid.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\eval.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_advection_diffusion.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_diffusion.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_dkt.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_helmholtz.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_hyper.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_linear_solid2d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_linear_solid3d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_navier_stokes.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_poisson.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_stokes.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\eqn_st_venant.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\ker_emat_bar.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\ker_emat_hex.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\ker_emat_quad.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\ker_emat_tet.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femeqn\ker_emat_tri.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femls\linearsystem_field.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femls\linearsystem_fieldsave.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femls\zlinearsystem.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femls\zpreconditioner.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\femls\zsolver_ls_iter.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\field.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\field_value_setter.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\field_world.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\glut_utility.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\indexed_array.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\linearsystem_interface_eqnsys.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\ls\eigen_lanczos.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\ls\linearsystem.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\ls\linearsystem_interface_solver.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\ls\preconditioner.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\ls\solver_ls_iter.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\bcflag_blk.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\diamat_blk.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\ker_mat.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matdiafrac_blkcrs.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matdiainv_blkdia.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matdia_blkcrs.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matfrac_blkcrs.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matprecond_blk.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\matprolong_blkcrs.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\mat_blkcrs.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\ordering_blk.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\solver_mat_iter.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\solver_mg.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\vector_blk.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zmatdiafrac_blkcrs.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zmatdia_blkcrs.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zmatprecond_blk.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zmat_blkcrs.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zsolver_mat_iter.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\matvec\zvector_blk.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\mesh3d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\mesher2d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\mesher2d_edit.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\mesh_interface.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\mesh_primitive.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\msh\meshkernel2d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\msh\meshkernel3d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\msh\surface_mesh_reader.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\node_ary.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\objset.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\quaternion.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\rigid\linearsystem_rigid.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\rigid\linearsystem_rigidfield.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\rigid\rigidbody.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\serialize.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\spatial_hash_grid2d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\spatial_hash_grid3d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\tri_ary_topology.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\uglyfont.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\vector2d.h" />
+    <ClInclude Include="algorithm\SC\DelFEM\include\delfem\vector3d.h" />
+    <ClInclude Include="algorithm\SC\designer2d_cloth.h" />
+    <ClInclude Include="algorithm\SC\emat_cst.h" />
+    <ClInclude Include="algorithm\SC\emat_glue.h" />
+    <ClInclude Include="algorithm\SC\emat_quad_bend.h" />
+    <ClInclude Include="algorithm\SC\eqn_contact3d.h" />
+    <ClInclude Include="algorithm\SC\eqn_glue.h" />
+    <ClInclude Include="algorithm\SC\eqn_quad_bend.h" />
+    <ClInclude Include="algorithm\SC\slider_deform.h" />
+    <ClInclude Include="algorithm\SC\stitch_array.h" />
     <ClInclude Include="algorithm\Shader\glsl.h" />
     <ClInclude Include="algorithm\Shader\glslprogram.h" />
     <ClInclude Include="algorithm\Shader\ShaderManager.h" />
@@ -508,10 +735,29 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_SVG_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtSvg" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtXml"</Command>
     </CustomBuild>
     <ClInclude Include="event_handles\AbstractEventHandle.h" />
+    <ClInclude Include="event_handles\AbstractMeshEventHandle.h" />
     <ClInclude Include="event_handles\GroupEventHandle.h" />
     <ClInclude Include="event_handles\ShapeEventHandle.h" />
     <ClInclude Include="event_handles\ZoomEventHandle.h" />
     <ClInclude Include="GeneratedFiles\ui_sewingeditor.h" />
+    <CustomBuild Include="MeshWindow.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing MeshWindow.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing MeshWindow.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_USE_MATH_DEFINES -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB "-I$(ProjectDir)\algorithm\svgpp" "-ID:\boost\boost_1_56_0" "-I$(ProjectDir)\algorithm\svgpp\nvprsvg\common" "-I$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include" "-I$(ProjectDir)\algorithm\svgpp\nvprsvg" "-I$(ProjectDir)\algorithm\renderable" "-I$(ProjectDir)\algorithm\openmesh" "-I$(ProjectDir)\algorithm\ldpMat" "-I$(ProjectDir)\algorithm\kdtree" "-I$(ProjectDir)\algorithm\freeimage" "-I$(ProjectDir)\algorithm\GL" "-I$(ProjectDir)\algorithm\conv" "-I$(ProjectDir)\algorithm\camera" "-I$(ProjectDir)\algorithm" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing MeshWindow.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing MeshWindow.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_USE_MATH_DEFINES -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB "-I$(ProjectDir)\algorithm\svgpp" "-ID:\boost\boost_1_56_0" "-I$(ProjectDir)\algorithm\svgpp\nvprsvg\common" "-I$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include" "-I$(ProjectDir)\algorithm\svgpp\nvprsvg" "-I$(ProjectDir)\algorithm\renderable" "-I$(ProjectDir)\algorithm\openmesh" "-I$(ProjectDir)\algorithm\ldpMat" "-I$(ProjectDir)\algorithm\kdtree" "-I$(ProjectDir)\algorithm\freeimage" "-I$(ProjectDir)\algorithm\GL" "-I$(ProjectDir)\algorithm\conv" "-I$(ProjectDir)\algorithm\camera" "-I$(ProjectDir)\algorithm" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets"</Command>
+    </CustomBuild>
     <ClInclude Include="resource.h" />
     <ClInclude Include="SquareWidget.h" />
   </ItemGroup>
@@ -795,6 +1041,24 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="meshwindow.ui">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+    </CustomBuild>
     <None Include="qdarkstyle\style.qss">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

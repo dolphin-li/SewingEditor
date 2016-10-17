@@ -6,6 +6,7 @@
 #include "event_handles\AbstractEventHandle.h"
 #include <QMap>
 #include <QSharedPointer>
+class MeshWindow;
 class SewingEditor : public QMainWindow
 {
 	Q_OBJECT
@@ -39,6 +40,7 @@ private:
 	Ui::SewingEditorClass ui;
 	QMap<AbstractEventHandle::ProcessorType, QSharedPointer<QPushButton>> m_leftDockButtons;
 	QSharedPointer<QSignalMapper> m_ldbSignalMapper;
+	QSharedPointer<MeshWindow> m_meshWindow;
 protected:
 	void addLeftDockWidgetButton(AbstractEventHandle::ProcessorType type, QString iconImage, QString toolTip="");
 

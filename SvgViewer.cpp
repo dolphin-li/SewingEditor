@@ -11,7 +11,7 @@ SvgViewer::SvgViewer(QWidget *parent)
 {
 	setMouseTracking(true);
 	m_buttons = Qt::MouseButton::NoButton;
-	m_svgManager.reset(new svg::SvgManager());
+	m_svgManager = nullptr;
 	m_isDragBox = false;
 
 	m_eventHandles.resize((size_t)AbstractEventHandle::ProcessorTypeEnd, nullptr);
@@ -102,10 +102,10 @@ void SvgViewer::resizeGL(int w, int h)
 
 svg::SvgManager* SvgViewer::getSvgManager()
 {
-	return m_svgManager.get();
+	return m_svgManager;
 }
 
-void SvgViewer::setSvgManager(std::shared_ptr<svg::SvgManager> manager)
+void SvgViewer::setSvgManager(svg::SvgManager* manager)
 {
 	m_svgManager = manager;
 }
@@ -130,7 +130,8 @@ void SvgViewer::paintGL()
 	
 	m_camera.apply();
 	renderDragBox();
-	m_svgManager->render();
+	if (m_svgManager)
+		m_svgManager->render();
 }
 
 void SvgViewer::renderFbo()
@@ -151,7 +152,8 @@ void SvgViewer::renderFbo()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	m_camera.apply();
-	m_svgManager->renderIndex();
+	if (m_svgManager)
+		m_svgManager->renderIndex();
 
 	m_fbo->release();
 	m_fboImage = m_fbo->toImage();
@@ -254,11 +256,6 @@ void SvgViewer::wheelEvent(QWheelEvent*ev)
 	m_currentEventHandle->wheelEvent(ev);
 
 	updateGL();
-}
-
-void SvgViewer::loadSvg(QString name)
-{
-	m_svgManager->load(name.toStdString().c_str());
 }
 
 

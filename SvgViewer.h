@@ -18,13 +18,11 @@ public:
 	void resizeGL(int w, int h);
 	void paintGL();
 
-	void loadSvg(QString name);
-
 	const Camera& camera()const{ return m_camera; }
 	Camera& camera(){ return m_camera; }
 	void resetCamera();
 	svg::SvgManager* getSvgManager();
-	void setSvgManager(std::shared_ptr<svg::SvgManager> manager);
+	void setSvgManager(svg::SvgManager* manager);
 	Qt::MouseButtons buttons()const{ return m_buttons; }
 	QPoint lastMousePos()const{ return m_lastPos; }
 	const QImage& fboImage()const{ return m_fboImage; }
@@ -52,8 +50,7 @@ protected:
 	Qt::MouseButtons m_buttons;
 	QGLFramebufferObject* m_fbo;
 	QImage m_fboImage;
-
-	std::shared_ptr<svg::SvgManager> m_svgManager;
+	svg::SvgManager* m_svgManager;
 
 	bool m_isDragBox;
 	QPoint m_dragBoxBegin;

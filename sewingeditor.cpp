@@ -6,20 +6,24 @@ SewingEditor::SewingEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
-
 	new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(showFullScreen()));
 	new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(showNormal()));
-
 	setAcceptDrops(true);
-
 	initLeftDockActions();
-
 	connect(ui.listLayers->itemDelegate(), SIGNAL(closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint)), 
 		this, SLOT(on_listWidgetEditEnd(QWidget*, QAbstractItemDelegate::EndEditHint)));
-	initLayerList();
 
-	resetRoll();
-	initHistoryList();
+	try
+	{
+		g_dataholder.init();
+		ui.widget->setSvgManager(g_dataholder.m_svgManager.get());
+		initLayerList();
+		resetRoll();
+		initHistoryList();
+	}
+	catch (std::exception e){
+		std::cout << e.what() << std::endl;
+	}
 }
 
 SewingEditor::~SewingEditor()
@@ -43,7 +47,9 @@ void SewingEditor::dropEvent(QDropEvent* event)
 	QString name = url.toLocalFile();
 	try
 	{
-		ui.widget->loadSvg(name);
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
+		ui.widget->getSvgManager()->load(name.toStdString().c_str());
 		pushHistory("load svg");
 		ui.widget->updateGL();
 	}
@@ -117,7 +123,13 @@ void SewingEditor::on_actionLoad_svg_triggered()
 		QString name = QFileDialog::getOpenFileName(this, "load svg", "data", "*.svg");
 		if (name.isEmpty())
 			return;
-		ui.widget->loadSvg(name);
+		if (ui.widget->getSvgManager() == nullptr)
+		{
+			g_dataholder.m_svgManager.reset(new svg::SvgManager);
+			ui.widget->setSvgManager(g_dataholder.m_svgManager.get());
+		}
+
+		ui.widget->getSvgManager()->load(name.toStdString().c_str());
 		pushHistory("load svg");
 		ui.widget->resetCamera();
 		ui.widget->updateGL();
@@ -141,6 +153,8 @@ void SewingEditor::on_actionSave_svg_triggered()
 		QString name = QFileDialog::getSaveFileName(this, "save svg", "data", "*.svg");
 		if (name.isEmpty())
 			return;
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		if (!name.endsWith(".svg"))
 			name.append(".svg");
 		ui.widget->getSvgManager()->save(name.toStdString().c_str());
@@ -160,6 +174,8 @@ void SewingEditor::on_actionSelect_all_triggered()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->selectShapeByIndex(0, svg::SvgManager::SelectAll);
 		ui.widget->updateGL();
 		pushHistory("select all");
@@ -178,6 +194,8 @@ void SewingEditor::on_actionSelect_none_triggered()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->selectShapeByIndex(0, svg::SvgManager::SelectNone);
 		ui.widget->updateGL();
 		pushHistory("select none");
@@ -196,6 +214,8 @@ void SewingEditor::on_actionSelect_inverse_triggered()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->selectShapeByIndex(0, svg::SvgManager::SelectInverse);
 		ui.widget->updateGL();
 		pushHistory("select inverse");
@@ -214,6 +234,8 @@ void SewingEditor::on_actionSelect_similar_width_triggered()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->selectPathBySimilarSelectedWidth();
 		ui.widget->updateGL();
 		pushHistory("select similar width");
@@ -232,6 +254,8 @@ void SewingEditor::on_actionGroup_triggered()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->groupSelected();
 		ui.widget->updateGL();
 		pushHistory("group");
@@ -250,6 +274,8 @@ void SewingEditor::on_actionFix_grouping_triggered()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->removeSingleNodeAndEmptyNode();
 		ui.widget->updateGL();
 		pushHistory("fix grouping");
@@ -268,6 +294,8 @@ void SewingEditor::on_actionUngroup_triggered()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->ungroupSelected();
 		ui.widget->updateGL();
 		pushHistory("ungroup");
@@ -286,6 +314,8 @@ void SewingEditor::on_actionDelete_selected_triggered()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->removeSelected();
 		ui.widget->updateGL();
 		pushHistory("delete selected");
@@ -304,6 +334,8 @@ void SewingEditor::on_actionSplit_selected_path_triggered()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->splitSelectedPath();
 		ui.widget->updateGL();
 		pushHistory("split selected path");
@@ -322,6 +354,8 @@ void SewingEditor::on_actionMerge_selected_path_triggered()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->mergeSelectedPath();
 		ui.widget->updateGL();
 		pushHistory("merge selected path");
@@ -372,6 +406,8 @@ void SewingEditor::on_pbToConnectedGroups_clicked()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->convertSelectedPathToConnectedGroups();
 		ui.widget->updateGL();
 		pushHistory("path to connected groups");
@@ -414,16 +450,17 @@ void SewingEditor::rollBackTo(int pos)
 		return;
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		m_rollPos = (m_rollHead + pos) % MAX_ROLLBACK_STEP;
 		ldp::Float4 lastBound = ui.widget->getSvgManager()->getBound();
-		ui.widget->setSvgManager(m_rollBackControls[m_rollPos].data->clone());
+		g_dataholder.m_svgManager = m_rollBackControls[m_rollPos].data->clone();
+		ui.widget->setSvgManager(g_dataholder.m_svgManager.get());
 		ldp::Float4 thisBound = ui.widget->getSvgManager()->getBound();
 		if (lastBound != thisBound)
 			ui.widget->resetCamera();
 		ui.widget->updateGL();
-
 		updateHistoryList();
-
 		initLayerList();
 	}
 	catch (std::exception e)
@@ -450,6 +487,8 @@ void SewingEditor::pushHistory(QString name)
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		m_rollPos = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
 		m_rollBackControls[m_rollPos].name = name;
 		m_rollBackControls[m_rollPos].data = ui.widget->getSvgManager()->clone();
@@ -511,6 +550,8 @@ void SewingEditor::on_listHistory_currentRowChanged(int r)
 // layer control
 void SewingEditor::initLayerList()
 {
+	if (ui.widget->getSvgManager() == nullptr)
+		throw std::exception("svgManger: nullptr");
 	m_disableCurrentRowChanged = true;
 	ui.listLayers->setUpdatesEnabled(false);
 	ui.listLayers->clear();
@@ -550,6 +591,8 @@ void SewingEditor::on_listLayers_itemSelectionChanged()
 	{
 		if (m_disableCurrentRowChanged)
 			return;
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		for (int i = 0; i < ui.listLayers->count(); i++)
 		{
 			auto item = ui.listLayers->item(i);
@@ -579,6 +622,8 @@ void SewingEditor::on_listLayers_currentRowChanged(int rowId)
 			return;
 		if (ui.listLayers->count() <= rowId || rowId < 0)
 			return;
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->setCurrentLayer(ui.listLayers->item(rowId)->text().toStdString());
 		ui.widget->updateGL();
 	}
@@ -598,6 +643,8 @@ void SewingEditor::on_listWidgetEditEnd(QWidget* widget, QAbstractItemDelegate::
 	{
 		if (m_disableCurrentRowChanged)
 			return;
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		QString newName = ui.listLayers->currentItem()->text();
 		ui.widget->getSvgManager()->renameLayer(
 			ui.widget->getSvgManager()->getCurrentLayer()->name, newName.toStdString());
@@ -616,6 +663,8 @@ void SewingEditor::on_pbNewLayer_clicked()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		auto layer = ui.widget->getSvgManager()->selectedToNewLayer();
 		pushHistory(QString("add layer: ") + layer->name.c_str());
 		initLayerList();
@@ -635,6 +684,8 @@ void SewingEditor::on_pbMergeLayers_clicked()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->mergeSelectedLayers();		
 		initLayerList();
 		ui.widget->updateGL();
@@ -654,6 +705,8 @@ void SewingEditor::on_pbRemoveLayers_clicked()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		QString info("remove layers: ");
 		auto items = ui.listLayers->selectedItems();
 		for (auto item : items)
@@ -682,6 +735,8 @@ void SewingEditor::on_pbMakePair_clicked()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->makeSelectedToPair();
 		ui.widget->updateGL();
 		ui.widget->updateGL();
@@ -701,6 +756,8 @@ void SewingEditor::on_pbRemovePairs_clicked()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->removeSelectedPairs();
 		ui.widget->updateGL();
 		pushHistory("remove pairs");
@@ -719,6 +776,8 @@ void SewingEditor::on_pbClosePolygon_clicked()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->closeSelectedPolygons();
 		ui.widget->updateGL();
 		pushHistory("close selected polygons");
@@ -737,6 +796,8 @@ void SewingEditor::on_pbSelectClosed_clicked()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->selectClosedPolygons();
 		ui.widget->updateGL();
 		pushHistory("select closed polygons");
@@ -755,6 +816,8 @@ void SewingEditor::on_pbSymmetricCopy_clicked()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->symmetryCopySelectedPoly();
 		ui.widget->updateGL();
 		pushHistory("symmetric copy");
@@ -773,6 +836,8 @@ void SewingEditor::on_pbPixelToMeter_clicked()
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		float one_pixel_is_how_many_meters = ui.widget->getSvgManager()->estimatePixelToMetersFromSelected();
 		ui.sbPixelToMeter->setValue(1.0 / one_pixel_is_how_many_meters);
 		ui.widget->updateGL();
@@ -791,6 +856,8 @@ void SewingEditor::on_sbPixelToMeter_valueChanged(double v)
 {
 	try
 	{
+		if (ui.widget->getSvgManager() == nullptr)
+			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->setPixelToMeters(1.0 / v);
 	}
 	catch (std::exception e)

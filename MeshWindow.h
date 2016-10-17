@@ -27,7 +27,7 @@ protected:
 	QMap<AbstractMeshEventHandle::ProcessorType, QSharedPointer<QPushButton>> m_leftDockButtons;
 	QSharedPointer<QSignalMapper> m_ldbSignalMapper;
 	void initLeftDockActions();
-	void addLeftDockWidgetButton(AbstractMeshEventHandle::ProcessorType type, QString iconImage, QString toolTip = "");
+	void addLeftDockWidgetButton(AbstractMeshEventHandle::ProcessorType type);
 };
 
 #endif // SEWINGEDITOR_H

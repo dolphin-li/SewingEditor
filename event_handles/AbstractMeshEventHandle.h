@@ -26,6 +26,7 @@ public:
 	QCursor& cursor(){ return m_cursor; }
 	const QCursor& cursor()const{ return m_cursor; }
 	QString iconFile()const;
+	QString inactiveIconFile()const;
 	QString toolTips()const;
 
 	virtual void mousePressEvent(QMouseEvent *);
@@ -42,5 +43,6 @@ protected:
 	QPoint m_mouse_press_pt;
 	QCursor m_cursor;
 	QString m_iconFile;
+	QString m_inactiveIconFile;
 	QString m_toolTips;
 };

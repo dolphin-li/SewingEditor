@@ -10,6 +10,7 @@ ClothSelectEventHandle::ClothSelectEventHandle(BaseMeshViewer* v) : AbstractMesh
 {
 	m_cursor = QCursor(Qt::CursorShape::ArrowCursor);
 	m_iconFile = "icons/selection.png";
+	m_inactiveIconFile = "icons/selection_inactive.png";
 	m_toolTips = "cloth handle";
 }
 

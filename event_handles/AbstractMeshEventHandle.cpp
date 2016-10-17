@@ -17,6 +17,7 @@ AbstractMeshEventHandle::AbstractMeshEventHandle(BaseMeshViewer* v)
 	m_currentSelectedId = -1;
 	m_cursor = QCursor(Qt::CursorShape::ArrowCursor);
 	m_iconFile = "";
+	m_inactiveIconFile = "";
 	m_toolTips = "general handle";
 }
 
@@ -28,6 +29,11 @@ AbstractMeshEventHandle::~AbstractMeshEventHandle()
 QString AbstractMeshEventHandle::iconFile()const
 {
 	return m_iconFile;
+}
+
+QString AbstractMeshEventHandle::inactiveIconFile()const
+{
+	return m_inactiveIconFile;
 }
 
 QString AbstractMeshEventHandle::toolTips()const

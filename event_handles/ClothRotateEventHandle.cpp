@@ -10,7 +10,7 @@ ClothRotateEventHandle::ClothRotateEventHandle(BaseMeshViewer* v) : AbstractMesh
 {
 	m_cursor = QCursor(Qt::CursorShape::SizeAllCursor);
 	m_iconFile = "icons/rotation.png";
-	m_toolTips = "cloth rotate handle";
+	m_toolTips = "cloth rotate handle"; 
 }
 
 ClothRotateEventHandle::~ClothRotateEventHandle()

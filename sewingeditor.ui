@@ -1074,6 +1074,15 @@
        <property name="title">
         <string>mesh</string>
        </property>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pbGenerateMesh">
+          <property name="text">
+           <string>Generate Mesh</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>

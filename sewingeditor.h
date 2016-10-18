@@ -32,6 +32,7 @@ public:
 	void on_pbToConnectedGroups_clicked();
 	void on_pbSymmetricCopy_clicked();
 	void leftDocButtonsClicked(int i); 
+	void on_pbGenerateMesh_clicked();
 protected:
 	void dragEnterEvent(QDragEnterEvent* ev);
 	void dropEvent(QDropEvent* ev);
@@ -39,6 +40,8 @@ protected:
 private:
 	Ui::SewingEditorClass ui;
 	QSharedPointer<MeshWindow> m_meshWindow;
+//////////////////////////////////////////////////////////////////////////
+
 //////////////////////////////////////////////////////////////////////////
 protected:
 	QMap<AbstractEventHandle::ProcessorType, QSharedPointer<QPushButton>> m_leftDockButtons;

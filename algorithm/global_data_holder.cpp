@@ -12,6 +12,10 @@ void GlobalDataHolder::init()
 	// clothes related
 	m_clothManger.reset(new CAnalysis2D_Cloth_Static);
 	m_clothUiListener.reset(new CDesigner2D_Cloth);
+}
+
+void GlobalDataHolder::generateClothDebug()
+{
 	m_clothUiListener->SetAnalysisInitialize(m_clothManger.get(), 6);
 	m_clothManger->SetColor_FaceFEM(1.0, 1.0, 1.0);
 	m_clothManger->SetTextureScale_FaceFEM(5);

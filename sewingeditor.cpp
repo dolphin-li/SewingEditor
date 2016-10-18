@@ -15,7 +15,6 @@ SewingEditor::SewingEditor(QWidget *parent)
 		this, SLOT(on_listWidgetEditEnd(QWidget*, QAbstractItemDelegate::EndEditHint)));
 	m_meshWindow.reset(new MeshWindow);
 	m_meshWindow->setWindowTitle("mesh window");
-	m_meshWindow->show();
 	try
 	{
 		g_dataholder.init();
@@ -868,6 +867,23 @@ void SewingEditor::on_sbPixelToMeter_valueChanged(double v)
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
 		ui.widget->getSvgManager()->setPixelToMeters(1.0 / v);
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void SewingEditor::on_pbGenerateMesh_clicked()
+{
+	try
+	{
+		m_meshWindow->show();
+		g_dataholder.generateClothDebug();
 	}
 	catch (std::exception e)
 	{

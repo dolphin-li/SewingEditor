@@ -129,6 +129,8 @@ void BaseMeshViewer::initializeGL()
 	//glEnable(GL_CULL_FACE);
 	//glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+	glEnable(GL_POLYGON_OFFSET_FILL);
+	glPolygonOffset(1, 1);
 
 	resetCamera();
 

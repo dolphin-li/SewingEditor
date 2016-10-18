@@ -11,6 +11,8 @@ class GlobalDataHolder
 {
 public:
 	void init();
+
+	void generateClothDebug();
 public:
 	std::shared_ptr<svg::SvgManager> m_svgManager;
 	std::shared_ptr<CAnalysis2D_Cloth_Static> m_clothManger;

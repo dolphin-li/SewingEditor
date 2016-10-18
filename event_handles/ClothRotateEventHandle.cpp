@@ -35,7 +35,13 @@ ClothRotateEventHandle::~ClothRotateEventHandle()
 
 void ClothRotateEventHandle::handleEnter()
 {
-
+	ldp::Double3 o, u, v;
+	int id_l;
+	if (getPickedMeshFrameInfo(o, u, v, id_l)){
+		ldp::Mat3d R = rotation_from_uv(u, v);
+		m_trackBallMouseClickR = R;
+		m_viewer->beginTrackBall(o, R, (u.length() + v.length()) * 0.1);
+	}
 }
 
 void ClothRotateEventHandle::handleLeave()
@@ -133,7 +139,7 @@ void ClothRotateEventHandle::mouseMoveEvent(QMouseEvent *ev)
 				break;
 			}
 			ldp::Mat3d lastR = rotation_from_uv(u, v);
-			axis = lastR * axis;
+			axis = m_trackBallMouseClickR * axis;
 			ldp::Float3 c1 = c + axis;
 			ldp::Float3 c_uvd = m_viewer->camera().getScreenCoords(c);
 			ldp::Float3 c1_uvd = m_viewer->camera().getScreenCoords(c1);
@@ -141,9 +147,8 @@ void ClothRotateEventHandle::mouseMoveEvent(QMouseEvent *ev)
 			c_uv[1] = m_viewer->camera().getViewPortBottom() - c_uv[1];
 			ldp::Float2 d1 = (ldp::Float2(ev->x(), ev->y()) - c_uv).normalize();
 			ldp::Float2 d2 = (ldp::Float2(lp.x(), lp.y()) - c_uv).normalize();
-			float ag = asin(d1.cross(d2));
-			if (c_uvd[2] < c1_uvd[2])
-				ag = -ag;
+			float ag = atan2(d1.cross(d2), d1.dot(d2));
+			if (c_uvd[2] < c1_uvd[2]) ag = -ag;
 			auto R = ldp::QuaternionF().fromAngleAxis(ag, axis).toRotationMatrix3() * m_trackBallMouseClickR;
 
 			m_viewer->pAnalysis()->RotateClothLoopInitialPosition(id_l, R*lastR.trans());

@@ -80,6 +80,8 @@ public:
     QPushButton *pbPixelToMeter;
     QDoubleSpinBox *sbPixelToMeter;
     QGroupBox *groupBox;
+    QGridLayout *gridLayout_5;
+    QPushButton *pbGenerateMesh;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -375,6 +377,15 @@ public:
         groupBox = new QGroupBox(dockWidgetRightContents);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setMinimumSize(QSize(0, 100));
+        gridLayout_5 = new QGridLayout(groupBox);
+        gridLayout_5->setSpacing(6);
+        gridLayout_5->setContentsMargins(11, 11, 11, 11);
+        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
+        pbGenerateMesh = new QPushButton(groupBox);
+        pbGenerateMesh->setObjectName(QStringLiteral("pbGenerateMesh"));
+
+        gridLayout_5->addWidget(pbGenerateMesh, 0, 0, 1, 1);
+
 
         gridLayout_4->addWidget(groupBox, 3, 0, 1, 1);
 
@@ -504,6 +515,7 @@ public:
 #endif // QT_NO_TOOLTIP
         pbPixelToMeter->setText(QApplication::translate("SewingEditorClass", "pixel to meter", 0));
         groupBox->setTitle(QApplication::translate("SewingEditorClass", "mesh", 0));
+        pbGenerateMesh->setText(QApplication::translate("SewingEditorClass", "Generate Mesh", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

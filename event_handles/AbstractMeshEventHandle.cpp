@@ -63,8 +63,28 @@ void AbstractMeshEventHandle::mousePressEvent(QMouseEvent *ev)
 {
 	m_mouse_press_pt = ev->pos();
 
+	// arcball drag
 	if (ev->buttons() == Qt::LeftButton)
 		m_viewer->camera().arcballClick(ldp::Float2(ev->x(), ev->y()));
+
+	// pick a point on the mesh
+	if (m_viewer->buttons() == Qt::LeftButton && m_viewer->pAnalysis())
+	{
+		const ldp::Camera& cam = m_viewer->camera();
+		ldp::UInt3 tri_id;
+		ldp::Double3 tri_coord;
+		unsigned int id_l;
+		bool res = m_viewer->pAnalysis()->Pick(ldp::Float2(ev->x(), m_viewer->height() - 1 - ev->y()),
+			cam, tri_id, tri_coord, id_l, m_picked_screenDepth);
+		if (!res){
+			m_viewer->pListener()->HilightCadTypeID(Cad::NOT_SET, 0);
+			m_viewer->pListener()->Cad_SetPicked(Cad::NOT_SET, 0, 0, 0);
+		}
+		else{
+			m_viewer->pListener()->HilightCadTypeID(Cad::LOOP, id_l);
+			m_viewer->pListener()->Cad_SetPicked(Cad::LOOP, id_l, 0, 0);
+		}
+	} // end if left button
 }
 
 void AbstractMeshEventHandle::mouseReleaseEvent(QMouseEvent *ev)

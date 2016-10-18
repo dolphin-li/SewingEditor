@@ -157,7 +157,7 @@ std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair)
 
 #if 1
 			// ldp test: add an non-manifold edge, failed
-			auto v_id0 = cad_2d.AddVertex(Cad::CAD_ELEM_TYPE::LOOP, res1.id_l_add, 
+			auto v_id0 = cad_2d.AddVertex(Cad::CAD_ELEM_TYPE::LOOP, res1.id_l_add,
 				(vec_ary[0] * 0.4 + vec_ary[1] * 0.6 + vec_ary[4] * 0.4 + vec_ary[5] * 0.6) * 0.5);
 			auto v_id1 = cad_2d.AddVertex(Cad::CAD_ELEM_TYPE::EDGE, res1.aIdE[0],
 				(vec_ary[0] * 0.4 + vec_ary[1] * 0.6 + vec_ary[0] * 0.4 + vec_ary[1] * 0.6) * 0.5);
@@ -2103,6 +2103,60 @@ bool CAnalysis2D_Cloth_Static::Pick(double scrx, double scry,
 	return false;
 }
 
+bool CAnalysis2D_Cloth_Static::Pick(ldp::Double2 screenPos, const ldp::Camera& cam,
+	ldp::UInt3& picked_elem_nodes, ldp::Double3& picked_elem_ratio, unsigned int& id_l_cad, double& screenDepth)
+{
+	//  std::cout << "Put Pin" << scrx << " " << scry << std::endl;
+	const Fem::Field::CField& field_disp = world.GetField(id_field_disp);
+	const Fem::Field::CNodeAry::CNodeSeg& ns_c = field_disp.GetNodeSeg(CORNER, false, world, VALUE);
+	const Fem::Field::CNodeAry::CNodeSeg& ns_u = field_disp.GetNodeSeg(CORNER, true, world, VALUE);
+	std::vector<unsigned int> aIdEA = field_disp.GetAryIdEA();
+	for (unsigned int iiea = 0; iiea < aIdEA.size(); iiea++)
+	{
+		const unsigned int id_ea = aIdEA[iiea];
+		const Fem::Field::CElemAry::CElemSeg& es = field_disp.GetElemSeg(id_ea, CORNER, true, world);
+		assert(es.Length() == 3);
+		for (unsigned int ielem = 0; ielem < es.Size(); ielem++)
+		{
+			unsigned int no[3];
+			es.GetNodes(ielem, no);
+			ldp::Double3 C[3], u[3], c0[3], C1[3];
+			ldp::Double2 c1[3];
+			for (int k = 0; k < 3; k++){
+				ns_c.GetValue(no[k], C[k].ptr());
+				ns_u.GetValue(no[k], u[k].ptr());
+				c0[k] = C[k] + u[k];
+				C1[k] = cam.getScreenCoords(c0[k]);
+				c1[k] = ldp::Float2(C1[k][0], C1[k][1]);
+			}
+			double area0 = Com::TriArea3D(c0[0].ptr(), c0[1].ptr(), c0[2].ptr());
+			double area1 = Com::TriArea2D(c1[0].ptr(), c1[1].ptr(), c1[2].ptr());
+			if (area1 < area0*0.01) continue;
+			const double scr[2] = { screenPos[0], screenPos[1] };
+			double area2 = Com::TriArea2D(scr, c1[1].ptr(), c1[2].ptr());
+			double area3 = Com::TriArea2D(c1[0].ptr(), scr, c1[2].ptr());
+			double area4 = Com::TriArea2D(c1[0].ptr(), c1[1].ptr(), scr);
+			if (area2 < -area1*0.01) continue;
+			if (area3 < -area1*0.01) continue;
+			if (area4 < -area1*0.01) continue;
+			std::cout << "hit " << id_ea << " " << ielem << std::endl;
+			picked_elem_nodes[0] = no[0];
+			picked_elem_nodes[1] = no[1];
+			picked_elem_nodes[2] = no[2];
+			picked_elem_ratio[0] = area2 / area1;
+			picked_elem_ratio[1] = area3 / area1;
+			picked_elem_ratio[2] = area4 / area1;
+			screenDepth = picked_elem_ratio[0] * C1[0][2] + picked_elem_ratio[1] * C1[1][2]
+				+ picked_elem_ratio[2] * C1[2][2];
+			const Fem::Field::CIDConvEAMshCad& conv = world.GetIDConverter(id_field_base);
+			Cad::CAD_ELEM_TYPE itype;
+			conv.GetIdCad_fromIdEA(id_ea, id_l_cad, itype);
+			return true;
+		}
+	}
+	id_l_cad = 0;
+	return false;
+}
 
 void CAnalysis2D_Cloth_Static::SetIsDetail(bool is_detail, const Cad::CCadObj2D& cad_2d, const Msh::CMesher2D& mesh_2d)
 {

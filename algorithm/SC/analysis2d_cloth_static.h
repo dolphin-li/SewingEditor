@@ -25,7 +25,7 @@
 #include "contact_target.h"
 
 // ldp added
-//#include "camera\Camera.h"
+#include "camera\Camera.h"
 
 enum SOLVER_FLAG
 {
@@ -205,8 +205,9 @@ public:
 		unsigned int& id_l);
 
 	//// ldp added
-	//bool Pick(ldp::Double2 screenPos, const ldp::Camera& cam,
-	//	const ldp::Int3& picked_ele_nodes, ldp::Double3& picked_elem_ratio){}
+	bool Pick(ldp::Double2 screenPos, const ldp::Camera& cam,
+		ldp::UInt3& picked_ele_nodes, ldp::Double3& picked_elem_ratio,
+		unsigned int& id_l, double& screenDepth);
 
 	bool WriteObjMeshSTL(const std::string& fname, double scale) { return obj_mesh.WriteSTL(fname, scale); }
 	virtual SOLVER_FLAG Solve();

@@ -84,7 +84,8 @@
 	#pragma warning(push)
 	#pragma warning(disable : 4099 4127 4146)	//struct vs class, constant in if, negative unsigned
 #endif
-
+#undef min
+#undef max
 //check C++11 library features
 #include <utility>
 #if defined(_LIBCPP_VERSION)								//libc++

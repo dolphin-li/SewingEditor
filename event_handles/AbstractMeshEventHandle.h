@@ -36,6 +36,9 @@ public:
 	virtual void wheelEvent(QWheelEvent*);
 	virtual void keyPressEvent(QKeyEvent*);
 	virtual void keyReleaseEvent(QKeyEvent*);
+
+	void pickMesh(QPoint p);
+	bool getPickedMeshFrameInfo(ldp::Double3& o, ldp::Double3& u, ldp::Double3& v, int& id_l)const;
 protected:
 	BaseMeshViewer* m_viewer;
 	int m_lastHighlightShapeId;

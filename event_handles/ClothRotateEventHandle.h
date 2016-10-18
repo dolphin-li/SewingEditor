@@ -4,6 +4,7 @@
 #include <QCursor>
 #include <QString>
 #include "AbstractMeshEventHandle.h"
+
 class ClothRotateEventHandle : public AbstractMeshEventHandle
 {
 public:
@@ -17,4 +18,6 @@ public:
 	virtual void wheelEvent(QWheelEvent*);
 	virtual void keyPressEvent(QKeyEvent*);
 	virtual void keyReleaseEvent(QKeyEvent*);
+protected:
+	ldp::Mat3f m_trackBallMouseClickR;
 };

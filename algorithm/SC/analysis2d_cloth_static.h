@@ -210,6 +210,8 @@ public:
 		ldp::UInt3& picked_ele_nodes, ldp::Double3& picked_elem_ratio,
 		unsigned int& id_l, ldp::Double3& pickedScreenPos);
 	const CClothHandler& getClothHandle(){ return clothHandler_; }
+	const Fem::Field::CFieldWorld& getWorld()const{ return world; }
+	const unsigned int get_id_field_base()const{ return id_field_base; }
 
 	bool WriteObjMeshSTL(const std::string& fname, double scale) { return obj_mesh.WriteSTL(fname, scale); }
 	virtual SOLVER_FLAG Solve();

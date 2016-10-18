@@ -22,6 +22,12 @@ ClothSelectEventHandle::~ClothSelectEventHandle()
 void ClothSelectEventHandle::mousePressEvent(QMouseEvent *ev)
 {
 	AbstractMeshEventHandle::mousePressEvent(ev);
+
+	// pick a point on the mesh
+	if (m_viewer->buttons() == Qt::LeftButton && m_viewer->pAnalysis())
+	{
+		pickMesh(ev->pos());
+	} // end if left button
 }
 
 void ClothSelectEventHandle::mouseReleaseEvent(QMouseEvent *ev)

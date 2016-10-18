@@ -59,6 +59,44 @@ AbstractMeshEventHandle* AbstractMeshEventHandle::create(ProcessorType type, Bas
 	}
 }
 
+void AbstractMeshEventHandle::pickMesh(QPoint p)
+{
+	const ldp::Camera& cam = m_viewer->camera();
+	ldp::UInt3 tri_id;
+	ldp::Double3 tri_coord;
+	unsigned int id_l;
+	bool res = m_viewer->pAnalysis()->Pick(ldp::Float2(p.x(), m_viewer->height() - 1 - p.y()),
+		cam, tri_id, tri_coord, id_l, m_picked_screenPos);
+	if (!res){
+		m_viewer->pListener()->HilightCadTypeID(Cad::NOT_SET, 0);
+		m_viewer->pListener()->Cad_SetPicked(Cad::NOT_SET, 0, 0, 0);
+	}
+	else{
+		m_viewer->pListener()->HilightCadTypeID(Cad::LOOP, id_l);
+		m_viewer->pListener()->Cad_SetPicked(Cad::LOOP, id_l, 0, 0);
+	}
+}
+
+bool AbstractMeshEventHandle::getPickedMeshFrameInfo(ldp::Double3& o, ldp::Double3& u, ldp::Double3& v, int& id_l)const
+{
+	Cad::CAD_ELEM_TYPE itype_cad_part;
+	unsigned int id_cad_part;
+	double tmp_x, tmp_y;
+	m_viewer->pListener()->Cad_GetPicked(itype_cad_part, id_cad_part, tmp_x, tmp_y);
+	if (itype_cad_part == Cad::LOOP && m_viewer->pListener()->GetCad().IsElemID(itype_cad_part, id_cad_part))
+	{
+		const auto& handle = m_viewer->pAnalysis()->getClothHandle();
+		const auto& world = m_viewer->pAnalysis()->getWorld();
+		const auto& conv = world.GetIDConverter(m_viewer->pAnalysis()->get_id_field_base());
+		auto idEa = conv.GetIdEA_fromCad(id_cad_part, Cad::LOOP);
+		ldp::Double3 p, n, h;
+		handle.GetAnchor_3D(o.ptr(), u.ptr(), v.ptr(), idEa);
+		id_l = id_cad_part;
+		return true;
+	}
+	return false;
+}
+
 void AbstractMeshEventHandle::mousePressEvent(QMouseEvent *ev)
 {
 	m_mouse_press_pt = ev->pos();
@@ -66,25 +104,6 @@ void AbstractMeshEventHandle::mousePressEvent(QMouseEvent *ev)
 	// arcball drag
 	if (ev->buttons() == Qt::LeftButton)
 		m_viewer->camera().arcballClick(ldp::Float2(ev->x(), ev->y()));
-
-	// pick a point on the mesh
-	if (m_viewer->buttons() == Qt::LeftButton && m_viewer->pAnalysis())
-	{
-		const ldp::Camera& cam = m_viewer->camera();
-		ldp::UInt3 tri_id;
-		ldp::Double3 tri_coord;
-		unsigned int id_l;
-		bool res = m_viewer->pAnalysis()->Pick(ldp::Float2(ev->x(), m_viewer->height() - 1 - ev->y()),
-			cam, tri_id, tri_coord, id_l, m_picked_screenPos);
-		if (!res){
-			m_viewer->pListener()->HilightCadTypeID(Cad::NOT_SET, 0);
-			m_viewer->pListener()->Cad_SetPicked(Cad::NOT_SET, 0, 0, 0);
-		}
-		else{
-			m_viewer->pListener()->HilightCadTypeID(Cad::LOOP, id_l);
-			m_viewer->pListener()->Cad_SetPicked(Cad::LOOP, id_l, 0, 0);
-		}
-	} // end if left button
 }
 
 void AbstractMeshEventHandle::mouseReleaseEvent(QMouseEvent *ev)

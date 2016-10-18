@@ -12,6 +12,12 @@ class BaseMeshViewer : public QGLWidget
 	Q_OBJECT
 
 public:
+	enum {
+		TrackBallIndex_X = 1,
+		TrackBallIndex_Y,
+		TrackBallIndex_Z,
+	};
+public:
 	BaseMeshViewer(QWidget *parent);
 	~BaseMeshViewer();
 
@@ -39,7 +45,17 @@ public:
 	const AbstractMeshEventHandle* getEventHandle(AbstractMeshEventHandle::ProcessorType type)const;
 	AbstractMeshEventHandle* getEventHandle(AbstractMeshEventHandle::ProcessorType type);
 	void beginDragBox(QPoint p);
+	void rotateTrackBall(ldp::Mat3d R);
 	void endDragBox();
+	void beginTrackBall(ldp::Float3 p, ldp::Mat3f R, float scale);
+	void endTrackBall();
+	bool isTrackBallShown()const{ return m_isTrackBall; }
+	void setActiveTrackBallAxis(int i){ m_activeTrackBallAxis = i; }
+	int getActiveTrackBallAxis()const{ return m_activeTrackBallAxis; }
+	void setHoverTrackBallAxis(int i){ m_hoverTrackBallAxis = i; }
+	int getHoverTrackBallAxis()const{ return m_hoverTrackBallAxis; }
+
+	int fboRenderedIndex(QPoint p)const;
 protected:
 	void mousePressEvent(QMouseEvent *);
 	void mouseReleaseEvent(QMouseEvent *);
@@ -50,6 +66,7 @@ protected:
 	void keyReleaseEvent(QKeyEvent*);
 	void renderSelectionOnFbo();
 	void renderDragBox();
+	void renderTrackBall(bool idxMode);
 	void timerEvent(QTimerEvent* ev);
 protected:
 	ldp::Camera m_camera;
@@ -61,6 +78,12 @@ protected:
 	QImage m_fboImage;
 	bool m_isDragBox;
 	QPoint m_dragBoxBegin;
+	bool m_isTrackBall;
+	ldp::Float3 m_trackBallPos;
+	ldp::Mat3f m_trackBallR;
+	float m_trackBallScale;
+	int m_activeTrackBallAxis;
+	int m_hoverTrackBallAxis;
 	AbstractMeshEventHandle* m_currentEventHandle;
 	std::vector<std::shared_ptr<AbstractMeshEventHandle>> m_eventHandles;
 

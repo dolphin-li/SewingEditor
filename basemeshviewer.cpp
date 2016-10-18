@@ -2,14 +2,82 @@
 #include "basemeshviewer.h"
 #include "designer2d_cloth.h"
 #include "analysis2d_cloth_static.h"
+#include "ldpMat\Quaternion.h"
+#pragma region --mat_utils
+
+inline ldp::Mat3f angles2rot(ldp::Float3 v)
+{
+	float theta = v.length();
+	if (theta == 0)
+		return ldp::Mat3f().eye();
+	v /= theta;
+	return ldp::QuaternionF().fromAngleAxis(theta, v).toRotationMatrix3();
+}
+
+inline ldp::Float3 rot2angles(ldp::Mat3f R)
+{
+	ldp::QuaternionF q;
+	q.fromRotationMatrix(R);
+	ldp::Float3 v;
+	float ag;
+	q.toAngleAxis(v, ag);
+	v *= ag;
+	return v;
+}
+
+static GLUquadric* get_quadric()
+{
+	static GLUquadric* q = gluNewQuadric();
+	return q;
+}
+
+static ldp::Mat4f get_z2x_rot()
+{
+	static ldp::Mat4f R = ldp::QuaternionF().fromRotationVecs(ldp::Float3(0, 0, 1),
+		ldp::Float3(1, 0, 0)).toRotationMatrix();
+	return R;
+}
+
+static ldp::Mat4f get_z2y_rot()
+{
+	static ldp::Mat4f R = ldp::QuaternionF().fromRotationVecs(ldp::Float3(0, 0, 1),
+		ldp::Float3(0, 1, 0)).toRotationMatrix();
+	return R;
+}
+
+static void solid_axis(float base, float length)
+{
+	GLUquadric* q = get_quadric();
+	gluCylinder(q, base, base, length, 32, 32);
+	glTranslatef(0, 0, length);
+	gluCylinder(q, base*2.5f, 0.f, length* 0.2f, 32, 32);
+	glTranslatef(0, 0, -length);
+}
+
+inline int colorToSelectId(ldp::Float4 c)
+{
+	ldp::UInt4 cl = c*255.f;
+	return (cl[0] << 24) + (cl[1] << 16) + (cl[2] << 8) + cl[3];
+}
+
+inline ldp::Float4 selectIdToColor(unsigned int id)
+{
+	int r = (id >> 24) & 0xff;
+	int g = (id >> 16) & 0xff;
+	int b = (id >> 8) & 0xff;
+	int a = id & 0xff;
+	return ldp::Float4(r, g, b, a) / 255.f;
+}
+
+#pragma endregion
 
 BaseMeshViewer::BaseMeshViewer(QWidget *parent)
-	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
 	setMouseTracking(true);
 	m_buttons = Qt::MouseButton::NoButton;
 	m_isDragBox = false;
 	m_isEdgeMode = false;
+	m_isTrackBall = false;
 
 	m_eventHandles.resize((size_t)AbstractMeshEventHandle::ProcessorTypeEnd, nullptr);
 	for (size_t i = (size_t)AbstractMeshEventHandle::ProcessorTypeGeneral;
@@ -67,7 +135,6 @@ void BaseMeshViewer::initializeGL()
 	// fbo
 	QGLFramebufferObjectFormat fmt;
 	fmt.setAttachment(QGLFramebufferObject::CombinedDepthStencil);
-	fmt.setMipmap(true);
 	m_fbo = new QGLFramebufferObject(width(), height(), fmt);
 	if (!m_fbo->isValid())
 		printf("error: invalid depth fbo!\n");
@@ -130,11 +197,30 @@ void BaseMeshViewer::paintGL()
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		m_pListener->Draw(4);
 	}
+	renderTrackBall(false);
+	renderDragBox();
 }
 
 void BaseMeshViewer::renderSelectionOnFbo()
 {
+	m_fbo->bind();
+	glClearColor(0.f, 0.f, 0.f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_COLOR_MATERIAL);
+	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
 
+	m_camera.apply();
+
+	renderTrackBall(true);
+
+	m_fboImage = m_fbo->toImage();
+	m_fbo->release();
+
+	glPopAttrib();
 }
 
 void BaseMeshViewer::mousePressEvent(QMouseEvent *ev)
@@ -275,3 +361,97 @@ void BaseMeshViewer::getModelBound(ldp::Float3& bmin, ldp::Float3& bmax)
 	}
 }
 
+void BaseMeshViewer::beginTrackBall(ldp::Float3 p, ldp::Mat3f R, float scale)
+{
+	m_trackBallPos = p;
+	m_trackBallR = R;
+	m_trackBallScale = scale;
+	m_isTrackBall = true;
+	m_activeTrackBallAxis = -1;
+	m_hoverTrackBallAxis = -1;
+}
+
+void BaseMeshViewer::rotateTrackBall(ldp::Mat3d R)
+{
+	m_trackBallR = R * m_trackBallR;
+}
+
+void BaseMeshViewer::endTrackBall()
+{
+	m_isTrackBall = false;
+	m_activeTrackBallAxis = -1;
+	m_hoverTrackBallAxis = -1;
+}
+
+int BaseMeshViewer::fboRenderedIndex(QPoint p)const
+{
+	if (m_fboImage.rect().contains(p))
+	{
+		QRgb c = m_fboImage.pixel(p);
+		return colorToSelectId(ldp::Float4(qRed(c), qGreen(c), qBlue(c), qAlpha(c))/255.f);
+	}
+	return 0;
+}
+
+void BaseMeshViewer::renderTrackBall(bool indexMode)
+{
+	if (!m_isTrackBall)
+		return;
+
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	if (!indexMode)
+	{
+		glEnable(GL_COLOR_MATERIAL);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	glPushMatrix();
+	glTranslatef(m_trackBallPos[0], m_trackBallPos[1], m_trackBallPos[2]);
+	ldp::Mat4f M = ldp::Mat4f().eye();
+	M.setRotationPart(m_trackBallR);
+	glMultMatrixf(M.ptr());
+
+	// x axis
+	glColor3f(1, 0, 0);
+	if (m_activeTrackBallAxis == TrackBallIndex_X || (m_hoverTrackBallAxis == 
+		TrackBallIndex_X && m_activeTrackBallAxis < 0))
+		glColor3f(1, 1, 1);
+	if (indexMode)
+		glColor4fv(selectIdToColor(TrackBallIndex_X).ptr());
+	glMultMatrixf(get_z2x_rot().ptr());
+	glutSolidTorus(m_trackBallScale * 0.03, m_trackBallScale, 16, 128);
+	glMultMatrixf(get_z2x_rot().trans().ptr());
+
+	// y axis
+	glColor3f(0, 1, 0);
+	if (m_activeTrackBallAxis == TrackBallIndex_Y || (m_hoverTrackBallAxis == 
+		TrackBallIndex_Y && m_activeTrackBallAxis < 0))
+		glColor3f(1, 1, 1);
+	if (indexMode)
+		glColor4fv(selectIdToColor(TrackBallIndex_Y).ptr());
+	glMultMatrixf(get_z2y_rot().ptr());
+	glutSolidTorus(m_trackBallScale * 0.03, m_trackBallScale, 16, 128);
+	glMultMatrixf(get_z2y_rot().trans().ptr());
+
+	// z axis
+	glColor3f(0, 0, 1);
+	if (m_activeTrackBallAxis == TrackBallIndex_Z || (m_hoverTrackBallAxis == 
+		TrackBallIndex_Z && m_activeTrackBallAxis < 0))
+		glColor3f(1, 1, 1);
+	if (indexMode)
+		glColor4fv(selectIdToColor(TrackBallIndex_Z).ptr());
+	glutSolidTorus(m_trackBallScale * 0.03, m_trackBallScale, 4, 128);
+
+	// sphere
+	if (!indexMode)
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glColor4f(0.6, 0.6, 0.6, 0.5);
+		glutSolidSphere(m_trackBallScale, 32, 32);
+		glDisable(GL_BLEND);
+	}
+
+	glPopMatrix();
+	glPopAttrib();
+}

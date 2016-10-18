@@ -634,8 +634,6 @@ QComboBox
 QPushButton:checked{
     background-color: #f6797C;
     border-color: #6A6969;
-    padding-top: -15px;
-   # padding-bottom: -17px;
 }
 
 QComboBox:hover,QPushButton:hover,QAbstractSpinBox:hover,QLineEdit:hover,QTextEdit:hover,QPlainTextEdit:hover,QAbstractView:hover,QTreeView:hover

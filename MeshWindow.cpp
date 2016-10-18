@@ -82,6 +82,8 @@ void MeshWindow::initLeftDockActions()
 		addLeftDockWidgetButton(type);
 	}
 	m_leftDockButtons[AbstractMeshEventHandle::ProcessorTypeClothSelect]->setChecked(true);
+	m_leftDockButtons[AbstractMeshEventHandle::ProcessorTypeClothTranslate]->setShortcut(Qt::Key_T);
+	m_leftDockButtons[AbstractMeshEventHandle::ProcessorTypeClothRotate]->setShortcut(Qt::Key_R);
 
 	// do connections
 	for (auto it : m_leftDockButtons.toStdMap())

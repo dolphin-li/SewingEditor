@@ -45,5 +45,5 @@ protected:
 	QString m_iconFile;
 	QString m_inactiveIconFile;
 	QString m_toolTips;
-	double m_picked_screenDepth;
+	ldp::Double3 m_picked_screenPos;
 };

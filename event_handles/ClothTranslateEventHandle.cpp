@@ -46,8 +46,8 @@ void ClothTranslateEventHandle::mouseMoveEvent(QMouseEvent *ev)
 		if (itype_cad_part == Cad::LOOP && m_viewer->pListener()->GetCad().IsElemID(itype_cad_part, id_cad_part))
 		{
 			QPoint lp = m_viewer->lastMousePos();
-			ldp::Double3 wp = cam.getWorldCoords(ldp::Float3(ev->x(), m_viewer->height() - 1 - ev->y(), m_picked_screenDepth));
-			ldp::Double3 wlp = cam.getWorldCoords(ldp::Float3(lp.x(), m_viewer->height() - 1 - lp.y(), m_picked_screenDepth));
+			ldp::Double3 wp = cam.getWorldCoords(ldp::Float3(ev->x(), m_viewer->height() - 1 - ev->y(), m_picked_screenPos[2]));
+			ldp::Double3 wlp = cam.getWorldCoords(ldp::Float3(lp.x(), m_viewer->height() - 1 - lp.y(), m_picked_screenPos[2]));
 			ldp::Double3 dir = wp - wlp;
 			m_viewer->pAnalysis()->MoveClothLoopInitialPosition(id_cad_part, dir.ptr());
 			valid_op = true;

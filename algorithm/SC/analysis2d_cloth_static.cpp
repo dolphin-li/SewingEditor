@@ -1023,6 +1023,32 @@ void CAnalysis2D_Cloth_Static::MoveClothLoopInitialPosition
 	}
 }
 
+void CAnalysis2D_Cloth_Static::RotateClothLoopInitialPosition(unsigned int id_l, const ldp::Mat3d& R)
+{
+	const Fem::Field::CIDConvEAMshCad& conv = world.GetIDConverter(id_field_base);
+	unsigned int id_ea = conv.GetIdEA_fromCad(id_l, Cad::LOOP);
+	
+	ldp::Double3 p, n, h;
+	if (!clothHandler_.GetAnchor_3D(p.ptr(), n.ptr(), h.ptr(), id_ea)) { return; }
+	clothHandler_.Transform_Cloth_Rot(id_l, R);
+	if (imode_ == CLOTH_INITIAL_LOCATION)
+	{
+		//    std::cout << anc_x << " " << anc_y << " " << anc_z << std::endl;
+		clothHandler_.SetClothLocation(id_field_disp, world);
+		m_aDrawerField.Update(world);
+		if (is_detail_)
+		{
+			assert(id_field_disp_detail != 0);
+			assert(id_field_base_detail != 0);
+			MoveFineDeformedCoord(id_field_disp_detail, id_field_base_detail,
+				id_field_disp, id_field_base,
+				world, aInterp_detail);
+			m_aDrawerField_detail.Update(world);
+		}
+	}
+}
+
+
 void CAnalysis2D_Cloth_Static::DrawBoundaryCondition(const Cad::CCadObj2D& cad_2d) const
 {
 	stitch_ary_.DrawBoundaryCondition2D(cad_2d);
@@ -2104,7 +2130,8 @@ bool CAnalysis2D_Cloth_Static::Pick(double scrx, double scry,
 }
 
 bool CAnalysis2D_Cloth_Static::Pick(ldp::Double2 screenPos, const ldp::Camera& cam,
-	ldp::UInt3& picked_elem_nodes, ldp::Double3& picked_elem_ratio, unsigned int& id_l_cad, double& screenDepth)
+	ldp::UInt3& picked_elem_nodes, ldp::Double3& picked_elem_ratio, unsigned int& id_l_cad,
+	ldp::Double3& pickedScreenPos)
 {
 	//  std::cout << "Put Pin" << scrx << " " << scry << std::endl;
 	const Fem::Field::CField& field_disp = world.GetField(id_field_disp);
@@ -2146,8 +2173,8 @@ bool CAnalysis2D_Cloth_Static::Pick(ldp::Double2 screenPos, const ldp::Camera& c
 			picked_elem_ratio[0] = area2 / area1;
 			picked_elem_ratio[1] = area3 / area1;
 			picked_elem_ratio[2] = area4 / area1;
-			screenDepth = picked_elem_ratio[0] * C1[0][2] + picked_elem_ratio[1] * C1[1][2]
-				+ picked_elem_ratio[2] * C1[2][2];
+			pickedScreenPos = picked_elem_ratio[0] * C1[0] + picked_elem_ratio[1] * C1[1]
+				+ picked_elem_ratio[2] * C1[2];
 			const Fem::Field::CIDConvEAMshCad& conv = world.GetIDConverter(id_field_base);
 			Cad::CAD_ELEM_TYPE itype;
 			conv.GetIdCad_fromIdEA(id_ea, id_l_cad, itype);

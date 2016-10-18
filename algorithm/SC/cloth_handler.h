@@ -12,7 +12,7 @@
 
 #include "delfem/tri_ary_topology.h"
 
-
+#include "ldp_basic_mat.h"
 class CClothHandler
 {    
   class CNode;
@@ -45,7 +45,8 @@ public:
   void AddClothPiece(unsigned int id_l, double cent_x, double cent_y);
   void AddClothPiece(unsigned int id_l_new, unsigned int id_l_old);  
   void Transform_Cloth_Pan(unsigned int id_l, double anc_x, double anc_y, double anc_z);  
-  void Transform_Cloth_RotBryantAngle(unsigned int id_l, double phi, double theta, double psi); 
+  void Transform_Cloth_RotBryantAngle(unsigned int id_l, double phi, double theta, double psi);
+  void Transform_Cloth_Rot(unsigned int id_l, const ldp::Mat3d& R);
   void SetRadius(unsigned int id_l, double r);
     /////
   bool SetClothLocation(unsigned int id_field_disp, Fem::Field::CFieldWorld& world);

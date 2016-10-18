@@ -144,6 +144,7 @@ public:
 		InitDrawer();
 	}
 	void MoveClothLoopInitialPosition(unsigned int id_l, double der[3]);
+	void RotateClothLoopInitialPosition(unsigned int id_l, const ldp::Mat3d& R); // ldp
 	void SetHilight(Cad::CAD_ELEM_TYPE itype, unsigned int cad_elem_id);
 	void SetTextureCenter(double cent_x, double cent_y);
 	void SetTextureScale_FaceFEM(double scale);
@@ -207,7 +208,8 @@ public:
 	//// ldp added
 	bool Pick(ldp::Double2 screenPos, const ldp::Camera& cam,
 		ldp::UInt3& picked_ele_nodes, ldp::Double3& picked_elem_ratio,
-		unsigned int& id_l, double& screenDepth);
+		unsigned int& id_l, ldp::Double3& pickedScreenPos);
+	const CClothHandler& getClothHandle(){ return clothHandler_; }
 
 	bool WriteObjMeshSTL(const std::string& fname, double scale) { return obj_mesh.WriteSTL(fname, scale); }
 	virtual SOLVER_FLAG Solve();

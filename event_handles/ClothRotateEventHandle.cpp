@@ -33,6 +33,16 @@ ClothRotateEventHandle::~ClothRotateEventHandle()
 
 }
 
+void ClothRotateEventHandle::handleEnter()
+{
+
+}
+
+void ClothRotateEventHandle::handleLeave()
+{
+	m_viewer->endTrackBall();
+}
+
 void ClothRotateEventHandle::mousePressEvent(QMouseEvent *ev)
 {
 	AbstractMeshEventHandle::mousePressEvent(ev);

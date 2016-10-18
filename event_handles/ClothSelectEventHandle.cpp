@@ -19,6 +19,16 @@ ClothSelectEventHandle::~ClothSelectEventHandle()
 
 }
 
+void ClothSelectEventHandle::handleEnter()
+{
+
+}
+
+void ClothSelectEventHandle::handleLeave()
+{
+
+}
+
 void ClothSelectEventHandle::mousePressEvent(QMouseEvent *ev)
 {
 	AbstractMeshEventHandle::mousePressEvent(ev);

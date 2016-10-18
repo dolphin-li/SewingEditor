@@ -36,6 +36,15 @@ QString AbstractMeshEventHandle::inactiveIconFile()const
 	return m_inactiveIconFile;
 }
 
+void AbstractMeshEventHandle::handleEnter()
+{
+
+}
+void AbstractMeshEventHandle::handleLeave()
+{
+
+}
+
 QString AbstractMeshEventHandle::toolTips()const
 {
 	return m_toolTips;

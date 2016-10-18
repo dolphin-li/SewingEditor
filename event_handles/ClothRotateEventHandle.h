@@ -17,7 +17,9 @@ public:
 	virtual void mouseMoveEvent(QMouseEvent*);
 	virtual void wheelEvent(QWheelEvent*);
 	virtual void keyPressEvent(QKeyEvent*);
-	virtual void keyReleaseEvent(QKeyEvent*);
+	virtual void keyReleaseEvent(QKeyEvent*);	
+	virtual void handleEnter();
+	virtual void handleLeave();
 protected:
 	ldp::Mat3f m_trackBallMouseClickR;
 };

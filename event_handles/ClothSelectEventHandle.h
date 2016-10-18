@@ -17,4 +17,6 @@ public:
 	virtual void wheelEvent(QWheelEvent*);
 	virtual void keyPressEvent(QKeyEvent*);
 	virtual void keyReleaseEvent(QKeyEvent*);
+	virtual void handleEnter();
+	virtual void handleLeave();
 };

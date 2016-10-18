@@ -78,6 +78,7 @@ BaseMeshViewer::BaseMeshViewer(QWidget *parent)
 	m_isDragBox = false;
 	m_isEdgeMode = false;
 	m_isTrackBall = false;
+	m_currentEventHandle = nullptr;
 
 	m_eventHandles.resize((size_t)AbstractMeshEventHandle::ProcessorTypeEnd, nullptr);
 	for (size_t i = (size_t)AbstractMeshEventHandle::ProcessorTypeGeneral;
@@ -285,7 +286,10 @@ AbstractMeshEventHandle::ProcessorType BaseMeshViewer::getEventHandleType()const
 
 void BaseMeshViewer::setEventHandleType(AbstractMeshEventHandle::ProcessorType type)
 {
+	if (m_currentEventHandle)
+		m_currentEventHandle->handleLeave();
 	m_currentEventHandle = m_eventHandles[size_t(type)].get();
+	m_currentEventHandle->handleEnter();
 	setCursor(m_currentEventHandle->cursor());
 }
 

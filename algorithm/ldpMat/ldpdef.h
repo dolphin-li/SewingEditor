@@ -23,6 +23,8 @@
 // define internal datatype
 #if defined(LDP_OS_WIN)
 	#include <windows.h>
+#undef min
+#undef max
 	typedef LARGE_INTEGER gtime_t;
 #elif defined(LDP_OS_MAC)
 	// http://developer.apple.com/qa/qa2004/qa1398.html

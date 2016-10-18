@@ -115,7 +115,7 @@ void CreaseMesh::updateCreaseEdges()
 	}
 }
 
-void CreaseMesh::calcSmoothedCreaseDirections(std::vector<float>& thetas, const Camera& cam)const
+void CreaseMesh::calcSmoothedCreaseDirections(std::vector<float>& thetas, const ldp::Camera& cam)const
 {
 	thetas.resize(m_creaseEdges.size());
 	std::vector<ldp::Mat2f> vertsTensorSum(m_creaseEdges.size(), ldp::Mat2f().zeros());

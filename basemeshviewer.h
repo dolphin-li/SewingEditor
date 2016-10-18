@@ -25,8 +25,8 @@ public:
 	float getFps()const{ return m_fps; }
 	bool isEdgeMode()const{ return m_isEdgeMode; }
 	void setEdgeMode(bool b){ m_isEdgeMode = b; }
-	const Camera& camera()const{ return m_camera; }
-	Camera& camera(){ return m_camera; }
+	const ldp::Camera& camera()const{ return m_camera; }
+	ldp::Camera& camera(){ return m_camera; }
 	void resetCamera();
 	void initializeGL();
 	void resizeGL(int w, int h);
@@ -52,7 +52,7 @@ protected:
 	void renderDragBox();
 	void timerEvent(QTimerEvent* ev);
 protected:
-	Camera m_camera;
+	ldp::Camera m_camera;
 	QPoint m_lastPos;
 	int m_showType;
 	Qt::MouseButtons m_buttons;

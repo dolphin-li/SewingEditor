@@ -76,7 +76,7 @@ void ConnComponents::resetComponentDirtyFlag()const
 		getComponent(i)->resetDirtyFlag();
 }
 
-ConnComponents::Point2 ConnComponents::convertToGlViewport(Point2 p, const Camera& cam)const
+ConnComponents::Point2 ConnComponents::convertToGlViewport(Point2 p, const ldp::Camera& cam)const
 {
 	double cl = cam.getViewPortLeft();
 	double ct = cam.getViewPortTop();
@@ -91,7 +91,7 @@ ConnComponents::Point2 ConnComponents::convertToGlViewport(Point2 p, const Camer
 	return p;
 }
 
-ConnComponents::Point2 ConnComponents::convertFromGlViewport(Point2 p, const Camera& cam)const
+ConnComponents::Point2 ConnComponents::convertFromGlViewport(Point2 p, const ldp::Camera& cam)const
 {
 	double cl = cam.getViewPortLeft();
 	double ct = cam.getViewPortTop();
@@ -106,7 +106,7 @@ ConnComponents::Point2 ConnComponents::convertFromGlViewport(Point2 p, const Cam
 	return p;
 }
 
-float ConnComponents::scale_fromGL(const Camera& cam)const
+float ConnComponents::scale_fromGL(const ldp::Camera& cam)const
 {
 	double cl = cam.getViewPortLeft();
 	double ct = cam.getViewPortTop();
@@ -140,7 +140,7 @@ void ConnComponents::mergeSelectedConn()
 	m_data.insert(m_data.end(), to_left.begin(), to_left.end());
 }
 
-void ConnComponents::samplePointsOnUintsAndConvertToGlViewport(double stepOnGlView, const Camera& cam)
+void ConnComponents::samplePointsOnUintsAndConvertToGlViewport(double stepOnGlView, const ldp::Camera& cam)
 {
 	double step = stepOnGlView * scale_fromGL(cam);
 
@@ -159,7 +159,7 @@ void ConnComponents::samplePointsOnUintsAndConvertToGlViewport(double stepOnGlVi
 	}// iConn
 }
 
-void ConnComponents::selectUnitsViaGLBox(Point2 bMinGL, Point2 bMaxGL, const Camera& cam, SelectType stype)const
+void ConnComponents::selectUnitsViaGLBox(Point2 bMinGL, Point2 bMaxGL, const ldp::Camera& cam, SelectType stype)const
 {
 	Point2 bMin = convertFromGlViewport(bMinGL, cam);
 	Point2 bMax = convertFromGlViewport(bMaxGL, cam);

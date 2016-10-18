@@ -18,8 +18,8 @@ public:
 	void resizeGL(int w, int h);
 	void paintGL();
 
-	const Camera& camera()const{ return m_camera; }
-	Camera& camera(){ return m_camera; }
+	const ldp::Camera& camera()const{ return m_camera; }
+	ldp::Camera& camera(){ return m_camera; }
 	void resetCamera();
 	svg::SvgManager* getSvgManager();
 	void setSvgManager(svg::SvgManager* manager);
@@ -45,7 +45,7 @@ protected:
 	void renderFbo();
 	void renderDragBox();
 protected:
-	Camera m_camera;
+	ldp::Camera m_camera;
 	QPoint m_lastPos;
 	Qt::MouseButtons m_buttons;
 	QGLFramebufferObject* m_fbo;

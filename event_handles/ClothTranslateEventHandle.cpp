@@ -25,17 +25,22 @@ void ClothTranslateEventHandle::mousePressEvent(QMouseEvent *ev)
 
 	if (m_viewer->buttons() == Qt::LeftButton)
 	{
-		const Camera& cam = m_viewer->camera();
-		ldp::Double3 trans0 = 0.f - cam.getLocation();
-		ldp::Mat3d R = cam.getModelViewMatrix().getRotationPart().trans();
-		ldp::Double3 trans1 = 0;// cam.getLocation();
-		const float hvh = (cam.getViewPortBottom() - cam.getViewPortTop()) / 2.f / cam.getScalar()[0];
-		const float asp = cam.getAspect();
-		unsigned int no[3];
+		const ldp::Camera& cam = m_viewer->camera();
+		ldp::Double3 trans0 = cam.getModelViewMatrix().getTranslationPart();
+		ldp::Mat3d R = cam.getModelViewMatrix().getRotationPart();
+		ldp::Double3 trans1 = 0;
+		const float vl = cam.getViewPortLeft();
+		const float vr = cam.getViewPortRight();
+		const float vt = cam.getViewPortTop();
+		const float vb = cam.getViewPortBottom();
+		const float vx = (ev->x() - vl) / (vr - vl) * 2 - 1;
+		const float vy = (ev->y() - vt) / (vb - vt) * 2 - 1;
+		const float frustHalfH = (cam.getFrustumTop() - cam.getFrustumBottom()) / 2.f;
+		const float frustHalfW = (cam.getFrustumRight() - cam.getFrustumLeft()) / 2.f;
+		unsigned int no[3], id_l;
 		double r[3];
-		unsigned int id_l;
-		bool res = m_viewer->pAnalysis()->Pick(hvh*asp*ev->x(), hvh*ev->y(),
-			trans0.ptr(), R.ptr(), trans1.ptr(), no, r, id_l);//, dir,org); 
+		bool res = m_viewer->pAnalysis()->Pick(frustHalfW*vx, frustHalfH*vy,
+			trans0.ptr(), R.trans().ptr(), trans1.ptr(), no, r, id_l);//, dir,org); 
 		if (!res)
 		{
 			m_viewer->pListener()->HilightCadTypeID(Cad::NOT_SET, 0);
@@ -63,7 +68,7 @@ void ClothTranslateEventHandle::mouseMoveEvent(QMouseEvent *ev)
 
 	if (m_viewer->pAnalysis()->GetMode() == CLOTH_INITIAL_LOCATION && m_viewer->buttons() == Qt::LeftButton)
 	{
-		const Camera& cam = m_viewer->camera();
+		const ldp::Camera& cam = m_viewer->camera();
 		Cad::CAD_ELEM_TYPE itype_cad_part; unsigned int id_cad_part;
 		double tmp_x, tmp_y;
 		m_viewer->pListener()->Cad_GetPicked(itype_cad_part, id_cad_part, tmp_x, tmp_y);

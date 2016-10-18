@@ -50,7 +50,7 @@ public:
 	void setRotationOnLocal(ldp::Mat3f R)const{ m_rotationOnLocal = R; }
 
 	// calculate the smoothed theta direction under given camera
-	void calcSmoothedCreaseDirections(std::vector<float>& thetas, const Camera& cam)const;
+	void calcSmoothedCreaseDirections(std::vector<float>& thetas, const ldp::Camera& cam)const;
 
 	bool loadObj(const char* filename);
 	bool saveObj(const char* filename)const;
@@ -61,10 +61,10 @@ public:
 
 	bool isVertSelected(int i)const{ return !!m_isVertSelected[i]; }
 
-	void selectByBox(ldp::Float2 bMin, ldp::Float2 bMax, const Camera& cam);
+	void selectByBox(ldp::Float2 bMin, ldp::Float2 bMax, const ldp::Camera& cam);
 	std::shared_ptr<CreaseMesh> separateByBoxSelected();
 
-	void updateFrameByApplyingCam(const Camera& cam);
+	void updateFrameByApplyingCam(const ldp::Camera& cam);
 
 	// applying R, T on local coordinates
 	void updateFrameByApplyingLocalRT(const ldp::Mat3f& R, ldp::Float3 t);

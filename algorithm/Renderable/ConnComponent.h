@@ -221,21 +221,21 @@ public:
 	bool save(FILE* pFile)const;
 	void clear();
 
-	Point2 convertToGlViewport(Point2 p, const Camera& cam)const;
-	Point2 convertFromGlViewport(Point2 p, const Camera& cam)const;
+	Point2 convertToGlViewport(Point2 p, const ldp::Camera& cam)const;
+	Point2 convertFromGlViewport(Point2 p, const ldp::Camera& cam)const;
 
 	int size()const{ return m_data.size(); }
 	ConnComponent* getComponent(int i){ return m_data[i].get(); }
 	const ConnComponent* getComponent(int i)const{ return m_data[i].get(); }
-	void samplePointsOnUintsAndConvertToGlViewport(double stepOnGlView, const Camera& cam);
+	void samplePointsOnUintsAndConvertToGlViewport(double stepOnGlView, const ldp::Camera& cam);
 	void resetComponentDirtyFlag()const;
 	ldp::Float2 getCenter()const{ return m_center; }
 	ldp::Float2 getWH()const{ return m_wh; }
-	float scale_fromGL(const Camera& cam)const;
+	float scale_fromGL(const ldp::Camera& cam)const;
 	void mergeSelectedConn();
 	void splitComponetSelectedUnits(int iConn);
 
-	void selectUnitsViaGLBox(Point2 bMinGL, Point2 bMaxGL, const Camera& cam, SelectType stype)const;
+	void selectUnitsViaGLBox(Point2 bMinGL, Point2 bMaxGL, const ldp::Camera& cam, SelectType stype)const;
 	void clearSelection()const;
 	void setSelectedUnitsDisabled(bool ds);
 	void setAllUnitsDisabled(bool ds);

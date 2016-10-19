@@ -51,11 +51,15 @@ namespace svg
 
 	SvgPolyPath::SvgPolyPath() :SvgPath()
 	{
+		m_3dCenter = 0.f;
+		m_3dRot.setIdentity();
 	}
 
 	SvgPolyPath::SvgPolyPath(int id) : SvgPath()
 	{
 		m_id = id;
+		m_3dCenter = 0.f;
+		m_3dRot.setIdentity();
 	}
 
 	SvgPolyPath::~SvgPolyPath()
@@ -270,6 +274,8 @@ namespace svg
 			newTptr->m_edgeCoords = m_edgeCoords;
 			newTptr->m_edgeGLIds = m_edgeGLIds;
 			newTptr->m_edgeGroups = m_edgeGroups;
+			newTptr->m_3dCenter = m_3dCenter;
+			newTptr->m_3dRot = m_3dRot;
 		}
 	}
 
@@ -341,6 +347,13 @@ namespace svg
 		parent->LinkEndChild(ele);
 		ele->SetAttribute("fill", strokeFillMap(m_pathStyle.fill_rule));
 		ele->SetAttribute("ldp_poly", m_id);
+		ele->SetDoubleAttribute("ldp_3dx", m_3dCenter[0]);
+		ele->SetDoubleAttribute("ldp_3dy", m_3dCenter[1]);
+		ele->SetDoubleAttribute("ldp_3dz", m_3dCenter[2]);
+		ele->SetDoubleAttribute("ldp_3drx", m_3dRot.v[0]);
+		ele->SetDoubleAttribute("ldp_3dry", m_3dRot.v[1]);
+		ele->SetDoubleAttribute("ldp_3drz", m_3dRot.v[2]);
+		ele->SetDoubleAttribute("ldp_3drw", m_3dRot.w);
 		ele->SetAttribute("stroke", "#231F20");
 		ele->SetDoubleAttribute("stroke-width", m_pathStyle.stroke_width);
 		ele->SetAttribute("stroke-linecap", strokeLineCapMap(m_pathStyle.line_cap));

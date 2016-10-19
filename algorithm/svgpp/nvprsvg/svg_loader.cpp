@@ -2173,6 +2173,7 @@ NodePtr SVGParser::parsePath(TiXmlElement* elem)
     string path_string;
 
 	int ldp_poly = -1;
+	float ldp_c[3] = { 0 }, ldp_r[4] = { 0 };
     for(TiXmlAttribute* a = elem->FirstAttribute(); a; a = a->Next()) {
         string name(a->Name());
         if(name == "d") {
@@ -2183,6 +2184,34 @@ NodePtr SVGParser::parsePath(TiXmlElement* elem)
 			ldp_poly = a->IntValue();
 			continue;
 		}
+		if (name == "ldp_3dx"){
+			ldp_c[0] = a->DoubleValue();
+			continue;
+		}
+		if (name == "ldp_3dy"){
+			ldp_c[1] = a->DoubleValue();
+			continue;
+		}
+		if (name == "ldp_3dz"){
+			ldp_c[2] = a->DoubleValue();
+			continue;
+		}
+		if (name == "ldp_3drx"){
+			ldp_r[0] = a->DoubleValue();
+			continue;
+		}
+		if (name == "ldp_3dry"){
+			ldp_r[1] = a->DoubleValue();
+			continue;
+		}
+		if (name == "ldp_3drz"){
+			ldp_r[2] = a->DoubleValue();
+			continue;
+		}
+		if (name == "ldp_3drw"){
+			ldp_r[3] = a->DoubleValue();
+			continue;
+		}
         bool got_one = parseGenericShapeProperty(a, elem);
         if (got_one) {
             continue;
@@ -2190,6 +2219,10 @@ NodePtr SVGParser::parsePath(TiXmlElement* elem)
     }
     PathPtr path = PathPtr(new Path(style().path, path_string.c_str()));
 	path->ldp_poly_id = ldp_poly;
+	for (int k = 0; k < 3; k++)
+		path->ldp_poly_3dCenter[k] = ldp_c[k];
+	for (int k = 0; k < 4; k++)
+		path->ldp_poly_3dRot[k] = ldp_r[k];
     if (!path->isEmpty()) {
         NodePtr shape = createShape(path, style());
         

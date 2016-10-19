@@ -183,8 +183,21 @@ namespace svg
 				shape->getPath()->processSegments(processor);
 				Cg::float4 bd = shape->getPath()->getBounds();
 				SvgPath* path = nullptr;
-				if (shape->getPath()->ldp_poly_id >= 0)
+				if (shape->getPath()->ldp_poly_id >= 0){
 					path = new SvgPolyPath(shape->getPath()->ldp_poly_id);
+					auto poly = (SvgPolyPath*)path;
+					const auto c = shape->getPath()->ldp_poly_3dCenter;
+					const auto r = shape->getPath()->ldp_poly_3dRot;
+					ldp::QuaternionF q;
+					ldp::Float3 c3(c[0], c[1], c[2]);
+					q.v = ldp::Float3(r[0], r[1], r[2]);
+					q.w = r[3];
+					if (q.norm() == 0) q.setIdentity();
+					// RISK HERE: pure ZERO are not allowed to be loaded as center
+					if (c3.length() == 0) c3 = ldp::Float3((bd.x + bd.z) / 2, (bd.y + bd.w) / 2, 0);
+					poly->set3dCenter(ldp::Float3(c3[0], c3[1], c3[2]));
+					poly->set3dRot(q);
+				}
 				else
 					path = new SvgPath();
 				path->m_gl_fill_rull = gl_fill_rull;
@@ -1735,6 +1748,7 @@ namespace svg
 				if (newPathPtr)
 				{
 					newPathPtr->findCorners();
+					newPathPtr->set3dCenter(ldp::Float3(newPathPtr->getCenter()[0], newPathPtr->getCenter()[1], 0));
 					newGroups.push_back(newPath);
 				}
 			} // end for gIds

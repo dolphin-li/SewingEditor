@@ -223,7 +223,8 @@ public:
 
 	void SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
 		svg::SvgManager* svgManager, CSliderDeform& slider_deform,
-		std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair);
+		std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair,
+		std::map<unsigned int, int>& loopId2svgIdMap);
 private:
 	void ClearDetailField();
 	void MakeDetailField(const Cad::CCadObj2D& cad_2d, const Msh::CMesher2D& mesh_2d);

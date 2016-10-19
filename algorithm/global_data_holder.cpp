@@ -29,7 +29,7 @@ void GlobalDataHolder::generateClothDebug()
 
 void GlobalDataHolder::svgToCloth()
 {
-	m_clothUiListener->SetAnalysisFromSvg(m_clothManger.get(), m_svgManager.get());
+	m_clothUiListener->SetAnalysisFromSvg(m_clothManger.get(), m_svgManager.get(), m_clothLoopId2svgIdMap);
 	m_clothManger->SetColor_FaceFEM(1.0, 1.0, 1.0);
 	m_clothManger->SetTextureScale_FaceFEM(5);
 	m_clothManger->SetIsLighting(true);

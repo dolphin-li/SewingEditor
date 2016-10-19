@@ -90,6 +90,8 @@ public:
 
     PathStyle style;
 	int ldp_poly_id;
+	float ldp_poly_3dCenter[3];
+	float ldp_poly_3dRot[4];
 
     Path(const PathStyle &style, const char *string);
     Path(const PathStyle &style, const vector<char> &cmds, const vector<float> &coords);

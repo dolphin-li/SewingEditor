@@ -2509,7 +2509,8 @@ static unsigned int MakeHingeField_Tri(Fem::Field::CFieldWorld& world, unsigned 
 ////////////////////////////////////////////////////////////ldp////////////////////////////////////////////////////
 void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
 	svg::SvgManager* svgManager, CSliderDeform& slider_deform,
-	std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair)
+	std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair,
+	std::map<unsigned int, int>& loopId2svgIdMap)
 {
 	// clear---------------------------------------------------------------------
 	cad_2d.Clear();
@@ -2518,6 +2519,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	aIdECad_Fix.clear();
 	slider_deform.Clear();
 	aSymIdVPair.clear();
+	loopId2svgIdMap.clear();
 
 	// 1. create 2D pieces from svg ---------------------------------------------
 	auto polyPaths = svgManager->collectPolyPaths(true);
@@ -2528,24 +2530,31 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		printf("warning: are you sure 1 pixel = 1 meter? \npossibly you should select \
 			   the standard-4cm rectangle and click the \"pixel to meter\" button\n");
 	std::vector<Cad::CCadObj2D::CResAddPolygon> polyLoops;
+	std::vector<ldp::Float2> polyCenters;
+	std::vector<ldp::Float3> poly3dCenters;
+	std::vector<ldp::QuaternionF> poly3dRots;
+
 	for (auto polyPath : polyPaths)
 	{
-		Cad::CCadObj2D::CResAddPolygon res;
+		polyCenters.push_back(polyPath->getCenter());
+		poly3dCenters.push_back(polyPath->get3dCenter());
+		poly3dRots.push_back(polyPath->get3dRot());
 		// if non-closed, we ignore it this time
 		if (!polyPath->isClosed())
 		{
-			polyLoops.push_back(res);
+			polyLoops.push_back(Cad::CCadObj2D::CResAddPolygon());
 			continue;
 		}
 		// if closed, we create a loop for it
 		std::vector<Com::CVector2D> vec_ary;
 		assert(polyPath->m_coords.size() >= 4); // the closed polypath stored in svg duplicated the first point
-		for (size_t i = 0; i < polyPath->m_coords.size() - 2; i += 2)
-			vec_ary.push_back(Com::CVector2D(polyPath->m_coords[i] * pixel2meter,
-			polyPath->m_coords[i + 1] * pixel2meter));
-		res = cad_2d.AddPolygon(vec_ary);
-		polyLoops.push_back(res);
-		mesh_2d.AddIdLCad_CutMesh(res.id_l_add);
+		for (size_t i = 0; i < polyPath->m_coords.size() - 2; i += 2){
+			ldp::Float2 p = ldp::Float2(polyPath->m_coords[i], polyPath->m_coords[i+1]) * pixel2meter;
+			vec_ary.push_back(Com::CVector2D(p[0], p[1]));
+		}
+		polyLoops.push_back(cad_2d.AddPolygon(vec_ary));
+		mesh_2d.AddIdLCad_CutMesh(polyLoops.back().id_l_add);
+		loopId2svgIdMap.insert(std::make_pair(polyLoops.back().id_l_add, polyPath->getId()));
 	} // end for polyPath
 
 	std::vector< std::pair<unsigned int, unsigned int> > aIdECad_Stitch;
@@ -2597,10 +2606,18 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	((CContactTarget3D_AdaptiveDistanceField3D*)pCT)->BuildMarchingCubeEdge();
 
 	// 4. place 3D cloth pieces -------------------------------------------------------------
-	for (auto polyLoop : polyLoops)
+	for (size_t i = 0; i < polyLoops.size(); i++)
 	{
+		const auto& polyLoop = polyLoops[i];
+		auto p = polyCenters[i] * pixel2meter;
+		auto c = poly3dCenters[i] * pixel2meter;
+		auto r = poly3dRots[i].toRotationMatrix3();
 		if (polyLoop.id_l_add)
-			clothHandler_.AddClothPiece(polyLoop.id_l_add, 0, 0);
+		{
+			clothHandler_.AddClothPiece(polyLoop.id_l_add, p[0], p[1]);
+			clothHandler_.Transform_Cloth_Pan(polyLoop.id_l_add, c[0], c[1], c[2]);
+			clothHandler_.Transform_Cloth_Rot(polyLoop.id_l_add, r);
+		}
 	}
 
 	// 5. finally, other parameters --------------------------------------------------------

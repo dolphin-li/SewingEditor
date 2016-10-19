@@ -165,6 +165,8 @@ Path::Path(const vector<char> &cmds, const vector<float> &coords)
 	, ldp_poly_id(-1)
 {
     owner = this;
+	memset(ldp_poly_3dCenter, 0, sizeof(ldp_poly_3dCenter));
+	memset(ldp_poly_3dRot, 0, sizeof(ldp_poly_3dRot));
 }
 
 Path::Path(const PathStyle &s, const vector<char> &cmds, const vector<float> &coords)
@@ -175,6 +177,8 @@ Path::Path(const PathStyle &s, const vector<char> &cmds, const vector<float> &co
 	, style(s)
 	, ldp_poly_id(-1)
 {
+	memset(ldp_poly_3dCenter, 0, sizeof(ldp_poly_3dCenter));
+	memset(ldp_poly_3dRot, 0, sizeof(ldp_poly_3dRot));
 }
 
 Path::Path(const char *string)
@@ -187,7 +191,9 @@ Path::Path(const char *string)
         printf("Mis-formed path: <%s>\n", string);
         cmd.clear();
         coord.clear();
-    }
+	}		
+	memset(ldp_poly_3dCenter, 0, sizeof(ldp_poly_3dCenter));
+	memset(ldp_poly_3dRot, 0, sizeof(ldp_poly_3dRot));
 }
 
 Path::Path(const PathStyle &s, const char *string)
@@ -202,6 +208,8 @@ Path::Path(const PathStyle &s, const char *string)
         cmd.clear();
         coord.clear();
     }
+	memset(ldp_poly_3dCenter, 0, sizeof(ldp_poly_3dCenter));
+	memset(ldp_poly_3dRot, 0, sizeof(ldp_poly_3dRot));
 }
 
 void Path::invalidate()

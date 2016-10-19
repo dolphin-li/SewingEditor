@@ -2,6 +2,7 @@
 
 #include "util.h"
 #include "Param.h"
+#include <map>
 namespace svg{
 class SvgManager;
 }
@@ -19,6 +20,7 @@ public:
 	std::shared_ptr<svg::SvgManager> m_svgManager;
 	std::shared_ptr<CAnalysis2D_Cloth_Static> m_clothManger;
 	std::shared_ptr<CDesigner2D_Cloth> m_clothUiListener;
+	std::map<unsigned int, int> m_clothLoopId2svgIdMap;
 };
 
 extern GlobalDataHolder g_dataholder;

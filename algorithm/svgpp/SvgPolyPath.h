@@ -3,6 +3,7 @@
 #include "SvgPath.h"
 #include "PathStyle.hpp"
 #include <set>
+#include <ldpMat\Quaternion.h>
 namespace svg
 {
 	class SvgPolyPath;
@@ -97,6 +98,12 @@ namespace svg
 		}
 		const std::set<const SvgEdgeGroup*>& edgeGroups()const{ return m_edgeGroups; }
 		std::set<const SvgEdgeGroup*>& edgeGroups(){ return m_edgeGroups; }
+
+		/// 3d related
+		ldp::Float3 get3dCenter()const{ return m_3dCenter; }
+		void set3dCenter(ldp::Float3 c){ m_3dCenter = c; }
+		ldp::QuaternionF get3dRot()const{ return m_3dRot; }
+		void set3dRot(ldp::QuaternionF r){ m_3dRot = r; }
 	protected:
 		void cacheNvPaths();
 		void renderSelection(bool idxMode = false);
@@ -114,5 +121,9 @@ namespace svg
 
 		// is this edge related with others?
 		std::set<const SvgEdgeGroup*> m_edgeGroups;
+
+		// info for 3D placement
+		ldp::Float3 m_3dCenter;
+		ldp::QuaternionF m_3dRot;
 	};
 }

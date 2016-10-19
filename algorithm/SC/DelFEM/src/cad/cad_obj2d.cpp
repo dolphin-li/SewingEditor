@@ -44,7 +44,8 @@ using namespace Com;
 
 CCadObj2D::CCadObj2D()
 {
-	this->min_clearance = 1.0e-3;
+	//this->min_clearance = 1.0e-3;
+	this->min_clearance = 1.0e-4; // ldp: reduce this value to allow smaller segments
 	//  this->min_clearance = 0.1;  
 }
 
@@ -993,7 +994,8 @@ CCadObj2D::CResAddPolygon  Cad::CCadObj2D::AddPolygon(const std::vector<Com::CVe
 	for (unsigned int iedge = 0; iedge < npoint - 1; iedge++)
 	{
 		unsigned int id_e0 = this->ConnectVertex_Line(res.aIdV[iedge], res.aIdV[iedge + 1]).id_e_add;
-		if (id_e0 == 0) goto FAIL_ADD_POLYGON_INSIDE_LOOP;
+		if (id_e0 == 0) 
+			goto FAIL_ADD_POLYGON_INSIDE_LOOP;
 		res.aIdE.push_back(id_e0);
 	}
 	{

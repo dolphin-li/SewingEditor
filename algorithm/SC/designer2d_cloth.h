@@ -169,7 +169,8 @@ public:
 
 ////////////////////ldp//////////////////////////////////////////////
 public:
-	void SetAnalysisFromSvg(CAnalysis2D_Cloth_Static* pAnalysis, svg::SvgManager* svgManager);
+	void SetAnalysisFromSvg(CAnalysis2D_Cloth_Static* pAnalysis, svg::SvgManager* svgManager,
+		std::map<unsigned int, int>& loopId2SvgIdMap);
 ////////////////////ldp//////////////////////////////////////////////
 protected:
 	void InitDrawer();

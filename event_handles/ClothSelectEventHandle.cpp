@@ -63,22 +63,6 @@ void ClothSelectEventHandle::wheelEvent(QWheelEvent *ev)
 void ClothSelectEventHandle::keyPressEvent(QKeyEvent *ev)
 {
 	AbstractMeshEventHandle::keyPressEvent(ev);
-	switch (ev->key())
-	{
-	default:
-		break;
-	case Qt::Key_B:
-		if (ev->modifiers() == Qt::NoModifier && m_viewer->pAnalysis() && m_viewer->pListener())
-		{
-			if (m_viewer->pAnalysis()->GetMode() == CLOTH_INITIAL_LOCATION){
-				m_viewer->pListener()->Solve_fromCad_InitValue();
-				m_viewer->pAnalysis()->PerformStaticSolver();
-			}
-			else
-				m_viewer->pAnalysis()->SetClothPiecePlacingMode();
-		}
-		break;
-	}
 }
 
 void ClothSelectEventHandle::keyReleaseEvent(QKeyEvent *ev)

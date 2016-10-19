@@ -1748,6 +1748,17 @@ void CDesigner2D_Cloth::SaveTimeStamp()
 	}
 }
 
+//////////////////////////ldp///////////////////////////////////////////////////////
+void CDesigner2D_Cloth::SetAnalysisFromSvg(CAnalysis2D_Cloth_Static* pAnalysis, svg::SvgManager* svgManager)
+{
+	if (!pAnalysis || !svgManager)
+		throw std::exception("SetAnalysisFromSvg: nullptr");
+	this->setIdVCad_NeedFollow.clear();
+	this->pAnalysis = pAnalysis;
+	pAnalysis->SetModelClothFromSvg(cad_2d, mesh_2d, svgManager, slider_deform, aSymIdVPair);
+	this->InitDrawer();
+}
+
 
 
 

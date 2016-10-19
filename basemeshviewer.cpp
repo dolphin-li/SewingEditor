@@ -163,19 +163,22 @@ void BaseMeshViewer::timerEvent(QTimerEvent* ev)
 {
 	if (!m_pListener || !m_pAnalysis)
 		return;
-	if (ev->timerId() == m_computeTimer)
+	if (ev->timerId() == m_computeTimer && m_pAnalysis && m_pListener)
 	{
-		gtime_t t1 = ldp::gtime_now();
-		m_pListener->FollowMshToCad_ifNeeded();
-		m_pListener->Solve_ifNeeded();
-		if (m_pAnalysis->IsBlowUp())
+		if (!m_pListener->GetCad().isEmpty())
 		{
-			std::cout << "BlowUp" << std::endl;
-			m_pListener->LoadTimeStamp();
+			gtime_t t1 = ldp::gtime_now();
+			m_pListener->FollowMshToCad_ifNeeded();
+			m_pListener->Solve_ifNeeded();
+			if (m_pAnalysis->IsBlowUp())
+			{
+				std::cout << "BlowUp" << std::endl;
+				m_pListener->LoadTimeStamp();
+			}
+			gtime_t t2 = ldp::gtime_now();
+			double sec = ldp::gtime_seconds(t1, t2);
+			m_fps = 1 / sec;
 		}
-		gtime_t t2 = ldp::gtime_now();
-		double sec = ldp::gtime_seconds(t1, t2);
-		m_fps = 1 / sec;
 	}
 	if (ev->timerId() == m_renderTimer)
 		updateGL();
@@ -198,7 +201,8 @@ void BaseMeshViewer::paintGL()
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		m_pListener->Draw(4);
+		if (!m_pListener->GetCad().isEmpty())
+			m_pListener->Draw(4);
 	}
 	renderTrackBall(false);
 	renderDragBox();

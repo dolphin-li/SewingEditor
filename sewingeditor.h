@@ -14,6 +14,7 @@ public:
 	SewingEditor(QWidget *parent = 0);
 	~SewingEditor();
 
+	void loadSvg(QString name);
 	public slots:
 	void on_actionLoad_svg_triggered();
 	void on_actionSave_svg_triggered();

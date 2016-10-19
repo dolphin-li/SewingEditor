@@ -291,6 +291,7 @@ namespace svg
 	{
 		std::shared_ptr<SvgManager> manager(new SvgManager());
 		manager->m_currentLayerName = m_currentLayerName;
+		manager->m_one_pixel_is_how_many_meters = m_one_pixel_is_how_many_meters;
 		for (auto iter : m_layers)
 		{
 			const auto old_layer = iter.second;
@@ -394,7 +395,7 @@ namespace svg
 			m_layers.clear();
 		ConvertTraversal traversal;
 		svg_scene->traverse(VisitorPtr(new ConvertVisitor(this)), traversal);
-
+		m_one_pixel_is_how_many_meters = svg_scene->ldp_pixel2meter;
 		// clone edgeGroups: since we have not updated index yet, we can use index to match groups
 		for (auto layer_iter : m_layers)
 		{
@@ -422,7 +423,8 @@ namespace svg
 		{
 			m_currentLayerName = m_layers.begin()->second->name;
 			removeSingleNodeAndEmptyNode();
-			m_one_pixel_is_how_many_meters = estimatePixelToMetersFromSelected();
+			if (m_one_pixel_is_how_many_meters == 1.f)
+				m_one_pixel_is_how_many_meters = estimatePixelToMetersFromSelected();
 		}// end if m_layers.size()
 	}
 
@@ -452,6 +454,7 @@ namespace svg
 		root_ele->SetAttribute("viewBox", (x + " " + y + " " + w + " " + h).c_str());
 		root_ele->SetAttribute("enable-background", ("new " + x + " " + y + " " + w + " " + h).c_str());
 		root_ele->SetAttribute("xml:space", "preserve");
+		root_ele->SetDoubleAttribute("ldp_pixel2meter", m_one_pixel_is_how_many_meters);
 
 		for (auto iter : m_layers)
 		{
@@ -1741,6 +1744,22 @@ namespace svg
 			rootPtr->m_children.insert(rootPtr->m_children.end(), newGroups.begin(), newGroups.end());
 		} // end for all layers
 		removeSingleNodeAndEmptyNode();
+	}
+
+	std::vector<SvgPolyPath*> SvgManager::collectPolyPaths(bool selectionOnly)
+	{
+		std::vector<SvgPolyPath*> polyPaths;
+		for (auto layer : m_layers)
+		{
+			if (selectionOnly && !layer.second->selected)
+				continue;
+			auto rootPtr = (SvgGroup*)layer.second->root.get();
+			std::vector<std::shared_ptr<SvgAbstractObject>> tmp;
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, tmp, selectionOnly);
+			for (auto t : tmp)
+				polyPaths.push_back((SvgPolyPath*)t.get());
+		} // end for layer
+		return polyPaths;
 	}
 	//////////////////////////////////////////////////////////////////
 	/// layer related

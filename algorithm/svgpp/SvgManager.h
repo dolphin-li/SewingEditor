@@ -11,6 +11,7 @@ namespace svg
 	class SvgGroup;
 	class SvgAbstractObject;
 	class SvgEdgeGroup;
+	class SvgPolyPath;
 	class SvgManager
 	{
 	public:
@@ -46,8 +47,10 @@ namespace svg
 		void save(const char* svg_file, bool selectionOnly=false);
 		void render();
 		void renderIndex();
+		int width()const;
+		int height()const;
+		ldp::Float4 getBound()const;
 		std::shared_ptr<SvgManager> clone()const;
-
 		Layer* addLayer(std::string name = "");
 		Layer* getLayer(std::string name);
 		const Layer* getLayer(std::string name)const;
@@ -64,15 +67,11 @@ namespace svg
 		// axis: 0=x, 1=y, -1=auto
 		void symmetryCopySelectedPoly(int axis = -1);
 
-		int width()const;
-		int height()const;
-
 		// should be called after adding/removing units or groups
 		void updateIndex();
 
 		// should be called after geometric changes
 		void updateBound();
-		ldp::Float4 getBound()const;
 
 		// estimate the conversion from pixels to meters
 		float estimatePixelToMetersFromSelected()const;
@@ -82,15 +81,10 @@ namespace svg
 		// given an index, select shapes
 		void selectShapeByIndex(int id, SelectOp op = SelectThis);
 		void selectShapeByIndex(const std::set<int>& ids, SelectOp op = SelectThis);
-
 		void selectPathBySimilarSelectedWidth();
 		void selectPathByWidths(const std::set<float>& widths);
-
-		// given an index, find the largest group that contains this object.
 		void selectGroupByIndex(int id, SelectOp op = SelectThis);
 		void selectGroupByIndex(const std::set<int>& ids, SelectOp op = SelectThis);
-
-		// undo highlight for lastid and do highlight for this id
 		void highlightShapeByIndex(int lastId, int thisId);
 
 		///// group may fail when the selected have been in different groups
@@ -105,10 +99,12 @@ namespace svg
 		void convertSelectedPathToConnectedGroups();
 		void closeSelectedPolygons();
 		void selectClosedPolygons();
+		std::vector<SvgPolyPath*> collectPolyPaths(bool selectionOnly = true);
 
 		///// pair operations
 		void makeSelectedToPair();
-		// if not onlyUse.., then pairs on selected poly will be removed
+		// if not onlyUseSelectedEdges, then pairs on selected whole poly will be removed
+		// else only the selected poly-edge pairs will be removed
 		void removeSelectedPairs(bool onlyUseSelectedEdges = true); 
 	protected:
 		void removeSelected(SvgAbstractObject* obj);

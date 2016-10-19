@@ -3527,6 +3527,10 @@ SvgScenePtr SVGParser::parseScene(TiXmlElement *svg)
                 scene->preserve_aspect_ratio = a->Value();
                 continue;
             }
+			if (name == "ldp_pixel2meter"){
+				scene->ldp_pixel2meter = a->DoubleValue();
+				continue;
+			}
             bool got_one = parseGenericShapeProperty(a, svg);
             if (got_one) {
                 continue;

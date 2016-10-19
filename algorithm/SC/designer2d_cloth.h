@@ -28,6 +28,10 @@
 
 #include "analysis2d_cloth_static.h"
 
+namespace svg{
+	class SvgMangaer;
+}
+
 //! class for combining simulation and design
 class CDesigner2D_Cloth
 {
@@ -163,6 +167,10 @@ public:
 	void LoadTimeStamp();
 	void SaveTimeStamp();
 
+////////////////////ldp//////////////////////////////////////////////
+public:
+	void SetAnalysisFromSvg(CAnalysis2D_Cloth_Static* pAnalysis, svg::SvgManager* svgManager);
+////////////////////ldp//////////////////////////////////////////////
 protected:
 	void InitDrawer();
 	bool MoveLoop(unsigned int id_l, const Com::CVector2D& dir);

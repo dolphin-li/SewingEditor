@@ -58,6 +58,7 @@ void ClothRotateEventHandle::mousePressEvent(QMouseEvent *ev)
 	if (m_viewer->pAnalysis()->GetMode() == CLOTH_INITIAL_LOCATION && m_viewer->buttons() == Qt::LeftButton)
 	{
 		int sid = m_viewer->fboRenderedIndex(ev->pos());
+		m_viewer->setHoverTrackBallAxis(sid);
 		if (sid >= BaseMeshViewer::TrackBallIndex_X && sid <= BaseMeshViewer::TrackBallIndex_Z)
 		{
 			m_viewer->setActiveTrackBallAxis(sid);

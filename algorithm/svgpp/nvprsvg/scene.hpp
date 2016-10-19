@@ -572,6 +572,7 @@ struct SvgScene : public Group {
     int width, height;
     RectBounds view_box;
     string preserve_aspect_ratio;
+	double ldp_pixel2meter;
 };
 typedef shared_ptr<SvgScene> SvgScenePtr;
 

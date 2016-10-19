@@ -55,11 +55,7 @@ void SewingEditor::dropEvent(QDropEvent* event)
 	QString name = url.toLocalFile();
 	try
 	{
-		if (ui.widget->getSvgManager() == nullptr)
-			throw std::exception("svgManger: nullptr");
-		ui.widget->getSvgManager()->load(name.toStdString().c_str());
-		pushHistory("load svg");
-		ui.widget->updateGL();
+		loadSvg(name);
 	}
 	catch (std::exception e)
 	{
@@ -71,6 +67,22 @@ void SewingEditor::dropEvent(QDropEvent* event)
 	}
 
 	event->acceptProposedAction();
+}
+
+void SewingEditor::loadSvg(QString name)
+{
+	if (ui.widget->getSvgManager() == nullptr)
+	{
+		g_dataholder.m_svgManager.reset(new svg::SvgManager);
+		ui.widget->setSvgManager(g_dataholder.m_svgManager.get());
+	}
+	ui.widget->getSvgManager()->load(name.toStdString().c_str());
+	pushHistory("load svg");
+	ui.sbPixelToMeter->setValue(1.0/ui.widget->getSvgManager()->getPixelToMeters());
+	ui.widget->resetCamera();
+	ui.widget->updateGL();
+	initLayerList();
+	setWindowTitle(name);
 }
 
 void SewingEditor::initLeftDockActions()
@@ -131,18 +143,7 @@ void SewingEditor::on_actionLoad_svg_triggered()
 		QString name = QFileDialog::getOpenFileName(this, "load svg", "data", "*.svg");
 		if (name.isEmpty())
 			return;
-		if (ui.widget->getSvgManager() == nullptr)
-		{
-			g_dataholder.m_svgManager.reset(new svg::SvgManager);
-			ui.widget->setSvgManager(g_dataholder.m_svgManager.get());
-		}
-
-		ui.widget->getSvgManager()->load(name.toStdString().c_str());
-		pushHistory("load svg");
-		ui.widget->resetCamera();
-		ui.widget->updateGL();
-		initLayerList();
-		setWindowTitle(name);
+		loadSvg(name);
 	}
 	catch (std::exception e)
 	{
@@ -866,7 +867,13 @@ void SewingEditor::on_sbPixelToMeter_valueChanged(double v)
 	{
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
-		ui.widget->getSvgManager()->setPixelToMeters(1.0 / v);
+		double p1 = 1.0 / v;
+		double p2 = ui.widget->getSvgManager()->getPixelToMeters();
+		if (abs(p1 - p2) < std::numeric_limits<double>::epsilon())
+		{
+			ui.widget->getSvgManager()->setPixelToMeters(p1);
+			pushHistory("pixel2meter");
+		}
 	}
 	catch (std::exception e)
 	{
@@ -882,8 +889,8 @@ void SewingEditor::on_pbGenerateMesh_clicked()
 {
 	try
 	{
+		g_dataholder.svgToCloth();
 		m_meshWindow->show();
-		g_dataholder.generateClothDebug();
 	}
 	catch (std::exception e)
 	{

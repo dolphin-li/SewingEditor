@@ -15,6 +15,7 @@
 #if defined(__APPLE__) && defined(__MACH__)
 #include <GLUT/glut.h>
 #else
+#include <GL/glew.h>
 #include <GL/glut.h>
 #endif
 
@@ -35,6 +36,8 @@
 #include "analysis2d_cloth_static.h"
 #include "eqn_contact3d.h"
 
+#include "svgpp\SvgManager.h"
+#include "svgpp\SvgPolyPath.h"
 
 using namespace Fem::Field;
 
@@ -2501,5 +2504,150 @@ static unsigned int MakeHingeField_Tri(Fem::Field::CFieldWorld& world, unsigned 
 	unsigned int id_field = world.AddField(id_field_base, aElemIntp, na_c, na_b);
 	assert(world.IsIdField(id_field));
 	return id_field;
+}
+
+////////////////////////////////////////////////////////////ldp////////////////////////////////////////////////////
+void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
+	svg::SvgManager* svgManager, CSliderDeform& slider_deform,
+	std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair)
+{
+	// clear---------------------------------------------------------------------
+	cad_2d.Clear();
+	mesh_2d.Clear();
+	stitch_ary_.Clear();
+	aIdECad_Fix.clear();
+	slider_deform.Clear();
+	aSymIdVPair.clear();
+
+	// 1. create 2D pieces from svg ---------------------------------------------
+	auto polyPaths = svgManager->collectPolyPaths(true);
+	const float pixel2meter = svgManager->getPixelToMeters();
+	if (polyPaths.size() == 0)
+		throw std::exception("no selected polypaths given!");
+	if (pixel2meter == 1.f)
+		printf("warning: are you sure 1 pixel = 1 meter? \npossibly you should select \
+			   the standard-4cm rectangle and click the \"pixel to meter\" button\n");
+	std::vector<Cad::CCadObj2D::CResAddPolygon> polyLoops;
+	for (auto polyPath : polyPaths)
+	{
+		Cad::CCadObj2D::CResAddPolygon res;
+		// if non-closed, we ignore it this time
+		if (!polyPath->isClosed())
+		{
+			polyLoops.push_back(res);
+			continue;
+		}
+		// if closed, we create a loop for it
+		std::vector<Com::CVector2D> vec_ary;
+		assert(polyPath->m_coords.size() >= 4); // the closed polypath stored in svg duplicated the first point
+		for (size_t i = 0; i < polyPath->m_coords.size() - 2; i += 2)
+			vec_ary.push_back(Com::CVector2D(polyPath->m_coords[i] * pixel2meter,
+			polyPath->m_coords[i + 1] * pixel2meter));
+		res = cad_2d.AddPolygon(vec_ary);
+		polyLoops.push_back(res);
+		mesh_2d.AddIdLCad_CutMesh(res.id_l_add);
+	} // end for polyPath
+
+	std::vector< std::pair<unsigned int, unsigned int> > aIdECad_Stitch;
+	//aIdECad_Stitch.push_back(std::make_pair(res1.aIdE[1], res2.aIdE[8]));
+	//aIdECad_Stitch.push_back(std::make_pair(res1.aIdE[7], res2.aIdE[1]));
+	//aIdECad_Stitch.push_back(std::make_pair(res1.aIdE[3], res2.aIdE[6]));
+	//aIdECad_Stitch.push_back(std::make_pair(res1.aIdE[5], res2.aIdE[3]));
+
+	// 2. triangulation and make stitch-------------------------------------------------------------
+	mesh_2d.SetMeshingMode_ElemSize(3000);
+	mesh_2d.Meshing(cad_2d);
+	std::cout << "Node size : " << mesh_2d.GetVectorAry().size() << std::endl;
+
+	for (unsigned int ist = 0; ist < aIdECad_Stitch.size(); ist++)
+	{
+		const unsigned int id_e1 = aIdECad_Stitch[ist].first;
+		const unsigned int id_e2 = aIdECad_Stitch[ist].second;
+		stitch_ary_.AddStitch(cad_2d, mesh_2d, id_e1, id_e2);
+	}
+	std::cout << "stitch size : " << stitch_ary_.aStitch.size() << std::endl;
+
+	// 3. load 3D human body -----------------------------------------------------------------------
+	clothHandler_.Clear();
+	if (pCT != 0) { delete pCT; pCT = 0; }
+	obj_mesh.SetIsNormal(true);   
+	CSurfaceMeshReader cnt_mesh;
+	obj_mesh.Load_Ply("models/wm2_15k.ply");
+	cnt_mesh.Load_Ply("models/wm2_cnt.ply");
+	double c[3], w[3]; 
+	obj_mesh.GetCenterWidth(c[0], c[1], c[2], w[0], w[1], w[2]);
+	double scale = 1.65 / std::max(std::max(w[0], w[1]), w[2]); // debug, the person should be of 1.65 meters
+	obj_mesh.Translate(-c[0], -c[1], -c[2]);  obj_mesh.Scale(scale);  obj_mesh.Rot_Bryant(90, 0, 180);
+	cnt_mesh.Translate(-c[0], -c[1], -c[2]);  cnt_mesh.Scale(scale);  cnt_mesh.Rot_Bryant(90, 0, 180);
+	obj_mesh.GetCenterWidth(c[0], c[1], c[2], w[0], w[1], w[2]);
+	std::cout << "Scaled Armadillo " << " " << w[0] << " " << w[1] << " " << w[2] << std::endl;
+	////
+	std::vector<unsigned int> aTri;
+	std::vector<double> aXYZ;
+	cnt_mesh.GetMesh(aTri, aXYZ);
+	clothHandler_.SetObjectMesh(aTri, aXYZ);
+	////
+	CContactTarget3D_Mesh* pCT1 = new CContactTarget3D_Mesh;
+	pCT1->SetMesh(aTri, aXYZ);
+	pCT1->BuildBoxel();
+	pCT1->SetHole(false);
+	pCT = new CContactTarget3D_AdaptiveDistanceField3D();
+	double bb[6] = { -1, 1, -1, 1, -1, 1 };
+	((CContactTarget3D_AdaptiveDistanceField3D*)pCT)->SetUp(*pCT1, bb);
+	((CContactTarget3D_AdaptiveDistanceField3D*)pCT)->BuildMarchingCubeEdge();
+
+	// 4. place 3D cloth pieces -------------------------------------------------------------
+	for (auto polyLoop : polyLoops)
+	{
+		if (polyLoop.id_l_add)
+			clothHandler_.AddClothPiece(polyLoop.id_l_add, 0, 0);
+	}
+
+	// 5. finally, other parameters --------------------------------------------------------
+	cur_time_ = 0;
+	dt_ = 0.005;
+	gx_ = 0, gy_ = 0, gz_ = -2;
+	//  gx_=0,gy_=0, gz_=-10;     
+
+	// cloth parameters   
+	//  cloth_param.stiff_bend = 1.0e-9;
+	cloth_param.stiff_bend = 1.0e-10;
+	//  cloth_param.stiff_bend = 0.0000;  
+	cloth_param.stiff_myu = 0.2;
+	cloth_param.stiff_lambda = 0.1;
+	cloth_param.rho = 0.02;
+
+	// contact parameters
+	contact_param.myu_k = 0.3;
+	contact_param.myu_s = 0.5;
+	//  contact_param.myu_k = 0.0;  
+	//  contact_param.myu_s = 0.0;  
+	contact_param.stiff_n = 1;
+	contact_param.stiff_f = 1;
+	contact_param.offset = 0.01;
+	contact_param.offset = 0.015;
+
+	// stitch coeff
+	stitch_ary_.SetStiff(1000);
+	stitch_ary_.SetDampingCoeff(0.07);
+	//  stitch_ary_.SetDampingCoeff(0.0);  
+	this->imode_ = CLOTH_INITIAL_LOCATION;
+
+	//if (inum_problem_ == 10)
+	//{
+	//	cloth_param.stiff_bend = 1.0 - 5;
+	//}
+	//if (inum_problem_ == 12 || inum_problem_ == 13)
+	//{
+	//	this->is_detail_ = false;
+	//	cloth_param.stiff_bend = 1.5e-3;
+	//	cloth_param.stiff_myu = 20;
+	//	dt_ = 0.0001;
+	//}
+
+	this->InitFieldEqn_fromMsh(cad_2d, mesh_2d);
+	this->ClearLinearSystemPreconditioner();
+	this->InitDrawer();
+	SaveTimeStamp(cad_2d, mesh_2d);
 }
 

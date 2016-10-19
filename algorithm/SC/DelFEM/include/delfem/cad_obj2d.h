@@ -206,6 +206,9 @@ namespace Cad
 		virtual bool WriteToFile_dxf(const std::string& file_name, double scale) const;
 		bool Serialize(Com::CSerializer& serialize);
 		int AssertValid() const;
+
+		/// ldp ////////////////////////////////////////
+		int isEmpty()const { return m_LoopSet.MaxID() == 0; }
 	protected:
 		// return edge with vertex id(id_vs, id_ve) and vertex coord  
 		CEdge2D& GetEdgeRef(unsigned int id_e);

@@ -47,6 +47,7 @@ CCadObj2D::CCadObj2D()
 	//this->min_clearance = 1.0e-3;
 	this->min_clearance = 1.0e-4; // ldp: reduce this value to allow smaller segments
 	//  this->min_clearance = 0.1;  
+	m_ldp_disable_edge_loop_intersection_test = false;
 }
 
 CCadObj2D::CCadObj2D(const CCadObj2D& rhs)
@@ -57,6 +58,7 @@ CCadObj2D::CCadObj2D(const CCadObj2D& rhs)
 	this->m_VertexSet = rhs.m_VertexSet;
 	this->m_BRep = rhs.m_BRep;
 	this->min_clearance = rhs.min_clearance;
+	m_ldp_disable_edge_loop_intersection_test = rhs.m_ldp_disable_edge_loop_intersection_test;
 }
 
 CCadObj2D::~CCadObj2D()
@@ -1240,7 +1242,8 @@ bool Cad::CCadObj2D::SetCurve_Polyline(unsigned int id_e, const std::vector<Com:
 	for (unsigned int iid_l = 0; iid_l < aID_Loop.size(); iid_l++)
 	{
 		unsigned int id_l = aID_Loop[iid_l];
-		if (this->CheckLoop(id_l) != 0) goto FAILURE;
+		if (this->CheckLoop(id_l) != 0) 
+			goto FAILURE;
 	}
 	return true;
 FAILURE:
@@ -1302,6 +1305,10 @@ bool CCadObj2D::CheckIntersection_Loop(unsigned int id_l) const
 // id_l is not exist(e.g. 0), check intersection for all edges
 bool CCadObj2D::CheckIntersection_EdgeAgainstLoop(const CEdge2D& edge, unsigned int id_l) const
 {
+	// ldp: hack here to disable this test some times
+	if (m_ldp_disable_edge_loop_intersection_test)
+		return false;
+
 	std::vector<unsigned int> aIdEdge;
 	if (m_BRep.IsElemID(Cad::LOOP, id_l))
 	{

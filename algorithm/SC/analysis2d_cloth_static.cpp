@@ -2548,17 +2548,41 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 			polyLoops.push_back(Cad::CCadObj2D::CResAddPolygon());
 			continue;
 		}
-		// if closed, we create a loop for it
+		// if closed, we create a loop for it: 
+		// firstly, straght lines added
 		std::vector<Com::CVector2D> vec_ary;
-		assert(polyPath->m_coords.size() >= 4); // the closed polypath stored in svg duplicated the first point
-		for (size_t i = 0; i < polyPath->m_coords.size() - 2; i += 2){
-			ldp::Float2 p = ldp::Float2(polyPath->m_coords[i], polyPath->m_coords[i+1]) * pixel2meter;
+		for (size_t i = 0; i < polyPath->numCorners(); i ++){
+			ldp::Float2 p = polyPath->getCorner(i) * pixel2meter;
 			vec_ary.push_back(Com::CVector2D(p[0], p[1]));
 		}
+		// this is a hack of Li-Bao-Jian's code: we are adding curved polygons,
+		// firstly we add an straight polygon, we do not want intersection test here
+		// then we make the polygon curved, and we recover the interection test
+		cad_2d.ldpSetEdgeLoopIntersectionDisabled(true);
 		polyLoops.push_back(cad_2d.AddPolygon(vec_ary));
 		mesh_2d.AddIdLCad_CutMesh(polyLoops.back().id_l_add);
 		loopId2svgIdMap.insert(std::make_pair(polyLoops.back().id_l_add, polyPath->getId()));
 		svg2loopMap.insert(std::make_pair(polyPath->getId(), &polyLoops.back()));
+
+		// then make curve
+		const auto& loop = polyLoops.back();
+		for (size_t iEdge = 0; iEdge < loop.aIdE.size(); iEdge++)
+		{
+			const auto& coords = polyPath->getEdgeCoords(iEdge);
+			std::vector<Com::CVector2D> pc;
+			if (coords.size() <= 4) continue; // only two points, must be a straight line
+			ldp::Float2 lastp(coords[0], coords[1]); // we should avoid overlapped points
+			for (size_t i = 2; i < coords.size() - 2; i += 2){
+				ldp::Float2 p(coords[i], coords[i + 1]);
+				if ((p - lastp).length() < std::numeric_limits<float>::epsilon())
+					continue;
+				pc.push_back(Com::CVector2D(p[0], p[1])*pixel2meter);
+				lastp = p;
+			}
+			if (!cad_2d.SetCurve_Polyline(loop.aIdE[iEdge], pc))
+				printf("error: set curve failed: %d %d!\n", polyPath->getId(), iEdge);
+		} // end for iEdge
+		cad_2d.ldpSetEdgeLoopIntersectionDisabled(false);
 	} // end for polyPath
 
 	// 1.1 make stitchings -------------------------------------------------------------------------
@@ -2574,7 +2598,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 				if (iter2 == svg2loopMap.end()) continue;
 				auto loop2 = iter2->second;
 				if (loop1->id_l_add < loop2->id_l_add) continue;
-				if (loop1->id_l_add == loop2->id_l_add && g1.second < g2.second) continue;
+				if (loop1->id_l_add == loop2->id_l_add && g1.second <= g2.second) continue;
 				aIdECad_Stitch.push_back(std::make_pair(loop1->aIdE[g1.second], loop2->aIdE[g2.second]));
 			} // end for g2
 		} // end for g1

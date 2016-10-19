@@ -237,8 +237,16 @@ namespace Cad
 		Com::CObjSet<CVertex2D> m_VertexSet;
 		////////////////
 		double min_clearance;
+
 	public:
 		CBRepSurface m_BRep;	// class which have topology
+
+		////////////////////////////////////ldp////////////////////////////////
+	protected:
+		bool m_ldp_disable_edge_loop_intersection_test;
+	public:
+		void ldpSetEdgeLoopIntersectionDisabled(bool b){ m_ldp_disable_edge_loop_intersection_test = b; }
+		bool ldpIsEdgeLoopIntersectionDisabled()const{ return m_ldp_disable_edge_loop_intersection_test; }
 	};
 
 }	// end namespace CAD

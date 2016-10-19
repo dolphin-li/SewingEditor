@@ -1782,7 +1782,7 @@ namespace svg
 		removeSingleNodeAndEmptyNode();
 	}
 
-	std::vector<SvgPolyPath*> SvgManager::collectPolyPaths(bool selectionOnly)
+	std::vector<SvgPolyPath*> SvgManager::collectPolyPaths(bool selectionOnly)const
 	{
 		std::vector<SvgPolyPath*> polyPaths;
 		for (auto layer : m_layers)
@@ -1796,6 +1796,28 @@ namespace svg
 				polyPaths.push_back((SvgPolyPath*)t.get());
 		} // end for layer
 		return polyPaths;
+	}
+
+	std::vector<SvgEdgeGroup*> SvgManager::collectEdgeGroups(bool selectionOnly)const
+	{
+		std::vector<SvgEdgeGroup*> groups;
+		for (auto layer : m_layers)
+		{
+			if (selectionOnly && !layer.second->selected)
+				continue;
+			const auto& g = layer.second->edgeGroups;
+			for (auto iter : g){
+				bool s = false;
+				for (auto obj : iter->group){
+					if (obj.first->isSelected() || !selectionOnly){
+						s = true;
+						break;
+					}
+				}
+				if (s) groups.push_back(iter.get());
+			} // end for iter
+		} // end for layer
+		return groups;
 	}
 	//////////////////////////////////////////////////////////////////
 	/// layer related

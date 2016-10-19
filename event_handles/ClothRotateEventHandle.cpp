@@ -23,6 +23,7 @@ ClothRotateEventHandle::~ClothRotateEventHandle()
 
 void ClothRotateEventHandle::handleEnter()
 {
+	AbstractMeshEventHandle::handleEnter();
 	ldp::Double3 o, u, v;
 	int id_l;
 	if (getPickedMeshFrameInfo(o, u, v, id_l)){
@@ -35,6 +36,7 @@ void ClothRotateEventHandle::handleEnter()
 void ClothRotateEventHandle::handleLeave()
 {
 	m_viewer->endTrackBall();
+	AbstractMeshEventHandle::handleLeave();
 }
 
 void ClothRotateEventHandle::mousePressEvent(QMouseEvent *ev)

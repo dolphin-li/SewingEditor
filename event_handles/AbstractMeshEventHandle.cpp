@@ -54,11 +54,11 @@ QString AbstractMeshEventHandle::inactiveIconFile()const
 
 void AbstractMeshEventHandle::handleEnter()
 {
-
+	m_viewer->setFocus();
 }
 void AbstractMeshEventHandle::handleLeave()
 {
-
+	m_viewer->clearFocus();
 }
 
 QString AbstractMeshEventHandle::toolTips()const

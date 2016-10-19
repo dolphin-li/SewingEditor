@@ -21,12 +21,12 @@ ClothSelectEventHandle::~ClothSelectEventHandle()
 
 void ClothSelectEventHandle::handleEnter()
 {
-
+	AbstractMeshEventHandle::handleEnter();
 }
 
 void ClothSelectEventHandle::handleLeave()
 {
-
+	AbstractMeshEventHandle::handleLeave();
 }
 
 void ClothSelectEventHandle::mousePressEvent(QMouseEvent *ev)

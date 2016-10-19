@@ -101,7 +101,8 @@ namespace svg
 		void convertSelectedPathToConnectedGroups();
 		void closeSelectedPolygons();
 		void selectClosedPolygons();
-		std::vector<SvgPolyPath*> collectPolyPaths(bool selectionOnly = true);
+		std::vector<SvgPolyPath*> collectPolyPaths(bool selectionOnly = true)const;
+		std::vector<SvgEdgeGroup*> collectEdgeGroups(bool selectionOnly = true)const;
 
 		///// pair operations
 		void makeSelectedToPair();

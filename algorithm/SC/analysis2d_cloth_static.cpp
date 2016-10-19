@@ -2523,6 +2523,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 
 	// 1. create 2D pieces from svg ---------------------------------------------
 	auto polyPaths = svgManager->collectPolyPaths(true);
+	auto edgeGroups = svgManager->collectEdgeGroups(true);
 	const float pixel2meter = svgManager->getPixelToMeters();
 	if (polyPaths.size() == 0)
 		throw std::exception("no selected polypaths given!");
@@ -2533,7 +2534,9 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	std::vector<ldp::Float2> polyCenters;
 	std::vector<ldp::Float3> poly3dCenters;
 	std::vector<ldp::QuaternionF> poly3dRots;
+	std::map<int, Cad::CCadObj2D::CResAddPolygon*> svg2loopMap;
 
+	polyLoops.reserve(polyPaths.size());
 	for (auto polyPath : polyPaths)
 	{
 		polyCenters.push_back(polyPath->getCenter());
@@ -2555,13 +2558,27 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		polyLoops.push_back(cad_2d.AddPolygon(vec_ary));
 		mesh_2d.AddIdLCad_CutMesh(polyLoops.back().id_l_add);
 		loopId2svgIdMap.insert(std::make_pair(polyLoops.back().id_l_add, polyPath->getId()));
+		svg2loopMap.insert(std::make_pair(polyPath->getId(), &polyLoops.back()));
 	} // end for polyPath
 
+	// 1.1 make stitchings -------------------------------------------------------------------------
 	std::vector< std::pair<unsigned int, unsigned int> > aIdECad_Stitch;
-	//aIdECad_Stitch.push_back(std::make_pair(res1.aIdE[1], res2.aIdE[8]));
-	//aIdECad_Stitch.push_back(std::make_pair(res1.aIdE[7], res2.aIdE[1]));
-	//aIdECad_Stitch.push_back(std::make_pair(res1.aIdE[3], res2.aIdE[6]));
-	//aIdECad_Stitch.push_back(std::make_pair(res1.aIdE[5], res2.aIdE[3]));
+	for (auto eg : edgeGroups)
+	{
+		for (auto g1 : eg->group){
+			auto iter1 = svg2loopMap.find(g1.first->getId());
+			if (iter1 == svg2loopMap.end()) continue;
+			auto loop1 = iter1->second;
+			for (auto g2 : eg->group){
+				auto iter2 = svg2loopMap.find(g2.first->getId());
+				if (iter2 == svg2loopMap.end()) continue;
+				auto loop2 = iter2->second;
+				if (loop1->id_l_add < loop2->id_l_add) continue;
+				if (loop1->id_l_add == loop2->id_l_add && g1.second < g2.second) continue;
+				aIdECad_Stitch.push_back(std::make_pair(loop1->aIdE[g1.second], loop2->aIdE[g2.second]));
+			} // end for g2
+		} // end for g1
+	} // end for eg
 
 	// 2. triangulation and make stitch-------------------------------------------------------------
 	mesh_2d.SetMeshingMode_ElemSize(3000);

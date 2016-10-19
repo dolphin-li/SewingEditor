@@ -22,6 +22,7 @@ ClothTranslateEventHandle::~ClothTranslateEventHandle()
 
 void ClothTranslateEventHandle::handleEnter()
 {
+	AbstractMeshEventHandle::handleEnter();
 	ldp::Double3 o, u, v;
 	int id_l;
 	if (getPickedMeshFrameInfo(o, u, v, id_l)){
@@ -33,6 +34,7 @@ void ClothTranslateEventHandle::handleEnter()
 void ClothTranslateEventHandle::handleLeave()
 {
 	m_viewer->endTrackBall();
+	AbstractMeshEventHandle::handleLeave();
 }
 
 void ClothTranslateEventHandle::mousePressEvent(QMouseEvent *ev)

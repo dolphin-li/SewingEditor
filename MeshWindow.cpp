@@ -102,7 +102,7 @@ void MeshWindow::addLeftDockWidgetButton(AbstractMeshEventHandle::ProcessorType 
 	icon.addFile(handle->iconFile(), QSize(), QIcon::Active);
 	icon.addFile(handle->iconFile(), QSize(), QIcon::Selected);
 	icon.addFile(handle->inactiveIconFile(), QSize(), QIcon::Normal);
-	QSharedPointer<QPushButton> btn(new QPushButton(ui.dockWidgetLeftContents));
+	QSharedPointer<QPushButton> btn(new QPushButton(ui.dockWidgetLeft));
 	btn->setIconSize(QSize(80, 80));
 	btn->setIcon(icon);
 	btn->setCheckable(true);

@@ -6,6 +6,7 @@
 #include "designer2d_cloth.h"
 #include "analysis2d_cloth_static.h"
 
+
 ClothTranslateEventHandle::ClothTranslateEventHandle(BaseMeshViewer* v) : AbstractMeshEventHandle(v)
 {
 	m_cursor = QCursor(Qt::CursorShape::SizeAllCursor);
@@ -57,20 +58,20 @@ void ClothTranslateEventHandle::mouseMoveEvent(QMouseEvent *ev)
 		if (m_viewer->pAnalysis()->GetMode() == CLOTH_INITIAL_LOCATION && m_viewer->buttons() == Qt::LeftButton)
 		{
 			const ldp::Camera& cam = m_viewer->camera();
-			Cad::CAD_ELEM_TYPE itype_cad_part; unsigned int id_cad_part;
-			double tmp_x, tmp_y;
-			m_viewer->pListener()->Cad_GetPicked(itype_cad_part, id_cad_part, tmp_x, tmp_y);
-			if (itype_cad_part == Cad::LOOP && m_viewer->pListener()->GetCad().IsElemID(itype_cad_part, id_cad_part))
+			ldp::Double3 o, u, v;
+			int id_l;
+			if (getPickedMeshFrameInfo(o, u, v, id_l))
 			{
 				QPoint lp = m_viewer->lastMousePos();
 				ldp::Double3 wp = cam.getWorldCoords(ldp::Float3(ev->x(), m_viewer->height() - 1 - ev->y(), m_picked_screenPos[2]));
 				ldp::Double3 wlp = cam.getWorldCoords(ldp::Float3(lp.x(), m_viewer->height() - 1 - lp.y(), m_picked_screenPos[2]));
 				ldp::Double3 dir = wp - wlp;
-				m_viewer->pAnalysis()->MoveClothLoopInitialPosition(id_cad_part, dir.ptr());
+				m_viewer->pAnalysis()->MoveClothLoopInitialPosition(id_l, dir.ptr());
+				updateSvg3dInfo();
 				valid_op = true;
-			}
-		}
-	}
+			} // end if getPickedMeshFrameInfo
+		} // end if left button
+	} // end if pAnalysis
 	if (!valid_op)
 		AbstractMeshEventHandle::mouseMoveEvent(ev);
 }

@@ -1033,7 +1033,7 @@ void CAnalysis2D_Cloth_Static::RotateClothLoopInitialPosition(unsigned int id_l,
 	
 	ldp::Double3 p, n, h;
 	if (!clothHandler_.GetAnchor_3D(p.ptr(), n.ptr(), h.ptr(), id_ea)) { return; }
-	clothHandler_.Transform_Cloth_Rot(id_l, R);
+	clothHandler_.Transform_Cloth_Rot(id_l, R, false);
 	if (imode_ == CLOTH_INITIAL_LOCATION)
 	{
 		//    std::cout << anc_x << " " << anc_y << " " << anc_z << std::endl;
@@ -2616,7 +2616,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		{
 			clothHandler_.AddClothPiece(polyLoop.id_l_add, p[0], p[1]);
 			clothHandler_.Transform_Cloth_Pan(polyLoop.id_l_add, c[0], c[1], c[2]);
-			clothHandler_.Transform_Cloth_Rot(polyLoop.id_l_add, r);
+			clothHandler_.Transform_Cloth_Rot(polyLoop.id_l_add, r, true);
 		}
 	}
 

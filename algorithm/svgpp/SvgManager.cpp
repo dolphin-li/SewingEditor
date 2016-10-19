@@ -579,6 +579,28 @@ namespace svg
 		}
 	}
 
+	SvgAbstractObject* SvgManager::getObjectById(int id)
+	{
+		for (auto layer_iter : m_layers)
+		{
+			auto it = layer_iter.second->idxMap.find(id);
+			if (it != layer_iter.second->idxMap.end())
+				return it->second;
+		}
+		return nullptr;
+	}
+
+	const SvgAbstractObject* SvgManager::getObjectById(int id)const
+	{
+		for (auto layer_iter : m_layers)
+		{
+			auto it = layer_iter.second->idxMap.find(id);
+			if (it != layer_iter.second->idxMap.end())
+				return it->second;
+		}
+		return nullptr;
+	}
+
 	void SvgManager::selectShapeByIndex(int id, SelectOp op)
 	{
 		for (auto layer_iter : m_layers)

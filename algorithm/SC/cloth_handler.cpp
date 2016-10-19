@@ -173,7 +173,7 @@ void CClothHandler::Transform_Cloth_RotBryantAngle(unsigned int id_l, double phi
   cp->h[2] = res[2];        
 }
 
-void CClothHandler::Transform_Cloth_Rot(unsigned int id_l, const ldp::Mat3d& R)
+void CClothHandler::Transform_Cloth_Rot(unsigned int id_l, const ldp::Mat3d& R, bool resetPrevious)
 {
 	int icp0 = -1;
 	for (unsigned int i = 0; i<apPiece.size(); i++){
@@ -185,6 +185,12 @@ void CClothHandler::Transform_Cloth_Rot(unsigned int id_l, const ldp::Mat3d& R)
 	if (icp0 == -1){ return; }
 
 	CClothPiece* cp = apPiece[icp0];
+
+	if (resetPrevious)
+	{
+		cp->n[0] = 1;   cp->n[1] = 0;   cp->n[2] = 0;
+		cp->h[0] = 0;   cp->h[1] = 1;   cp->h[2] = 0;
+	}
 
 	ldp::Double3 rn = R * ldp::Double3(cp->n[0], cp->n[1], cp->n[2]);
 	ldp::Double3 rh = R * ldp::Double3(cp->h[0], cp->h[1], cp->h[2]);

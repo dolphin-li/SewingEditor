@@ -62,6 +62,8 @@ namespace svg
 		void mergeSelectedLayers();
 		Layer* selectedToNewLayer();
 		const std::map<std::string, std::shared_ptr<Layer>>& layers()const { return m_layers; }
+		SvgAbstractObject* getObjectById(int id);
+		const SvgAbstractObject* getObjectById(int id)const;
 		
 		// extend all polyPaths symmetrically
 		// axis: 0=x, 1=y, -1=auto

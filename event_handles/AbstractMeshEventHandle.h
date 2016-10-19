@@ -41,6 +41,9 @@ public:
 
 	void pickMesh(QPoint p);
 	bool getPickedMeshFrameInfo(ldp::Double3& o, ldp::Double3& u, ldp::Double3& v, int& id_l)const;
+	void updateSvg3dInfo();
+
+	static ldp::Mat3d rotation_from_uv(ldp::Double3 u, ldp::Double3 v);
 protected:
 	BaseMeshViewer* m_viewer;
 	int m_lastHighlightShapeId;

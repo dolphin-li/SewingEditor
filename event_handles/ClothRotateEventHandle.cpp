@@ -7,18 +7,6 @@
 #include "analysis2d_cloth_static.h"
 #include "ldpMat\Quaternion.h"
 
-inline ldp::Mat3d rotation_from_uv(ldp::Double3 u, ldp::Double3 v)
-{
-	ldp::Double3 x = u.normalize();
-	ldp::Double3 z = x.cross(v).normalize();
-	ldp::Double3 y = z.cross(x);
-	ldp::Mat3d R;
-	R(0, 0) = x[0]; R(0, 1) = y[0]; R(0, 2) = z[0];
-	R(1, 0) = x[1]; R(1, 1) = y[1]; R(1, 2) = z[1];
-	R(2, 0) = x[2]; R(2, 1) = y[2]; R(2, 2) = z[2];
-	return R;
-}
-
 ClothRotateEventHandle::ClothRotateEventHandle(BaseMeshViewer* v)
 : AbstractMeshEventHandle(v)
 {
@@ -154,6 +142,7 @@ void ClothRotateEventHandle::mouseMoveEvent(QMouseEvent *ev)
 
 			m_viewer->pAnalysis()->RotateClothLoopInitialPosition(id_l, R*lastR.trans());
 			m_viewer->rotateTrackBall(R*lastR.trans());
+			updateSvg3dInfo();
 			valid_op = true;
 		}
 	} // end if initial_cloth and left button

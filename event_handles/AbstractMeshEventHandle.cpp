@@ -10,6 +10,22 @@
 #include "ClothTranslateEventHandle.h"
 #include "ClothRotateEventHandle.h"
 
+#include "global_data_holder.h"
+#include "svgpp\SvgPolyPath.h"
+#include "svgpp\SvgManager.h"
+
+ldp::Mat3d AbstractMeshEventHandle::rotation_from_uv(ldp::Double3 u, ldp::Double3 v)
+{
+	ldp::Double3 x = u.normalize();
+	ldp::Double3 z = x.cross(v).normalize();
+	ldp::Double3 y = z.cross(x);
+	ldp::Mat3d R;
+	R(0, 0) = x[0]; R(0, 1) = y[0]; R(0, 2) = z[0];
+	R(1, 0) = x[1]; R(1, 1) = y[1]; R(1, 2) = z[1];
+	R(2, 0) = x[2]; R(2, 1) = y[2]; R(2, 2) = z[2];
+	return R;
+}
+
 AbstractMeshEventHandle::AbstractMeshEventHandle(BaseMeshViewer* v)
 {
 	m_viewer = v;
@@ -104,6 +120,27 @@ bool AbstractMeshEventHandle::getPickedMeshFrameInfo(ldp::Double3& o, ldp::Doubl
 		return true;
 	}
 	return false;
+}
+
+void AbstractMeshEventHandle::updateSvg3dInfo()
+{
+	ldp::Double3 o, u, v;
+	int id_l;
+	if (!getPickedMeshFrameInfo(o, u, v, id_l))
+		return;
+	auto iter = g_dataholder.m_clothLoopId2svgIdMap.find(id_l);
+	if (iter != g_dataholder.m_clothLoopId2svgIdMap.end())
+	{
+		auto obj = g_dataholder.m_svgManager->getObjectById(iter->second);
+		if (obj == nullptr)
+			throw std::exception("error: loop_to_svg index not valid!");
+		if (obj->objectType() != svg::SvgAbstractObject::PolyPath)
+			throw std::exception("error: loop_to_svg index not valid!");
+		auto poly = (svg::SvgPolyPath*)obj;
+		float scale = g_dataholder.m_svgManager->getPixelToMeters();
+		poly->set3dCenter(o / scale);
+		poly->set3dRot(ldp::QuaternionF().fromRotationMatrix(rotation_from_uv(u, v)));
+	} // end if iter
 }
 
 void AbstractMeshEventHandle::mousePressEvent(QMouseEvent *ev)

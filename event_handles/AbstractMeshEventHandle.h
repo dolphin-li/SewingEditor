@@ -39,7 +39,7 @@ public:
 	virtual void handleEnter();
 	virtual void handleLeave();
 
-	void pickMesh(QPoint p);
+	void pickMesh(QPoint p, bool reset_if_none_picked = false);
 	bool getPickedMeshFrameInfo(ldp::Double3& o, ldp::Double3& u, ldp::Double3& v, int& id_l)const;
 	void updateSvg3dInfo();
 

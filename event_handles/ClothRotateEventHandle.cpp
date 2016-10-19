@@ -28,7 +28,7 @@ void ClothRotateEventHandle::handleEnter()
 	if (getPickedMeshFrameInfo(o, u, v, id_l)){
 		ldp::Mat3d R = rotation_from_uv(u, v);
 		m_trackBallMouseClickR = R;
-		m_viewer->beginTrackBall(o, R, (u.length() + v.length()) * 0.1);
+		m_viewer->beginTrackBall(BaseMeshViewer::TrackBall_Rot, o, R, (u.length() + v.length()) * 0.1);
 	}
 }
 
@@ -79,10 +79,8 @@ void ClothRotateEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 			if (getPickedMeshFrameInfo(o, u, v, id_l)){
 				ldp::Mat3d R = rotation_from_uv(u, v);
 				m_trackBallMouseClickR = R;
-				m_viewer->beginTrackBall(o, R, (u.length() + v.length()) * 0.1);
+				m_viewer->beginTrackBall(BaseMeshViewer::TrackBall_Rot, o, R, (u.length() + v.length()) * 0.1);
 			}
-			else
-				m_viewer->endTrackBall();
 		} // end else
 	} // end if left button and initial_cloth
 
@@ -104,6 +102,8 @@ void ClothRotateEventHandle::mouseMoveEvent(QMouseEvent *ev)
 		int hid = m_viewer->fboRenderedIndex(ev->pos());
 		if (hid >= BaseMeshViewer::TrackBallIndex_X && hid <= BaseMeshViewer::TrackBallIndex_Z)
 			m_viewer->setHoverTrackBallAxis(hid);
+		else
+			m_viewer->setHoverTrackBallAxis(0);
 	}
 	else if (m_viewer->pAnalysis()->GetMode() == CLOTH_INITIAL_LOCATION && m_viewer->buttons() == Qt::LeftButton)
 	{

@@ -84,7 +84,7 @@ AbstractMeshEventHandle* AbstractMeshEventHandle::create(ProcessorType type, Bas
 	}
 }
 
-void AbstractMeshEventHandle::pickMesh(QPoint p)
+void AbstractMeshEventHandle::pickMesh(QPoint p, bool reset_if_none_picked)
 {
 	const ldp::Camera& cam = m_viewer->camera();
 	ldp::UInt3 tri_id;
@@ -93,8 +93,10 @@ void AbstractMeshEventHandle::pickMesh(QPoint p)
 	bool res = m_viewer->pAnalysis()->Pick(ldp::Float2(p.x(), m_viewer->height() - 1 - p.y()),
 		cam, tri_id, tri_coord, id_l, m_picked_screenPos);
 	if (!res){
-		m_viewer->pListener()->HilightCadTypeID(Cad::NOT_SET, 0);
-		m_viewer->pListener()->Cad_SetPicked(Cad::NOT_SET, 0, 0, 0);
+		if (reset_if_none_picked){
+			m_viewer->pListener()->HilightCadTypeID(Cad::NOT_SET, 0);
+			m_viewer->pListener()->Cad_SetPicked(Cad::NOT_SET, 0, 0, 0);
+		}
 	}
 	else{
 		m_viewer->pListener()->HilightCadTypeID(Cad::LOOP, id_l);

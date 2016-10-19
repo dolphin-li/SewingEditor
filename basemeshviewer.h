@@ -17,6 +17,11 @@ public:
 		TrackBallIndex_Y,
 		TrackBallIndex_Z,
 	};
+	enum TrackBallMode{
+		TrackBall_None,
+		TrackBall_Rot,
+		TrackBall_Trans
+	};
 public:
 	BaseMeshViewer(QWidget *parent);
 	~BaseMeshViewer();
@@ -46,10 +51,11 @@ public:
 	AbstractMeshEventHandle* getEventHandle(AbstractMeshEventHandle::ProcessorType type);
 	void beginDragBox(QPoint p);
 	void rotateTrackBall(ldp::Mat3d R);
+	void translateTrackBall(ldp::Double3 t);
 	void endDragBox();
-	void beginTrackBall(ldp::Float3 p, ldp::Mat3f R, float scale);
+	void beginTrackBall(TrackBallMode mode, ldp::Float3 p, ldp::Mat3f R, float scale);
 	void endTrackBall();
-	bool isTrackBallShown()const{ return m_isTrackBall; }
+	TrackBallMode getTrackBallMode()const{ return m_trackBallMode; }
 	void setActiveTrackBallAxis(int i){ m_activeTrackBallAxis = i; }
 	int getActiveTrackBallAxis()const{ return m_activeTrackBallAxis; }
 	void setHoverTrackBallAxis(int i){ m_hoverTrackBallAxis = i; }
@@ -78,7 +84,7 @@ protected:
 	QImage m_fboImage;
 	bool m_isDragBox;
 	QPoint m_dragBoxBegin;
-	bool m_isTrackBall;
+	TrackBallMode m_trackBallMode;
 	ldp::Float3 m_trackBallPos;
 	ldp::Mat3f m_trackBallR;
 	float m_trackBallScale;

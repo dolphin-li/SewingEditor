@@ -77,7 +77,7 @@ BaseMeshViewer::BaseMeshViewer(QWidget *parent)
 	m_buttons = Qt::MouseButton::NoButton;
 	m_isDragBox = false;
 	m_isEdgeMode = false;
-	m_isTrackBall = false;
+	m_trackBallMode = TrackBall_None;
 	m_currentEventHandle = nullptr;
 
 	m_eventHandles.resize((size_t)AbstractMeshEventHandle::ProcessorTypeEnd, nullptr);
@@ -371,12 +371,12 @@ void BaseMeshViewer::getModelBound(ldp::Float3& bmin, ldp::Float3& bmax)
 	}
 }
 
-void BaseMeshViewer::beginTrackBall(ldp::Float3 p, ldp::Mat3f R, float scale)
+void BaseMeshViewer::beginTrackBall(TrackBallMode mode, ldp::Float3 p, ldp::Mat3f R, float scale)
 {
 	m_trackBallPos = p;
 	m_trackBallR = R;
 	m_trackBallScale = scale;
-	m_isTrackBall = true;
+	m_trackBallMode = mode;
 	m_activeTrackBallAxis = -1;
 	m_hoverTrackBallAxis = -1;
 }
@@ -386,9 +386,14 @@ void BaseMeshViewer::rotateTrackBall(ldp::Mat3d R)
 	m_trackBallR = R * m_trackBallR;
 }
 
+void BaseMeshViewer::translateTrackBall(ldp::Double3 t)
+{
+	m_trackBallPos += t;
+}
+
 void BaseMeshViewer::endTrackBall()
 {
-	m_isTrackBall = false;
+	m_trackBallMode = TrackBall_None;
 	m_activeTrackBallAxis = -1;
 	m_hoverTrackBallAxis = -1;
 }
@@ -405,7 +410,7 @@ int BaseMeshViewer::fboRenderedIndex(QPoint p)const
 
 void BaseMeshViewer::renderTrackBall(bool indexMode)
 {
-	if (!m_isTrackBall)
+	if (m_trackBallMode == TrackBall_None)
 		return;
 
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -429,7 +434,10 @@ void BaseMeshViewer::renderTrackBall(bool indexMode)
 	if (indexMode)
 		glColor4fv(selectIdToColor(TrackBallIndex_X).ptr());
 	glMultMatrixf(get_z2x_rot().ptr());
-	glutSolidTorus(m_trackBallScale * 0.03, m_trackBallScale, 16, 128);
+	if (m_trackBallMode == TrackBall_Rot)
+		glutSolidTorus(m_trackBallScale * 0.03, m_trackBallScale, 16, 128);
+	else if (m_trackBallMode == TrackBall_Trans)
+		solid_axis(m_trackBallScale * 0.03, m_trackBallScale);
 	glMultMatrixf(get_z2x_rot().trans().ptr());
 
 	// y axis
@@ -440,7 +448,10 @@ void BaseMeshViewer::renderTrackBall(bool indexMode)
 	if (indexMode)
 		glColor4fv(selectIdToColor(TrackBallIndex_Y).ptr());
 	glMultMatrixf(get_z2y_rot().ptr());
-	glutSolidTorus(m_trackBallScale * 0.03, m_trackBallScale, 16, 128);
+	if (m_trackBallMode == TrackBall_Rot)
+		glutSolidTorus(m_trackBallScale * 0.03, m_trackBallScale, 16, 128);
+	else if (m_trackBallMode == TrackBall_Trans)
+		solid_axis(m_trackBallScale * 0.03, m_trackBallScale);
 	glMultMatrixf(get_z2y_rot().trans().ptr());
 
 	// z axis
@@ -450,10 +461,13 @@ void BaseMeshViewer::renderTrackBall(bool indexMode)
 		glColor3f(1, 1, 1);
 	if (indexMode)
 		glColor4fv(selectIdToColor(TrackBallIndex_Z).ptr());
-	glutSolidTorus(m_trackBallScale * 0.03, m_trackBallScale, 4, 128);
+	if (m_trackBallMode == TrackBall_Rot)
+		glutSolidTorus(m_trackBallScale * 0.03, m_trackBallScale, 16, 128);
+	else if (m_trackBallMode == TrackBall_Trans)
+		solid_axis(m_trackBallScale * 0.03, m_trackBallScale);
 
 	// sphere
-	if (!indexMode)
+	if (!indexMode && m_trackBallMode == TrackBall_Rot)
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

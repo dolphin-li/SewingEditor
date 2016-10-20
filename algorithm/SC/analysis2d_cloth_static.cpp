@@ -2161,14 +2161,17 @@ bool CAnalysis2D_Cloth_Static::Pick(ldp::Double2 screenPos, const ldp::Camera& c
 			}
 			double area0 = Com::TriArea3D(c0[0].ptr(), c0[1].ptr(), c0[2].ptr());
 			double area1 = Com::TriArea2D(c1[0].ptr(), c1[1].ptr(), c1[2].ptr());
-			if (area1 < area0*0.01) continue;
+			if (abs(area1) < area0*0.01) continue;
 			const double scr[2] = { screenPos[0], screenPos[1] };
 			double area2 = Com::TriArea2D(scr, c1[1].ptr(), c1[2].ptr());
 			double area3 = Com::TriArea2D(c1[0].ptr(), scr, c1[2].ptr());
 			double area4 = Com::TriArea2D(c1[0].ptr(), c1[1].ptr(), scr);
-			if (area2 < -area1*0.01) continue;
-			if (area3 < -area1*0.01) continue;
-			if (area4 < -area1*0.01) continue;
+			if (std::signbit(area2) != std::signbit(area1)) continue;
+			if (std::signbit(area3) != std::signbit(area1)) continue;
+			if (std::signbit(area4) != std::signbit(area1)) continue;
+			//if (area2 < -area1*0.01) continue;
+			//if (area3 < -area1*0.01) continue;
+			//if (area4 < -area1*0.01) continue;
 			std::cout << "hit " << id_ea << " " << ielem << std::endl;
 			picked_elem_nodes[0] = no[0];
 			picked_elem_nodes[1] = no[1];
@@ -2626,7 +2629,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	cnt_mesh.Load_Ply("models/wm2_cnt.ply");
 	double c[3], w[3]; 
 	obj_mesh.GetCenterWidth(c[0], c[1], c[2], w[0], w[1], w[2]);
-	double scale = 1.65 / std::max(std::max(w[0], w[1]), w[2]); // debug, the person should be of 1.65 meters
+	double scale = 2 / std::max(std::max(w[0], w[1]), w[2]); // debug, the person should be of 1.65 meters
 	obj_mesh.Translate(-c[0], -c[1], -c[2]);  obj_mesh.Scale(scale);  obj_mesh.Rot_Bryant(90, 0, 180);
 	cnt_mesh.Translate(-c[0], -c[1], -c[2]);  cnt_mesh.Scale(scale);  cnt_mesh.Rot_Bryant(90, 0, 180);
 	obj_mesh.GetCenterWidth(c[0], c[1], c[2], w[0], w[1], w[2]);

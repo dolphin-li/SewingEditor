@@ -34,9 +34,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "delfem/femls/zlinearsystem.h"
 
-#ifndef for 
-#define for if(0); else for
-#endif
+//#ifndef for 
+//#define for if(0); else for
+//#endif
 
 using namespace MatVec;
 using namespace Fem::Ls;

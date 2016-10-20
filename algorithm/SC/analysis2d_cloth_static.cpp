@@ -2524,7 +2524,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	aSymIdVPair.clear();
 	loopId2svgIdMap.clear();
 
-	// 1. create 2D pieces from svg ---------------------------------------------
+	// 1. create 2D pieces from svg ------------------------------------------------------------
 	auto polyPaths = svgManager->collectPolyPaths(true);
 	auto edgeGroups = svgManager->collectEdgeGroups(true);
 	const float pixel2meter = svgManager->getPixelToMeters();
@@ -2539,6 +2539,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	std::vector<ldp::QuaternionF> poly3dRots;
 	std::map<int, Cad::CCadObj2D::CResAddPolygon*> svg2loopMap;
 
+	// 1.1 add closed polygons as loops ------------------------------------------------------
 	polyLoops.reserve(polyPaths.size());
 	for (auto polyPath : polyPaths)
 	{
@@ -2588,7 +2589,13 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		cad_2d.ldpSetEdgeLoopIntersectionDisabled(false);
 	} // end for polyPath
 
-	// 1.1 make stitchings -------------------------------------------------------------------------
+	// 1.2 add non-closed polygons as pleats -------------------------------------------------------
+	for (size_t iPoly = 0; iPoly < polyPaths.size(); iPoly++)
+	{
+
+	} // end for iPoly
+
+	// 1.3 make stitchings -------------------------------------------------------------------------
 	std::vector< std::pair<unsigned int, unsigned int> > aIdECad_Stitch;
 	for (auto eg : edgeGroups)
 	{

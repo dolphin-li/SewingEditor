@@ -29,9 +29,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     #pragma warning( disable : 4786 )
 #endif
 
-#ifndef for 
-#define for if(0); else for
-#endif
+//#ifndef for 
+//#define for if(0); else for
+//#endif
 
 #include <iostream>
 #include <cassert>

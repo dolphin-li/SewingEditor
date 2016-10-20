@@ -2515,9 +2515,12 @@ static unsigned int MakeHingeField_Tri(Fem::Field::CFieldWorld& world, unsigned 
 // if c on poly, return 0
 // else return -1
 // verts: n-points, the last is then connected to the first
-static int svg_point_In_On_polygon(int nvert, const ldp::Float2* verts, ldp::Float2 p, float thre)
+// edgeId: if on poly, return the edge it is on
+static int svg_point_In_On_polygon(int nvert, const ldp::Float2* verts, 
+	ldp::Float2 p, float thre, int& edgeId, ldp::Float2& nearestP)
 {
 	// 1. check if p on a segment by compute point-line distance
+	edgeId = -1;
 	for (int i = 0, j = nvert - 1; i < nvert; j = i++)
 	{
 		ldp::Float2 dir = verts[i] - verts[j], dp = p - verts[j];
@@ -2525,16 +2528,14 @@ static int svg_point_In_On_polygon(int nvert, const ldp::Float2* verts, ldp::Flo
 		if (len_dir < std::numeric_limits<float>::epsilon()) continue;
 		dir /= len_dir;
 		float t = dp.dot(dir);
-		ldp::Float2 p_projected = verts[j] + dir * t;
-		float dist = 0;
-		if (t < 0)
-			dist = dp.length();
-		else if (t > 1)
-			dist = (p - verts[i]).length();
-		else
-			dist = (p - p_projected).length();
-		if (dist <= thre)
+		if (t < 0) nearestP = verts[j];
+		else if (t > 1) nearestP = verts[i];
+		else nearestP = verts[j] + dir * t;
+		float dist = (p-nearestP).length();
+		if (dist <= thre){
+			edgeId = i;
 			return 0;
+		}
 	}
 
 	// check if in or out
@@ -2547,6 +2548,96 @@ static int svg_point_In_On_polygon(int nvert, const ldp::Float2* verts, ldp::Flo
 			c = -c;
 	}
 	return c;
+}
+
+// given a polyPaths[pathId], if it is not closed and maked as loop before
+// we tested all its corners and find a loop contains it.
+// the idx of corners in/on the founded loop are returned
+// the idx of the edge of the founded loop, which the corners on, are also returned
+// the pos of on-edge polygons will also be returned
+static void collect_point_In_On_polygon(const std::vector<svg::SvgPolyPath*>& polyPaths,
+	const std::vector<Cad::CCadObj2D::CResAddPolygon>& polyLoops, int pathId,
+	Cad::CCadObj2D::CResAddPolygon*& foundLoop, 
+	std::vector<int>& cornersInLoop,
+	std::vector<int>& cornersOnLoop,
+	std::vector<ldp::Float2>& cornersOnPos,
+	std::vector<int>& edgesCornersOn)
+{
+	foundLoop = nullptr;
+	if (polyLoops[pathId].id_l_add)
+		return; // those valid polygons
+	const auto& path_i = polyPaths[pathId];
+	const auto& loop_i = polyLoops[pathId];
+	if (path_i->numCorners() <= 1)
+		return; // ignore individual points
+	assert(!path_i->isClosed());
+
+	// thre shold to decide whether a point on an edge
+	const float on_segment_thre = (path_i->getCorner(0) - path_i->getCorner(1)).length() * 0.2f;
+
+	// find corners that are in/on polygons
+	for (size_t jPoly = 0; jPoly < polyPaths.size(); jPoly++)
+	{
+		const auto& path_j = polyPaths[jPoly];
+		auto& loop_j = polyLoops[jPoly];
+		if (pathId == jPoly || loop_j.id_l_add == 0)
+			continue; // we only choose closed path here
+		for (int iCorner = 0; iCorner < path_i->numCorners(); iCorner++){
+			auto p = path_i->getCorner(iCorner);
+			int eid = -1;
+			ldp::Float2 nearestP;
+			auto r = svg_point_In_On_polygon(path_j->m_coords.size() / 2 - 1,
+				(const ldp::Float2*)path_j->m_coords.data(), p, on_segment_thre, eid, nearestP);
+			if (r == 1) cornersInLoop.push_back(iCorner);
+			if (r == 0) {
+				cornersOnLoop.push_back(iCorner);
+				cornersOnPos.push_back(nearestP);
+				int mappedEid = - 1;
+				for (int p0 = path_j->numCorners() - 1, p1 = 0; p1 < path_j->numCorners(); p0 = p1++){
+					int lastPos = path_j->getCornerIdx(p0);
+					int thisPos = path_j->getCornerIdx(p1);
+					if (lastPos < thisPos){
+						if (eid >= lastPos && eid < thisPos){
+							mappedEid = p0;
+							break;
+						}
+					} // end if lp < tp
+					else{
+						if (eid >= thisPos && eid < path_j->m_cmds.size()
+							|| eid >= 0 && eid < lastPos){
+							mappedEid = p0;
+							break;
+						}
+					}
+				} // end for p0, p1
+				assert(mappedEid >= 0);
+				edgesCornersOn.push_back(mappedEid);
+			}// end if r==0, on path
+		} // end for iCorner
+		if (cornersInLoop.size() || cornersOnLoop.size()){
+			foundLoop = (Cad::CCadObj2D::CResAddPolygon*)&loop_j;
+			break;
+		}
+	} // end for jPoly
+}
+
+static void makeCurveFromSvgCurve(Cad::CCadObj2D_Move& cad_2d, const svg::SvgPolyPath* path, 
+	const Cad::CCadObj2D::CResAddPolygon& loop, int iEdge, float pixel2meter)
+{
+	const auto& coords = path->getEdgeCoords(iEdge);
+	std::vector<Com::CVector2D> pc;
+	if (coords.size() <= 4) 
+		return; // only two points, must be a straight line
+	ldp::Float2 lastp(coords[0], coords[1]); // we should avoid overlapped points
+	for (size_t i = 2; i < coords.size() - 2; i += 2){
+		ldp::Float2 p(coords[i], coords[i + 1]);
+		if ((p - lastp).length() < std::numeric_limits<float>::epsilon())
+			continue;
+		pc.push_back(Com::CVector2D(p[0], p[1])*pixel2meter);
+		lastp = p;
+	}
+	if (!cad_2d.SetCurve_Polyline(loop.aIdE[iEdge], pc))
+		printf("error: set curve failed: %d %d!\n", path->getId(), iEdge);
 }
 
 void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
@@ -2586,8 +2677,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		poly3dCenters.push_back(polyPath->get3dCenter());
 		poly3dRots.push_back(polyPath->get3dRot());
 		// if non-closed, we ignore it this time
-		if (!polyPath->isClosed())
-		{
+		if (!polyPath->isClosed()){
 			polyLoops.push_back(Cad::CCadObj2D::CResAddPolygon());
 			continue;
 		}
@@ -2608,68 +2698,54 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		svg2loopMap.insert(std::make_pair(polyPath->getId(), &polyLoops.back()));
 
 		// then make curve
-		const auto& loop = polyLoops.back();
-		for (size_t iEdge = 0; iEdge < loop.aIdE.size(); iEdge++)
-		{
-			const auto& coords = polyPath->getEdgeCoords(iEdge);
-			std::vector<Com::CVector2D> pc;
-			if (coords.size() <= 4) continue; // only two points, must be a straight line
-			ldp::Float2 lastp(coords[0], coords[1]); // we should avoid overlapped points
-			for (size_t i = 2; i < coords.size() - 2; i += 2){
-				ldp::Float2 p(coords[i], coords[i + 1]);
-				if ((p - lastp).length() < std::numeric_limits<float>::epsilon())
-					continue;
-				pc.push_back(Com::CVector2D(p[0], p[1])*pixel2meter);
-				lastp = p;
-			}
-			if (!cad_2d.SetCurve_Polyline(loop.aIdE[iEdge], pc))
-				printf("error: set curve failed: %d %d!\n", polyPath->getId(), iEdge);
-		} // end for iEdge
+		for (size_t iEdge = 0; iEdge < polyLoops.back().aIdE.size(); iEdge++)
+			makeCurveFromSvgCurve(cad_2d, polyPath, polyLoops.back(), iEdge, pixel2meter);
 		cad_2d.ldpSetEdgeLoopIntersectionDisabled(false);
 	} // end for polyPath
 
 	// 1.2 add non-closed polygons as pleats -------------------------------------------------------
 	for (size_t iPoly = 0; iPoly < polyPaths.size(); iPoly++)
 	{
-		if (polyLoops[iPoly].id_l_add)
-			continue; // those valid polygons
-		const auto& path = polyPaths[iPoly];
-		if (path->numCorners() <= 1) 
-			continue; // ignore individual points
-		assert(!path->isClosed());
-		const float on_segment_thre = (path->getCorner(0) - path->getCorner(1)).length() * 0.2f;
+		const auto& path_i = polyPaths[iPoly];
+		const auto& loop_i = polyLoops[iPoly];
 
-		// find corners that are in/on polygons
-		std::vector<int> inCornerIds, onCornerIds;
-		unsigned int insideLoopId = 0;
-		for (size_t jPoly = 0; jPoly < polyPaths.size(); jPoly++)
-		{
-			if (iPoly == jPoly || polyLoops[jPoly].id_l_add == 0)
-				continue; // we only choose closed path here
-			const auto& jpath = polyPaths[jPoly];
-			for (int i = 0; i < path->numCorners(); i++){
-				auto p = path->getCorner(i);
-				auto r = svg_point_In_On_polygon(jpath->m_coords.size() / 2 - 1, 
-					(const ldp::Float2*)jpath->m_coords.data(), p, on_segment_thre);
-				if (r == 1) inCornerIds.push_back(i);
-				if (r == 0) onCornerIds.push_back(i);
-			} // end for i
-			if (inCornerIds.size() || onCornerIds.size()){
-				insideLoopId = svg2loopMap.at(jpath->getId())->id_l_add;
-				break;
-			}
-		} // end for jPoly
-
+		std::vector<int> cornersInLoop, cornersOnLoop, edgeCornerOn;
+		std::vector<ldp::Float2> cornersOnPos;
+		Cad::CCadObj2D::CResAddPolygon* foundLoop = nullptr;
+		collect_point_In_On_polygon(polyPaths, polyLoops, iPoly, foundLoop,
+			cornersInLoop, cornersOnLoop, cornersOnPos, edgeCornerOn);
 		// not in any loop, just ignore them
-		if (insideLoopId == 0) 
+		if (foundLoop == nullptr)
 			continue;
+		printf("i=%d l=%d: in=%d on=%d\n", path_i->getId(), foundLoop->id_l_add, 
+			cornersInLoop.size(), cornersOnLoop.size());
 
 		// collect points
 		std::vector<Com::CVector2D> pts;
-		for (size_t i = 0; i < path->numCorners(); i++)
-			pts.push_back(Com::CVector2D(path->getCorner(i)[0], path->getCorner(i)[1])*pixel2meter);
+		for (size_t i = 0; i < path_i->numCorners(); i++)
+			pts.push_back(Com::CVector2D(path_i->getCorner(i)[0], path_i->getCorner(i)[1])*pixel2meter);
 
-		printf("i=%d l=%d: in=%d on=%d\n", path->getId(), insideLoopId, inCornerIds.size(), onCornerIds.size());
+		// add a pleat if 1:1
+		if (cornersInLoop.size() == 1 && cornersOnLoop.size() == 1){
+			auto v_id0 = cad_2d.AddVertex(Cad::CAD_ELEM_TYPE::LOOP, foundLoop->id_l_add, pts[cornersInLoop[0]]);
+			Com::CVector2D pon(cornersOnPos[0][0], cornersOnPos[0][1]);
+			pon *= pixel2meter;
+			auto v_id1 = cad_2d.AddVertex(Cad::CAD_ELEM_TYPE::EDGE, foundLoop->aIdE[edgeCornerOn[0]], pon);
+			foundLoop->aIdV.push_back(v_id0.id_v_add);
+			foundLoop->aIdV.push_back(v_id1.id_v_add);
+			auto e_id_01 = cad_2d.ConnectVertex_Line(v_id0.id_v_add, v_id1.id_v_add);
+			foundLoop->aIdE.push_back(e_id_01.id_e_add);
+		} // end if 1:1
+
+		// add a heamline if 0:2
+		if (cornersInLoop.size() == 0 && cornersOnLoop.size() == 2){
+
+		} // end if 0:2
+
+		// add a corner-diamond if 1:2
+		if (cornersInLoop.size() == 1 && cornersOnLoop.size() == 2){
+
+		} // end if 1:2
 	} // end for iPoly
 
 	// 1.3 make stitchings -------------------------------------------------------------------------

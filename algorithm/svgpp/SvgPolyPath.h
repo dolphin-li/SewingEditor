@@ -46,6 +46,9 @@ namespace svg
 			return ldp::Float2(m_coords[m_cornerPos[i] * 2], 
 			m_coords[m_cornerPos[i] * 2 + 1]); 
 		}
+		int getCornerIdx(int i)const{
+			return m_cornerPos[i];
+		}
 		const std::vector<float>& getEdgeCoords(int i)const{ return m_edgeCoords[i]; }
 		std::set<int> selectedEdgeIds()const{
 			std::set<int> r;

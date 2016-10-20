@@ -71,6 +71,7 @@ void SewingEditor::dropEvent(QDropEvent* event)
 
 void SewingEditor::loadSvg(QString name)
 {
+	m_meshWindow->hide();
 	if (ui.widget->getSvgManager() == nullptr)
 	{
 		g_dataholder.m_svgManager.reset(new svg::SvgManager);
@@ -325,6 +326,7 @@ void SewingEditor::on_actionDelete_selected_triggered()
 	{
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
+		m_meshWindow->hide();
 		ui.widget->getSvgManager()->removeSelected();
 		ui.widget->updateGL();
 		pushHistory("delete selected");
@@ -345,6 +347,7 @@ void SewingEditor::on_actionSplit_selected_path_triggered()
 	{
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
+		m_meshWindow->hide();
 		ui.widget->getSvgManager()->splitSelectedPath();
 		ui.widget->updateGL();
 		pushHistory("split selected path");
@@ -365,6 +368,7 @@ void SewingEditor::on_actionMerge_selected_path_triggered()
 	{
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
+		m_meshWindow->hide();
 		ui.widget->getSvgManager()->mergeSelectedPath();
 		ui.widget->updateGL();
 		pushHistory("merge selected path");
@@ -417,6 +421,7 @@ void SewingEditor::on_pbToConnectedGroups_clicked()
 	{
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
+		m_meshWindow->hide();
 		ui.widget->getSvgManager()->convertSelectedPathToConnectedGroups();
 		ui.widget->updateGL();
 		pushHistory("path to connected groups");
@@ -674,6 +679,7 @@ void SewingEditor::on_pbNewLayer_clicked()
 	{
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
+		m_meshWindow->hide();
 		auto layer = ui.widget->getSvgManager()->selectedToNewLayer();
 		pushHistory(QString("add layer: ") + layer->name.c_str());
 		initLayerList();
@@ -695,6 +701,7 @@ void SewingEditor::on_pbMergeLayers_clicked()
 	{
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
+		m_meshWindow->hide();
 		ui.widget->getSvgManager()->mergeSelectedLayers();		
 		initLayerList();
 		ui.widget->updateGL();
@@ -717,6 +724,7 @@ void SewingEditor::on_pbRemoveLayers_clicked()
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
 		QString info("remove layers: ");
+		m_meshWindow->hide();
 		auto items = ui.listLayers->selectedItems();
 		for (auto item : items)
 		{
@@ -787,6 +795,7 @@ void SewingEditor::on_pbClosePolygon_clicked()
 	{
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
+		m_meshWindow->hide();
 		ui.widget->getSvgManager()->closeSelectedPolygons();
 		ui.widget->updateGL();
 		pushHistory("close selected polygons");
@@ -827,6 +836,7 @@ void SewingEditor::on_pbSymmetricCopy_clicked()
 	{
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
+		m_meshWindow->hide();
 		ui.widget->getSvgManager()->symmetryCopySelectedPoly();
 		ui.widget->updateGL();
 		pushHistory("symmetric copy");
@@ -847,6 +857,7 @@ void SewingEditor::on_pbPixelToMeter_clicked()
 	{
 		if (ui.widget->getSvgManager() == nullptr)
 			throw std::exception("svgManger: nullptr");
+		m_meshWindow->hide();
 		float one_pixel_is_how_many_meters = ui.widget->getSvgManager()->estimatePixelToMetersFromSelected();
 		ui.sbPixelToMeter->setValue(1.0 / one_pixel_is_how_many_meters);
 		ui.widget->updateGL();
@@ -871,6 +882,7 @@ void SewingEditor::on_sbPixelToMeter_valueChanged(double v)
 		double p2 = ui.widget->getSvgManager()->getPixelToMeters();
 		if (abs(p1 - p2) < std::numeric_limits<double>::epsilon())
 		{
+			m_meshWindow->hide();
 			ui.widget->getSvgManager()->setPixelToMeters(p1);
 			pushHistory("pixel2meter");
 		}

@@ -2141,6 +2141,7 @@ bool CAnalysis2D_Cloth_Static::Pick(ldp::Double2 screenPos, const ldp::Camera& c
 	const Fem::Field::CNodeAry::CNodeSeg& ns_c = field_disp.GetNodeSeg(CORNER, false, world, VALUE);
 	const Fem::Field::CNodeAry::CNodeSeg& ns_u = field_disp.GetNodeSeg(CORNER, true, world, VALUE);
 	std::vector<unsigned int> aIdEA = field_disp.GetAryIdEA();
+	id_l_cad = 0;
 	for (unsigned int iiea = 0; iiea < aIdEA.size(); iiea++)
 	{
 		const unsigned int id_ea = aIdEA[iiea];
@@ -2169,26 +2170,25 @@ bool CAnalysis2D_Cloth_Static::Pick(ldp::Double2 screenPos, const ldp::Camera& c
 			if (std::signbit(area2) != std::signbit(area1)) continue;
 			if (std::signbit(area3) != std::signbit(area1)) continue;
 			if (std::signbit(area4) != std::signbit(area1)) continue;
-			//if (area2 < -area1*0.01) continue;
-			//if (area3 < -area1*0.01) continue;
-			//if (area4 < -area1*0.01) continue;
-			std::cout << "hit " << id_ea << " " << ielem << std::endl;
 			picked_elem_nodes[0] = no[0];
 			picked_elem_nodes[1] = no[1];
 			picked_elem_nodes[2] = no[2];
 			picked_elem_ratio[0] = area2 / area1;
 			picked_elem_ratio[1] = area3 / area1;
 			picked_elem_ratio[2] = area4 / area1;
-			pickedScreenPos = picked_elem_ratio[0] * C1[0] + picked_elem_ratio[1] * C1[1]
+			ldp::Double3 tmpScreenPos = picked_elem_ratio[0] * C1[0] + picked_elem_ratio[1] * C1[1]
 				+ picked_elem_ratio[2] * C1[2];
-			const Fem::Field::CIDConvEAMshCad& conv = world.GetIDConverter(id_field_base);
-			Cad::CAD_ELEM_TYPE itype;
-			conv.GetIdCad_fromIdEA(id_ea, id_l_cad, itype);
-			return true;
-		}
-	}
-	id_l_cad = 0;
-	return false;
+			// we only want the nearest..
+			if (id_l_cad == 0 || (id_l_cad && tmpScreenPos[2] < pickedScreenPos[2])){
+				std::cout << "hit " << id_ea << " " << ielem << std::endl;
+				pickedScreenPos = tmpScreenPos;
+				const Fem::Field::CIDConvEAMshCad& conv = world.GetIDConverter(id_field_base);
+				Cad::CAD_ELEM_TYPE itype;
+				conv.GetIdCad_fromIdEA(id_ea, id_l_cad, itype);
+			}
+		} // end for ielem
+	} // iiea
+	return id_l_cad != 0;
 }
 
 void CAnalysis2D_Cloth_Static::SetIsDetail(bool is_detail, const Cad::CCadObj2D& cad_2d, const Msh::CMesher2D& mesh_2d)
@@ -2639,6 +2639,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		assert(!path->isClosed());
 		const float on_segment_thre = (path->getCorner(0) - path->getCorner(1)).length() * 0.2f;
 
+		// find corners that are in/on polygons
 		std::vector<int> inCornerIds, onCornerIds;
 		unsigned int insideLoopId = 0;
 		for (size_t jPoly = 0; jPoly < polyPaths.size(); jPoly++)

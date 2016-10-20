@@ -2510,6 +2510,45 @@ static unsigned int MakeHingeField_Tri(Fem::Field::CFieldWorld& world, unsigned 
 }
 
 ////////////////////////////////////////////////////////////ldp////////////////////////////////////////////////////
+
+// if c in poly, return 1, 
+// if c on poly, return 0
+// else return -1
+// verts: n-points, the last is then connected to the first
+static int svg_point_In_On_polygon(int nvert, const ldp::Float2* verts, ldp::Float2 p, float thre)
+{
+	// 1. check if p on a segment by compute point-line distance
+	for (int i = 0, j = nvert - 1; i < nvert; j = i++)
+	{
+		ldp::Float2 dir = verts[i] - verts[j], dp = p - verts[j];
+		float len_dir = dir.length();
+		if (len_dir < std::numeric_limits<float>::epsilon()) continue;
+		dir /= len_dir;
+		float t = dp.dot(dir);
+		ldp::Float2 p_projected = verts[j] + dir * t;
+		float dist = 0;
+		if (t < 0)
+			dist = dp.length();
+		else if (t > 1)
+			dist = (p - verts[i]).length();
+		else
+			dist = (p - p_projected).length();
+		if (dist <= thre)
+			return 0;
+	}
+
+	// check if in or out
+	int c = -1;
+	for (int i = 0, j = nvert - 1; i < nvert; j = i++) 
+	{
+		if (((verts[i][1]>p[1]) != (verts[j][1]>p[1])) &&
+			(p[0] < (verts[j][0] - verts[i][0]) * (p[1] - verts[i][1]) /
+			(verts[j][1] - verts[i][1]) + verts[i][0]))
+			c = -c;
+	}
+	return c;
+}
+
 void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
 	svg::SvgManager* svgManager, CSliderDeform& slider_deform,
 	std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair,
@@ -2592,7 +2631,44 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	// 1.2 add non-closed polygons as pleats -------------------------------------------------------
 	for (size_t iPoly = 0; iPoly < polyPaths.size(); iPoly++)
 	{
+		if (polyLoops[iPoly].id_l_add)
+			continue; // those valid polygons
+		const auto& path = polyPaths[iPoly];
+		if (path->numCorners() <= 1) 
+			continue; // ignore individual points
+		assert(!path->isClosed());
+		const float on_segment_thre = (path->getCorner(0) - path->getCorner(1)).length() * 0.2f;
 
+		std::vector<int> inCornerIds, onCornerIds;
+		unsigned int insideLoopId = 0;
+		for (size_t jPoly = 0; jPoly < polyPaths.size(); jPoly++)
+		{
+			if (iPoly == jPoly || polyLoops[jPoly].id_l_add == 0)
+				continue; // we only choose closed path here
+			const auto& jpath = polyPaths[jPoly];
+			for (int i = 0; i < path->numCorners(); i++){
+				auto p = path->getCorner(i);
+				auto r = svg_point_In_On_polygon(jpath->m_coords.size() / 2 - 1, 
+					(const ldp::Float2*)jpath->m_coords.data(), p, on_segment_thre);
+				if (r == 1) inCornerIds.push_back(i);
+				if (r == 0) onCornerIds.push_back(i);
+			} // end for i
+			if (inCornerIds.size() || onCornerIds.size()){
+				insideLoopId = svg2loopMap.at(jpath->getId())->id_l_add;
+				break;
+			}
+		} // end for jPoly
+
+		// not in any loop, just ignore them
+		if (insideLoopId == 0) 
+			continue;
+
+		// collect points
+		std::vector<Com::CVector2D> pts;
+		for (size_t i = 0; i < path->numCorners(); i++)
+			pts.push_back(Com::CVector2D(path->getCorner(i)[0], path->getCorner(i)[1])*pixel2meter);
+
+		printf("i=%d l=%d: in=%d on=%d\n", path->getId(), insideLoopId, inCornerIds.size(), onCornerIds.size());
 	} // end for iPoly
 
 	// 1.3 make stitchings -------------------------------------------------------------------------

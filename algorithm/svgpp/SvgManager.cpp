@@ -1597,7 +1597,8 @@ namespace svg
 		for (const auto& groupi : groups)
 		{
 			if (!groupi.closed) continue;
-#pragma omp parallel for
+
+			std::set<PolyPath*> segmentedPaths;
 			for (int j_group = 0; j_group < (int)groups.size(); j_group++)
 			{
 				PolyPath& groupj = groups[j_group];
@@ -1638,7 +1639,17 @@ namespace svg
 				}
 				int postPos = (tmpIds[(startPos - 1 + tmpIds.size()) % tmpIds.size()] + 1) % groupj.nodes.size();
 				tmpPath.nodes.push_back(groupj.nodes[postPos]);
+
+				// remove existed paths
+				for (auto path : segmentedPaths){
+					if (*path == tmpPath){
+						tmpPath.nodes.clear();
+						break;
+					}
+				}
+
 				groupj = tmpPath;
+				segmentedPaths.insert(&groupj);
 			} // groupj
 		} // groupi
 	}
@@ -1737,6 +1748,9 @@ namespace svg
 			std::vector<ObjPtr> newGroups;
 			for (auto gIds : pathGroups)
 			{
+				// ignore empty and individual
+				if (gIds.nodes.size() < 2)
+					continue;
 				std::shared_ptr<SvgAbstractObject> newPath;
 				auto newPathPtr = (SvgPolyPath*)nullptr;
 				for (int i = 0; i < (int)gIds.nodes.size(); i++)

@@ -120,7 +120,8 @@ namespace Cad
 		// loop functions
 		//! @{
 		bool CheckIsPointInsideLoop(unsigned int id_l1, const Com::CVector2D& point) const;
-		double SignedDistPointLoop(unsigned int id_l1, const Com::CVector2D& point, unsigned int id_v_ignore = 0) const;
+		double SignedDistPointLoop(unsigned int id_l1, const Com::CVector2D& point, 
+			unsigned int id_v_ignore = 0, int* eid = nullptr) const;
 		//! get color(double[3]) of loop(ID:id_l), return false if there is no loop(ID:id_l)
 		virtual bool GetColor_Loop(unsigned int id_l, double color[3]) const;
 		//! ID:id_l set color of loop
@@ -209,11 +210,24 @@ namespace Cad
 
 		/// ldp ////////////////////////////////////////
 		int isEmpty()const { return m_LoopSet.MaxID() == 0; }
+
+		// add a pleat: a pleat is a segment p0, p1, with one point inside loop and the other point on the loop 
+		//	two cases:
+		//     1. both p0 and p1 not coincident with existed vertices
+		//		then @splittedEdgeId is splitted into two, with one hold the origional index and the other pushed back
+		//		the third edge connecting p0, p1 is finally added.  is the edge
+		//	   2. one of p0 or p1 coincident with an existed vertex
+		//		then only one new edge is created to @mergedVertId to the other
+		// add a hemline: a hemline is a segment p0, p1, with both points on the loop
+		//     NO new edges produced or splitted.
+		// return false if the given points cannot be a pleat
+		bool addPleat_HemLine(Com::CVector2D p0, Com::CVector2D p1, double point_on_seg_thre,
+			unsigned int& loopId, int& mergedVertId, int& splittedEdgeId, int newEdgeIds[2]);
 	protected:
 		// return edge with vertex id(id_vs, id_ve) and vertex coord  
 		CEdge2D& GetEdgeRef(unsigned int id_e);
 		bool CheckIsPointInside_ItrLoop(CBRepSurface::CItrLoop& itrl, const Com::CVector2D& p1) const;
-		double DistPointItrLoop(CBRepSurface::CItrLoop& itrl, const Com::CVector2D& point) const;
+		double DistPointItrLoop(CBRepSurface::CItrLoop& itrl, const Com::CVector2D& point, int* eid = nullptr) const;
 
 
 		// ret:0 all the points in id_ul1 are inside id_ul2

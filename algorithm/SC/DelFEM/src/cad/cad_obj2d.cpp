@@ -35,6 +35,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <cassert>	
 #include <math.h>	
 #include <cstring>	// strlen
+#include <algorithm>
 
 #include "delfem/cad_obj2d.h"
 #include "delfem/cad/cad_elem2d.h"
@@ -446,9 +447,8 @@ bool CCadObj2D::CheckIsPointInsideLoop(unsigned int id_l1, const CVector2D& poin
 }
 
 
-double CCadObj2D::SignedDistPointLoop
-(unsigned int id_l1, const Com::CVector2D& point,
-unsigned int id_v_ignore) const
+double CCadObj2D::SignedDistPointLoop (unsigned int id_l1, const Com::CVector2D& point,
+unsigned int id_v_ignore, int* eid) const
 {
 	double min_sd = 0;
 	assert(m_LoopSet.IsObjID(id_l1));
@@ -456,7 +456,7 @@ unsigned int id_v_ignore) const
 	{
 		if (itrl.IsParent())
 		{
-			min_sd = +DistPointItrLoop(itrl, point);
+			min_sd = +DistPointItrLoop(itrl, point, eid);
 			assert(min_sd >= 0);
 			if (!CheckIsPointInside_ItrLoop(itrl, point)) { min_sd = -min_sd; }
 		}
@@ -467,17 +467,22 @@ unsigned int id_v_ignore) const
 				unsigned int id_v = itrl.GetIdVertex();
 				if (id_v == id_v_ignore) continue;
 			}
-			double sd0 = DistPointItrLoop(itrl, point);
+			int teid = 0;
+			double sd0 = DistPointItrLoop(itrl, point, &teid);
 			if (sd0 < 0) continue;
 			if (CheckIsPointInside_ItrLoop(itrl, point)) { sd0 = -sd0; }
-			if (fabs(sd0) < fabs(min_sd)) { min_sd = sd0; }
+			if (fabs(sd0) < fabs(min_sd)) { 
+				min_sd = sd0; 
+				if (eid)
+					*eid = teid;
+			}
 		}
 	}
 	return min_sd;
 }
 
 
-double CCadObj2D::DistPointItrLoop(CBRepSurface::CItrLoop& itrl, const CVector2D& point) const
+double CCadObj2D::DistPointItrLoop(CBRepSurface::CItrLoop& itrl, const CVector2D& point, int* eid) const
 {
 	double min_dist = -1;
 	for (itrl.Begin(); !itrl.IsEnd(); itrl++)
@@ -495,7 +500,11 @@ double CCadObj2D::DistPointItrLoop(CBRepSurface::CItrLoop& itrl, const CVector2D
 		const CEdge2D& e = this->GetEdge(id_e);
 		const Com::CVector2D& v = e.GetNearestPoint(point);
 		const double d0 = Distance(v, point);
-		if (min_dist < 0 || d0 < min_dist) { min_dist = d0; }
+		if (min_dist < 0 || d0 < min_dist) { 
+			min_dist = d0; 
+			if (eid)
+				*eid = id_e;
+		}
 	}
 	return min_dist;
 }
@@ -1612,3 +1621,70 @@ bool CCadObj2D::Serialize(Com::CSerializer& arch)
 	return true;
 }
 
+
+///////////////////ldp///////////////////////////////////////////////////////////////
+bool CCadObj2D::addPleat_HemLine(Com::CVector2D p0, Com::CVector2D p1, double point_on_seg_thre,
+	unsigned int& foundLoopId, int& mergedVertId, int& splittedEdgeId, int newEdgeIds[2])
+{
+	foundLoopId = 0;
+	splittedEdgeId = 0;
+	const auto& loopIds = m_LoopSet.GetAry_ObjID();
+	for (auto loopId : loopIds)
+	{
+		Com::CVector2D p[2] = { p0, p1 };
+		int p_eids[2] = { 0 };
+		Cad::CEdge2D* p_edges[2] = { 0 };
+		double dists[2] = { 0 }, p_dists_s[2] = { 0 }, p_dists_e[2] = { 0 };
+		bool p_on[2] = { false }, p_in[2] = { false };
+		for (int k = 0; k < 2; k++){
+			dists[k] = SignedDistPointLoop(loopId, p[k], 0, &p_eids[k]);
+			p_edges[k] = &GetEdgeRef(p_eids[k]);
+			p_dists_s[k] = (p_edges[k]->po_s - p[k]).Length();
+			p_dists_e[k] = (p_edges[k]->po_e - p[k]).Length();
+			p_on[k] = abs(dists[k]) < point_on_seg_thre;
+			p_in[k] = p_on[k] ? false : dists[k] > point_on_seg_thre;
+		} // k
+
+		if (!p_on[0] && !p_in[0] && !p_on[1] && !p_in[1])
+			continue;
+		foundLoopId = loopId;
+
+		// pleat
+		if ((p_on[0] && p_in[1]) || (p_on[1] && p_in[0])){
+			int i[2] = { 0, 1 };
+			if (p_on[1]) std::swap(i[0], i[1]);
+			auto v1 = AddVertex(Cad::LOOP, foundLoopId, p[i[1]]);
+			assert(v1.id_v_add);
+			if (std::min(p_dists_e[i[0]], p_dists_s[i[0]]) > point_on_seg_thre){
+				auto v0 = AddVertex(Cad::EDGE, p_eids[i[0]], p[i[0]]);
+				assert(v0.id_v_add && v0.id_e_add);
+				auto e01 = ConnectVertex_Line(v0.id_v_add, v1.id_v_add);
+				assert(e01.id_e_add);
+				splittedEdgeId = p_eids[i[0]];
+				newEdgeIds[0] = v0.id_e_add;
+				newEdgeIds[1] = e01.id_e_add;
+			}
+			else{
+				int v0_id = p_edges[i[0]]->id_v_s;
+				if (p_dists_e[i[0]] < p_dists_s[i[0]])
+					v0_id = p_edges[i[0]]->id_v_e;
+				auto e01 = ConnectVertex_Line(v0_id, v1.id_v_add);
+				assert(e01.id_e_add);
+				mergedVertId = v0_id;
+				newEdgeIds[0] = e01.id_e_add;
+			}
+		} // end if p0_on and p1_in
+		// hemline
+		if (p_on[0] && p_on[1]){
+			//for (int k = 0; k < 2; k++)
+			//{
+			//	if (p_dists_s[k] < p_dists_e[k])
+			//		m_VertexSet.GetObj(p_edges[k]->id_v_s).point = p0;
+			//	else
+			//		m_VertexSet.GetObj(p_edges[k]->id_v_e).point = p0;
+			//}
+		} // end if p1_on and p0_on
+	} // end for loopId
+
+	return false;
+}

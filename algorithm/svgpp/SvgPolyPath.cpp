@@ -314,7 +314,6 @@ namespace svg
 
 		// edgeGroups are not clonable
 		newTptr->m_edgeGroups.clear();
-
 		newTptr->invalid();
 		return newT;
 	}
@@ -434,7 +433,7 @@ namespace svg
 		m_edgeCoords.clear();
 		m_edgeCmds.resize(nEdges);
 		m_edgeCoords.resize(nEdges);
-		m_edgeGLIds.resize(nEdges);
+		m_edgeGLIds.resize(nEdges, 0);
 
 		// gl resource
 		for (int iedge = 0; iedge < nEdges; iedge++)

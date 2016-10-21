@@ -1676,6 +1676,7 @@ bool CCadObj2D::addPleat_HemLine(Com::CVector2D p0, Com::CVector2D p1, double po
 		} // end if p0_on and p1_in
 		// hemline
 		if (p_on[0] && p_on[1]){
+			// LDP TODO : how to handle hemlines?
 			//for (int k = 0; k < 2; k++)
 			//{
 			//	if (p_dists_s[k] < p_dists_e[k])

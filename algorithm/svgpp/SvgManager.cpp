@@ -371,14 +371,19 @@ namespace svg
 			std::map<int, SvgPolyPath*> newPathsMap;
 
 			for (const auto& oldp : oldPaths){
-				auto newp = ((SvgPolyPath*)oldp.get())->deepclone();
+				auto oldpoly = (SvgPolyPath*)oldp.get();
+				auto newp = oldpoly->deepclone();
 				auto newpoly = (SvgPolyPath*)newp.get();
-				newPathsMap.insert(std::make_pair(newp->getId(), newpoly));
 				for (size_t i = 0; i < newpoly->m_coords.size(); i += 2){
 					float* coord = newpoly->m_coords.data() + i;
 					coord[axis] = 2 * axis_sympos - coord[axis];
 				}
+				auto c = oldpoly->get3dCenter();
+				c[0] = -c[0];
+				newpoly->set3dCenter(c);
+				newpoly->invalid();
 				rootPtr->m_children.push_back(newp);
+				newPathsMap.insert(std::make_pair(newp->getId(), newpoly));
 			}// end for p
 
 			std::vector<std::shared_ptr<SvgEdgeGroup>> newEgs;

@@ -2619,8 +2619,16 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 			int newEdgeIds[2] = { 0 };
 			cad_2d.addPleat_HemLine(pts[0], pts[1], on_segment_thre, foundLoopId, mergedVertId, splittedEdgeId, newEdgeIds);
 			if (foundLoopId > 0){
+				// ldp TO DO: we should fill edgesWithPleats ordered to construct the split array
 				if (splittedEdgeId || mergedVertId){
 					auto& iter = edgesWithPleats.find(splittedEdgeId);
+					if (iter == edgesWithPleats.end()){
+						edgesWithPleats.insert(std::make_pair((unsigned int)splittedEdgeId, EdgeWithPleats()));
+						iter = edgesWithPleats.find(splittedEdgeId);
+						iter->second.splittedIds.push_back(splittedEdgeId);
+					}
+					iter->second.pleatsIds.push_back(newEdgeIds[1]);
+					iter->second.splittedIds.push_back(newEdgeIds[0]);
 					printf("add pleat %d to loop %d\n", path_i->getId(), foundLoopId);
 				}
 				else

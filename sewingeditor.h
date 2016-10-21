@@ -34,6 +34,7 @@ public:
 	void on_pbSymmetricCopy_clicked();
 	void leftDocButtonsClicked(int i); 
 	void on_pbGenerateMesh_clicked();
+	void on_actionRemove_selected_corner_triggered();
 protected:
 	void dragEnterEvent(QDragEnterEvent* ev);
 	void dropEvent(QDropEvent* ev);

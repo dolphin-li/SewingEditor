@@ -2530,6 +2530,11 @@ static void makeCurveFromSvgCurve(Cad::CCadObj2D_Move& cad_2d, const svg::SvgPol
 		printf("error: set curve failed: %d %d!\n", path->getId(), iEdge);
 }
 
+struct EdgeWithPleats{
+	std::vector<unsigned int> pleatsIds;
+	std::vector<unsigned int> splittedIds;
+};
+
 void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
 	svg::SvgManager* svgManager, CSliderDeform& slider_deform,
 	std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair,
@@ -2594,6 +2599,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	} // end for polyPath
 
 	// 1.2 add non-closed polygons as pleats -------------------------------------------------------
+	std::map<unsigned int, EdgeWithPleats> edgesWithPleats;
 	for (size_t iPoly = 0; iPoly < polyPaths.size(); iPoly++)
 	{
 		const auto& path_i = polyPaths[iPoly];
@@ -2613,11 +2619,13 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 			int newEdgeIds[2] = { 0 };
 			cad_2d.addPleat_HemLine(pts[0], pts[1], on_segment_thre, foundLoopId, mergedVertId, splittedEdgeId, newEdgeIds);
 			if (foundLoopId > 0){
-				if (splittedEdgeId || mergedVertId)
+				if (splittedEdgeId || mergedVertId){
+					auto& iter = edgesWithPleats.find(splittedEdgeId);
 					printf("add pleat %d to loop %d\n", path_i->getId(), foundLoopId);
+				}
 				else
 					printf("add hemline %d to loop %d\n", path_i->getId(), foundLoopId);
-			}
+			} // end if foundLoopId > 0
 		} //
 	} // end for iPoly
 

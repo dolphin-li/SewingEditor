@@ -777,6 +777,7 @@
     </property>
     <addaction name="actionSplit_selected_path"/>
     <addaction name="actionMerge_selected_path"/>
+    <addaction name="actionRemove_selected_corner"/>
    </widget>
    <widget class="QMenu" name="menuOp">
     <property name="styleSheet">
@@ -1230,6 +1231,14 @@
   <action name="actionSelect_connected">
    <property name="text">
     <string>select connected</string>
+   </property>
+  </action>
+  <action name="actionRemove_selected_corner">
+   <property name="text">
+    <string>remove selected Edge corner</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
  </widget>

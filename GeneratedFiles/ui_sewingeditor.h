@@ -48,6 +48,7 @@ public:
     QAction *actionUndo;
     QAction *actionRedo;
     QAction *actionSelect_connected;
+    QAction *actionRemove_selected_corner;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     SvgViewer *widget;
@@ -191,6 +192,8 @@ public:
         actionRedo->setObjectName(QStringLiteral("actionRedo"));
         actionSelect_connected = new QAction(SewingEditorClass);
         actionSelect_connected->setObjectName(QStringLiteral("actionSelect_connected"));
+        actionRemove_selected_corner = new QAction(SewingEditorClass);
+        actionRemove_selected_corner->setObjectName(QStringLiteral("actionRemove_selected_corner"));
         centralWidget = new QWidget(SewingEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -420,6 +423,7 @@ public:
         menuGroup->addAction(actionFix_grouping);
         menuPath->addAction(actionSplit_selected_path);
         menuPath->addAction(actionMerge_selected_path);
+        menuPath->addAction(actionRemove_selected_corner);
         menuOp->addAction(actionUndo);
         menuOp->addAction(actionRedo);
 
@@ -459,6 +463,8 @@ public:
         actionRedo->setText(QApplication::translate("SewingEditorClass", "redo", 0));
         actionRedo->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+Shift+Z", 0));
         actionSelect_connected->setText(QApplication::translate("SewingEditorClass", "select connected", 0));
+        actionRemove_selected_corner->setText(QApplication::translate("SewingEditorClass", "remove selected Edge corner", 0));
+        actionRemove_selected_corner->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+E", 0));
         menuFile->setTitle(QApplication::translate("SewingEditorClass", "file", 0));
         menuSelection->setTitle(QApplication::translate("SewingEditorClass", "selection", 0));
         menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));

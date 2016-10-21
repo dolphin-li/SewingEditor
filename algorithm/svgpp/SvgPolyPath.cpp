@@ -439,4 +439,51 @@ namespace svg
 			edgeCmd[0] = GL_MOVE_TO_NV;
 		} // end for iedge
 	}
+
+	void SvgPolyPath::removeSelectedCorner()
+	{
+		auto cornerIds = selectedCornerIds();
+		for (auto id : cornerIds)
+			removeCorner(id);
+		m_selectedCorner_arrayIds.clear();
+		m_highlightedCorner_arrayIds.clear();
+	}
+
+	void SvgPolyPath::removeCorner(int corner_arrayId)
+	{
+		if (corner_arrayId < 0 || corner_arrayId >= numCorners())
+			return;
+		if (!isClosed())
+		{
+			if (corner_arrayId == 0 || corner_arrayId == numCorners() - 1)
+				return;
+		}
+
+		int lastId = corner_arrayId - 1;
+		if (isClosed() && lastId < 0)
+			lastId = numCorners();
+
+		auto tmpCmds = m_edgeCmds[corner_arrayId];
+		auto tmpCoords = m_edgeCoords[corner_arrayId];
+		m_edgeCmds[lastId].insert(m_edgeCmds[lastId].end(), tmpCmds.begin()+1, tmpCmds.end());
+		m_edgeCoords[lastId].insert(m_edgeCoords[lastId].end(), tmpCoords.begin()+2, tmpCoords.end());
+		m_edgeCmds.erase(m_edgeCmds.begin() + corner_arrayId);
+		m_edgeCoords.erase(m_edgeCoords.begin() + corner_arrayId);
+		m_cornerPos.erase(m_cornerPos.begin() + corner_arrayId);
+		m_edgeGLIds.erase(m_edgeGLIds.begin() + corner_arrayId);
+		invalid();
+
+		for (auto& eg : m_edgeGroups)
+		{
+			auto tmp = eg->group;
+			eg->group.clear();
+			for (auto g : tmp){
+				if (g.first == this && g.second == corner_arrayId)
+					continue;
+				if (g.first == this && g.second > corner_arrayId)
+					g.second--;
+				eg->group.insert(g);
+			} // g
+		} // eg
+	}
 }

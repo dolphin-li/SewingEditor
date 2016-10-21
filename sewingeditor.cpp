@@ -914,3 +914,20 @@ void SewingEditor::on_pbGenerateMesh_clicked()
 	}
 }
 
+void SewingEditor::on_actionRemove_selected_corner_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->removeSelectedPolyCorners();
+		ui.widget->updateGL();
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+

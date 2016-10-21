@@ -37,6 +37,7 @@ namespace svg
 
 		// given this polygon (closed or non-closed), we find all the corners
 		void findCorners();
+		void removeSelectedCorner();
 
 		bool isClosed()const;
 		void makeClosed();
@@ -100,8 +101,8 @@ namespace svg
 			if (id < 0 || id >= numCorners()) return -1;
 			return id;
 		}
-		const std::set<const SvgEdgeGroup*>& edgeGroups()const{ return m_edgeGroups; }
-		std::set<const SvgEdgeGroup*>& edgeGroups(){ return m_edgeGroups; }
+		const std::set<SvgEdgeGroup*>& edgeGroups()const{ return m_edgeGroups; }
+		std::set<SvgEdgeGroup*>& edgeGroups(){ return m_edgeGroups; }
 
 		/// 3d related
 		ldp::Float3 get3dCenter()const{ return m_3dCenter; }
@@ -113,9 +114,10 @@ namespace svg
 		void renderSelection(bool idxMode = false);
 		void configNvParams();
 		void updateEdgeRenderData();
+		void removeCorner(int corner_arrayId);
 	protected:
 		std::vector<int> m_cornerPos;
-		std::set<int> m_selectedCorner_arrayIds; // LDP TO DO: enable multi-selection
+		std::set<int> m_selectedCorner_arrayIds;
 		std::set<int> m_highlightedCorner_arrayIds;
 
 		// corner-splitted path data, for rendering
@@ -124,7 +126,7 @@ namespace svg
 		std::vector<std::shared_ptr<GLPathResource>> m_edgeGLIds;
 
 		// is this edge related with others?
-		std::set<const SvgEdgeGroup*> m_edgeGroups;
+		std::set<SvgEdgeGroup*> m_edgeGroups;
 
 		// info for 3D placement
 		ldp::Float3 m_3dCenter;

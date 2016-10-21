@@ -1833,6 +1833,29 @@ namespace svg
 		} // end for layer
 		return groups;
 	}
+
+	void SvgManager::removeSelectedPolyCorners()
+	{
+		for (auto layer : m_layers)
+		{
+			if (!layer.second->selected)
+				continue;
+			auto rootPtr = (SvgGroup*)layer.second->root.get();
+			std::vector<std::shared_ptr<SvgAbstractObject>> polys;
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, polys, true);
+			for (auto poly : polys)
+				((SvgPolyPath*)poly.get())->removeSelectedCorner();
+
+			auto& edgeGroups = layer.second->edgeGroups;
+			auto tmpEdgeGroups = edgeGroups;
+			edgeGroups.clear();
+			for (auto eg : tmpEdgeGroups)
+			{
+				if (eg->group.size() > 1)
+					edgeGroups.push_back(eg);
+			}
+		} // end for layer
+	}
 	//////////////////////////////////////////////////////////////////
 	/// layer related
 	SvgManager::Layer* SvgManager::addLayer(std::string name)

@@ -207,7 +207,12 @@ namespace svg
 				path->setBound(ldp::Float4(bd.x, bd.z, bd.y, bd.w));
 				path->setParent(m_group);
 				if (path->objectType() == SvgAbstractObject::PolyPath)
-					((SvgPolyPath*)path)->findCorners();
+				{
+					auto poly = (SvgPolyPath*)path;
+					poly->setCorners(shape->getPath()->ldp_corner_ids);
+					if (poly->numCorners() == 0)
+						poly->findCorners();
+				}
 				m_group->m_children.push_back(std::shared_ptr<SvgAbstractObject>(path));
 			} // end if has path
 			// if has ldpPoly
@@ -954,6 +959,11 @@ namespace svg
 
 	void SvgManager::removeSelected()
 	{
+		// we firstly try to remove corners
+		// if succeed, we just return
+		if (removeSelectedPolyCorners())
+			return;
+
 		removeSelectedPairs(false);
 		for (auto layer_iter : m_layers)
 		{
@@ -1834,17 +1844,22 @@ namespace svg
 		return groups;
 	}
 
-	void SvgManager::removeSelectedPolyCorners()
+	bool SvgManager::removeSelectedPolyCorners()
 	{
+		bool re = false;
 		for (auto layer : m_layers)
 		{
 			if (!layer.second->selected)
 				continue;
+			bool lyre = false;
 			auto rootPtr = (SvgGroup*)layer.second->root.get();
 			std::vector<std::shared_ptr<SvgAbstractObject>> polys;
 			rootPtr->collectObjects(SvgAbstractObject::PolyPath, polys, true);
 			for (auto poly : polys)
-				((SvgPolyPath*)poly.get())->removeSelectedCorner();
+			if (((SvgPolyPath*)poly.get())->removeSelectedCorners())
+				lyre = true;
+
+			if (!lyre) continue;
 
 			auto& edgeGroups = layer.second->edgeGroups;
 			auto tmpEdgeGroups = edgeGroups;
@@ -1854,7 +1869,18 @@ namespace svg
 				if (eg->group.size() > 1)
 					edgeGroups.push_back(eg);
 			}
+			// re-link
+			for (auto eg : tmpEdgeGroups)
+			for (auto g : eg->group)
+				g.first->edgeGroups().clear();
+			for (auto eg : edgeGroups)
+			for (auto g : eg->group)
+				g.first->edgeGroups().insert(eg.get());
+			if (lyre)
+				re = true;
 		} // end for layer
+
+		return re;
 	}
 	//////////////////////////////////////////////////////////////////
 	/// layer related

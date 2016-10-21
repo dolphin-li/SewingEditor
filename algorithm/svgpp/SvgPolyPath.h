@@ -37,7 +37,8 @@ namespace svg
 
 		// given this polygon (closed or non-closed), we find all the corners
 		void findCorners();
-		void removeSelectedCorner();
+		void setCorners(std::vector<int>& cns);
+		bool removeSelectedCorners(); // return true if actually remove some corners
 
 		bool isClosed()const;
 		void makeClosed();
@@ -114,7 +115,7 @@ namespace svg
 		void renderSelection(bool idxMode = false);
 		void configNvParams();
 		void updateEdgeRenderData();
-		void removeCorner(int corner_arrayId);
+		bool removeCorner(int corner_arrayId);
 	protected:
 		std::vector<int> m_cornerPos;
 		std::set<int> m_selectedCorner_arrayIds;

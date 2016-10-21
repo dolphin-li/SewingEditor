@@ -94,7 +94,7 @@ namespace svg
 		void ungroupSelected();
 		void removeSelected();
 		void removeSingleNodeAndEmptyNode();
-		void removeSelectedPolyCorners();
+		bool removeSelectedPolyCorners(); // return true if actually remove some corners
 
 		///// path operations
 		void splitSelectedPath(); // split selected, non-closed paths

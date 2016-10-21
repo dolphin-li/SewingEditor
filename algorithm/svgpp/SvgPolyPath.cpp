@@ -360,6 +360,12 @@ namespace svg
 		ele->SetAttribute("stroke-linejoin", strokeLineJoinMap(m_pathStyle.line_join));
 		ele->SetDoubleAttribute("stroke-miterlimit", m_pathStyle.miter_limit);
 		ele->SetAttribute("d", cmdStr.c_str());
+		std::string cornerPosStr;
+		for (size_t i = 0; i < m_cornerPos.size(); i++)
+			cornerPosStr += std::to_string(m_cornerPos[i]) + " ";
+		if (cornerPosStr.size())
+			cornerPosStr = cornerPosStr.substr(0, cornerPosStr.size() - 1);
+		ele->SetAttribute("ldp_corner", cornerPosStr.c_str());
 		return ele;
 	}
 
@@ -408,6 +414,18 @@ namespace svg
 		invalid();
 	}
 
+	void SvgPolyPath::setCorners(std::vector<int>& cns)
+	{
+		m_cornerPos.clear();
+		if (m_cmds.size() == 0)
+			return;
+		for (auto c : cns){
+			if (c >= 0 && c < m_cmds.size())
+				m_cornerPos.push_back(c);
+		}
+		invalid();
+	}
+
 	void SvgPolyPath::updateEdgeRenderData()
 	{
 		const int nCorners = numCorners();
@@ -440,23 +458,26 @@ namespace svg
 		} // end for iedge
 	}
 
-	void SvgPolyPath::removeSelectedCorner()
+	bool SvgPolyPath::removeSelectedCorners()
 	{
+		bool re = false;
 		auto cornerIds = selectedCornerIds();
 		for (auto id : cornerIds)
-			removeCorner(id);
+		if (removeCorner(id))
+			re = true;
 		m_selectedCorner_arrayIds.clear();
 		m_highlightedCorner_arrayIds.clear();
+		return re;
 	}
 
-	void SvgPolyPath::removeCorner(int corner_arrayId)
+	bool SvgPolyPath::removeCorner(int corner_arrayId)
 	{
 		if (corner_arrayId < 0 || corner_arrayId >= numCorners())
-			return;
+			return false;
 		if (!isClosed())
 		{
 			if (corner_arrayId == 0 || corner_arrayId == numCorners() - 1)
-				return;
+				return false;
 		}
 
 		int lastId = corner_arrayId - 1;
@@ -471,8 +492,8 @@ namespace svg
 		m_edgeCoords.erase(m_edgeCoords.begin() + corner_arrayId);
 		m_cornerPos.erase(m_cornerPos.begin() + corner_arrayId);
 		m_edgeGLIds.erase(m_edgeGLIds.begin() + corner_arrayId);
-		invalid();
 
+		invalid();
 		for (auto& eg : m_edgeGroups)
 		{
 			auto tmp = eg->group;
@@ -485,5 +506,6 @@ namespace svg
 				eg->group.insert(g);
 			} // g
 		} // eg
+		return true;
 	}
 }

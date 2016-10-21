@@ -90,6 +90,7 @@ public:
 
     PathStyle style;
 	int ldp_poly_id;
+	std::vector<int> ldp_corner_ids;
 	float ldp_poly_3dCenter[3];
 	float ldp_poly_3dRot[4];
 

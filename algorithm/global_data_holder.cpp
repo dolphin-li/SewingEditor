@@ -12,6 +12,7 @@ void GlobalDataHolder::init()
 	// clothes related
 	m_clothManger.reset(new CAnalysis2D_Cloth_Static);
 	m_clothUiListener.reset(new CDesigner2D_Cloth);
+	*m_param.m_clothParam = m_clothManger->GetParam_Cloth();
 }
 
 void GlobalDataHolder::generateClothDebug()

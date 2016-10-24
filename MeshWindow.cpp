@@ -1,5 +1,6 @@
 #include "MeshWindow.h"
-
+#include "global_data_holder.h"
+#include "SC\analysis2d_cloth_static.h"
 MeshWindow::MeshWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -8,7 +9,6 @@ MeshWindow::MeshWindow(QWidget *parent)
 	new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(showNormal()));
 	setAcceptDrops(true);
 	initLeftDockActions();
-
 	startTimer(200);
 }
 
@@ -118,4 +118,37 @@ void MeshWindow::leftDocButtonsClicked(int i)
 	AbstractMeshEventHandle::ProcessorType type = (AbstractMeshEventHandle::ProcessorType)i;
 	ui.widget->setEventHandleType(type);
 	m_leftDockButtons[type]->setChecked(true);
+}
+
+void MeshWindow::on_cbThickness_currentTextChanged(const QString& s)
+{
+	try
+	{
+		QString s1 = s.toLower();
+		if (s1 == "thin")
+		{
+			g_dataholder.m_param.changeClothThickness(Param::Thin);
+		}
+		else if (s1 == "very thin")
+		{
+			g_dataholder.m_param.changeClothThickness(Param::VeryThin);
+		}
+		else if (s1 == "medium")
+		{
+			g_dataholder.m_param.changeClothThickness(Param::Medium);
+		}
+		else if (s1 == "thick")
+		{
+			g_dataholder.m_param.changeClothThickness(Param::Thick);
+		}
+		g_dataholder.m_clothManger->SetParam_Cloth(*g_dataholder.m_param.m_clothParam);
+	}
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }

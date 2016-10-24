@@ -16,6 +16,7 @@ public:
 	const BaseMeshViewer* getViewer()const;
 	public slots:
 	void leftDocButtonsClicked(int i);
+	void on_cbThickness_currentTextChanged(const QString& s);
 protected:
 	void dragEnterEvent(QDragEnterEvent* ev);
 	void dropEvent(QDropEvent* ev);

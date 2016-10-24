@@ -22,6 +22,7 @@ public:
 	std::shared_ptr<CDesigner2D_Cloth> m_clothUiListener;
 	std::map<unsigned int, int> m_clothLoopId2svgIdMap;
 	std::map<int, unsigned int> m_svgId2clothLoopIdMap;
+	Param m_param;
 };
 
 extern GlobalDataHolder g_dataholder;

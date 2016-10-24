@@ -13,9 +13,12 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -37,6 +40,9 @@ public:
     QStatusBar *statusbar;
     QDockWidget *dockWidgetRight;
     QWidget *dockWidgetRightContents;
+    QGroupBox *groupBox;
+    QComboBox *cbThickness;
+    QLabel *label;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -68,10 +74,19 @@ public:
         MeshWindow->setStatusBar(statusbar);
         dockWidgetRight = new QDockWidget(MeshWindow);
         dockWidgetRight->setObjectName(QStringLiteral("dockWidgetRight"));
-        dockWidgetRight->setMinimumSize(QSize(200, 200));
+        dockWidgetRight->setMinimumSize(QSize(300, 200));
         dockWidgetRight->setFeatures(QDockWidget::NoDockWidgetFeatures);
         dockWidgetRightContents = new QWidget();
         dockWidgetRightContents->setObjectName(QStringLiteral("dockWidgetRightContents"));
+        groupBox = new QGroupBox(dockWidgetRightContents);
+        groupBox->setObjectName(QStringLiteral("groupBox"));
+        groupBox->setGeometry(QRect(30, 20, 221, 191));
+        cbThickness = new QComboBox(groupBox);
+        cbThickness->setObjectName(QStringLiteral("cbThickness"));
+        cbThickness->setGeometry(QRect(100, 20, 69, 22));
+        label = new QLabel(groupBox);
+        label->setObjectName(QStringLiteral("label"));
+        label->setGeometry(QRect(10, 20, 61, 16));
         dockWidgetRight->setWidget(dockWidgetRightContents);
         MeshWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
         dockWidgetLeft = new QDockWidget(MeshWindow);
@@ -89,6 +104,9 @@ public:
 
         retranslateUi(MeshWindow);
 
+        cbThickness->setCurrentIndex(2);
+
+
         QMetaObject::connectSlotsByName(MeshWindow);
     } // setupUi
 
@@ -97,6 +115,16 @@ public:
         MeshWindow->setWindowTitle(QApplication::translate("MeshWindow", "MainWindow", 0));
         actionOpen->setText(QApplication::translate("MeshWindow", "open", 0));
         menuFile->setTitle(QApplication::translate("MeshWindow", "file", 0));
+        groupBox->setTitle(QApplication::translate("MeshWindow", "cloth param", 0));
+        cbThickness->clear();
+        cbThickness->insertItems(0, QStringList()
+         << QApplication::translate("MeshWindow", "thick", 0)
+         << QApplication::translate("MeshWindow", "medium", 0)
+         << QApplication::translate("MeshWindow", "thin", 0)
+         << QApplication::translate("MeshWindow", "very thin", 0)
+        );
+        cbThickness->setCurrentText(QApplication::translate("MeshWindow", "thin", 0));
+        label->setText(QApplication::translate("MeshWindow", "Thickness", 0));
     } // retranslateUi
 
 };

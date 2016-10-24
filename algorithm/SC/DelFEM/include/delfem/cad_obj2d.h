@@ -251,7 +251,6 @@ namespace Cad
 		Com::CObjSet<CVertex2D> m_VertexSet;
 		////////////////
 		double min_clearance;
-
 	public:
 		CBRepSurface m_BRep;	// class which have topology
 

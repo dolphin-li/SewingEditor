@@ -2531,8 +2531,188 @@ static void makeCurveFromSvgCurve(Cad::CCadObj2D_Move& cad_2d, const svg::SvgPol
 }
 
 struct EdgeWithPleats{
-	std::vector<unsigned int> pleatsIds;
-	std::vector<unsigned int> splittedIds;
+	int vert_id_s;
+	int vert_id_e;
+	std::set<unsigned int> pleatsEdgeIds;
+	std::set<unsigned int> splittedEdgeIds;
+	EdgeWithPleats() : vert_id_s(0), vert_id_e(0){}
+
+	// filled by makeOrdered
+	std::vector<unsigned int> splittedEdgeIdsOrdered;
+	std::vector<float> splittedEdgeLengths;
+	std::vector<bool> splittedEdgeValid;
+	std::map<unsigned int, int> splittedEdgeIdToArrayPosMap;
+	std::map<unsigned int, std::set<unsigned int>> splittedVertsToEdgeMap;
+	std::map<unsigned int, std::set<unsigned int>> edgesWithContactPleats;
+
+	void makeOrdered(const Cad::CCadObj2D_Move& cad)
+	{
+		splittedVertsToEdgeMap.clear();
+		// counting
+		for (auto eid : splittedEdgeIds){
+			auto edge = cad.GetEdge(eid);
+			std::set<unsigned int> eids;
+			eids.insert(eid);
+
+			auto eiter = splittedVertsToEdgeMap.find(edge.id_v_s);
+			if (eiter == splittedVertsToEdgeMap.end())
+				splittedVertsToEdgeMap.insert(std::make_pair(edge.id_v_s, eids));
+			else
+				eiter->second.insert(eid);
+
+			eiter = splittedVertsToEdgeMap.find(edge.id_v_e);
+			if (eiter == splittedVertsToEdgeMap.end())
+				splittedVertsToEdgeMap.insert(std::make_pair(edge.id_v_e, eids));
+			else
+				eiter->second.insert(eid);
+		} // end for auto id : pleatsEdgeIds
+
+		// find the minimal-cnt edge
+		int cnt1num = 0;
+		for (auto iter : splittedVertsToEdgeMap){
+			int cnt = iter.second.size();
+			int vid = iter.first;
+			if (cnt >= 3)
+				throw std::exception("non-single-dir edges found!");
+			if (cnt == 1)
+				cnt1num++;
+		} // end for auto iter : pleatVertsCnt
+		if (cnt1num > 2)
+			throw std::exception("not a connected edge");
+		auto vbegin = splittedVertsToEdgeMap.find(vert_id_s);
+		if (vbegin == splittedVertsToEdgeMap.end())
+			throw std::exception("construction error");
+		if (vbegin->second.size() != 1)
+			throw std::exception("construction error1");
+
+		// start from the minimal-cnt edge and go through
+		splittedEdgeIdsOrdered.clear();
+		splittedEdgeLengths.clear();
+		splittedEdgeValid.clear();
+		splittedEdgeIdToArrayPosMap.clear();
+		int vid = vert_id_s;
+		std::set<unsigned int> eidVisited;
+		while (1){
+			const auto& eids = splittedVertsToEdgeMap[vid];
+			int nvid = 0;
+			for (auto eid : eids){
+				if (eidVisited.find(eid) != eidVisited.end())
+					continue;
+				auto edge = cad.GetEdge(eid);
+				nvid = edge.id_v_s;
+				if (nvid == vid) nvid = edge.id_v_e;
+				eidVisited.insert(eid);
+				splittedEdgeIdToArrayPosMap.insert(std::make_pair(eid, (int)splittedEdgeIdsOrdered.size()));
+				splittedEdgeIdsOrdered.push_back(eid);
+				splittedEdgeLengths.push_back(edge.GetCurveLength());
+				splittedEdgeValid.push_back(true); 
+				break;
+			} // end for eid
+			vid = nvid;
+			if (vid == 0 || vid == vert_id_s)
+				break;
+		} // end while vid
+
+		// build edge-pleats connections
+		edgesWithContactPleats.clear();
+		for (auto eid : pleatsEdgeIds){
+			auto edge = cad.GetEdge(eid);
+			const auto& siter = splittedVertsToEdgeMap.find(edge.id_v_s);
+			if (siter == splittedVertsToEdgeMap.end())
+				continue;
+			for (auto neid : siter->second){
+				auto& piter = edgesWithContactPleats.find(neid);
+				if (piter == edgesWithContactPleats.end()){
+					std::set<unsigned int> eids;
+					edgesWithContactPleats.insert(std::make_pair(neid, eids));
+					piter = edgesWithContactPleats.find(neid);
+				}
+				piter->second.insert(eid);
+			}
+		} // end for pleatsEdgeIds
+	}
+
+	void addPleatPair(Cad::CCadObj2D_Move& cad, int pleat1id, int pleat2id)
+	{
+		if (pleatsEdgeIds.find(pleat1id) == pleatsEdgeIds.end()
+			|| pleatsEdgeIds.find(pleat2id) == pleatsEdgeIds.end())
+			return;
+
+		for (const auto& piter : edgesWithContactPleats){
+			const auto& pleatIds = piter.second;
+			if (pleatIds.size() != 2)
+				continue;
+			if (pleatIds.find(pleat1id) != pleatIds.end() && pleatIds.find(pleat2id) != pleatIds.end())
+				splittedEdgeValid[splittedEdgeIdToArrayPosMap[piter.first]] = false;
+		}
+	}
+
+	static bool isSameDir(Cad::CCadObj2D_Move& cad_2d, int id_e1, int id_e2)
+	{
+		bool is_left1 = true;
+		{
+			unsigned int id_l1_l, id_l1_r;
+			cad_2d.GetIdLoop_Edge(id_l1_l, id_l1_r, id_e1);
+			//assert( id_l1_l*id_l1_r == 0 );    // ldp comment this to enable pleats
+			if (id_l1_l == 0 && id_l1_r != 0){ is_left1 = false; }
+			if (id_l1_l != 0 && id_l1_r == 0){ is_left1 = true; }
+		}
+		bool is_left2 = false;
+		{
+			unsigned int id_l2_l, id_l2_r;
+			cad_2d.GetIdLoop_Edge(id_l2_l, id_l2_r, id_e2);
+			//assert( id_l2_l*id_l2_r == 0 );    // ldp comment this to enable pleats
+			if (id_l2_l == 0 && id_l2_r != 0) { is_left2 = false; }
+			if (id_l2_l != 0 && id_l2_r == 0) { is_left2 = true; }
+		}
+		bool dir = (is_left1 != is_left2);
+		return dir;
+	}
+
+	void divideAnotherEdgeByThis(Cad::CCadObj2D_Move& cad, int this_edge_id,
+		int other_edge_id, EdgeWithPleats& newEdgeIdOrdered)const
+	{
+		bool dir = isSameDir(cad, this_edge_id, other_edge_id);
+		std::vector<float> sumLens;
+		sumLens.push_back(0);
+		for (size_t i = 0; i < splittedEdgeLengths.size(); i++){
+			if (!splittedEdgeValid[i]) continue;
+			sumLens.push_back(sumLens.back() + splittedEdgeLengths[i]);
+		}
+		if (sumLens.back() < std::numeric_limits<float>::epsilon())
+			return;
+		newEdgeIdOrdered.splittedEdgeIds.insert(other_edge_id);
+		auto edge = cad.GetEdge(other_edge_id);
+		newEdgeIdOrdered.vert_id_s = edge.id_v_s;
+		newEdgeIdOrdered.vert_id_e = edge.id_v_e;
+		auto po_s = edge.po_s;
+		auto po_e = edge.po_e;
+		if (!dir) std::swap(po_s, po_e);
+		for (size_t i = 1; i < sumLens.size() - 1; i++){
+			float s = sumLens[i] / sumLens.back();
+			Com::CVector2D p = po_s * (1 - s) + po_e * s;
+			auto res = cad.AddVertex(Cad::EDGE, other_edge_id, p);
+			if (res.id_e_add == 0){
+				for (auto eid : newEdgeIdOrdered.splittedEdgeIds){
+					res = cad.AddVertex(Cad::EDGE, eid, p);
+					if (res.id_e_add)
+						break;
+				}
+			}
+			assert(res.id_e_add);
+			newEdgeIdOrdered.splittedEdgeIds.insert(res.id_e_add);
+		}
+		newEdgeIdOrdered.makeOrdered(cad);
+		if (!dir)
+		{
+			auto tmp = newEdgeIdOrdered.splittedEdgeIdsOrdered;
+			std::copy(tmp.begin(), tmp.end(), newEdgeIdOrdered.splittedEdgeIdsOrdered.rbegin());
+			auto tmp1 = newEdgeIdOrdered.splittedEdgeLengths;
+			std::copy(tmp1.begin(), tmp1.end(), newEdgeIdOrdered.splittedEdgeLengths.rbegin());
+			auto tmp2 = newEdgeIdOrdered.splittedEdgeValid;
+			std::copy(tmp2.begin(), tmp2.end(), newEdgeIdOrdered.splittedEdgeValid.rbegin());
+		}
+	}
 };
 
 void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
@@ -2600,6 +2780,8 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 
 	// 1.2 add non-closed polygons as pleats -------------------------------------------------------
 	std::map<unsigned int, EdgeWithPleats> edgesWithPleats;
+	std::map<unsigned int, unsigned int> newEdgesToRootSplitEdgesMap;
+	std::map<unsigned int, int> pleatsToPathIdMap, pathIdToPleatsMap;
 	for (size_t iPoly = 0; iPoly < polyPaths.size(); iPoly++)
 	{
 		const auto& path_i = polyPaths[iPoly];
@@ -2617,44 +2799,115 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		{
 			int splittedEdgeId = 0, mergedVertId = 0;
 			int newEdgeIds[2] = { 0 };
-			cad_2d.addPleat_HemLine(pts[0], pts[1], on_segment_thre, foundLoopId, mergedVertId, splittedEdgeId, newEdgeIds);
+			cad_2d.addPleat_HemLine(pts[0], pts[1], on_segment_thre, foundLoopId, 
+				mergedVertId, splittedEdgeId, newEdgeIds);
 			if (foundLoopId > 0){
 				// ldp TO DO: we should fill edgesWithPleats ordered to construct the split array
-				if (splittedEdgeId || mergedVertId){
-					auto& iter = edgesWithPleats.find(splittedEdgeId);
+				if (splittedEdgeId)
+				{
+					int rootEdgeId = splittedEdgeId;
+					const auto& rootIter = newEdgesToRootSplitEdgesMap.find(rootEdgeId);
+					if (rootIter != newEdgesToRootSplitEdgesMap.end())
+						rootEdgeId = rootIter->second;
+					const auto& rootEdge = cad_2d.GetEdge(rootEdgeId);
+					auto& iter = edgesWithPleats.find(rootEdgeId);
 					if (iter == edgesWithPleats.end()){
-						edgesWithPleats.insert(std::make_pair((unsigned int)splittedEdgeId, EdgeWithPleats()));
-						iter = edgesWithPleats.find(splittedEdgeId);
-						iter->second.splittedIds.push_back(splittedEdgeId);
+						edgesWithPleats.insert(std::make_pair((unsigned int)rootEdgeId, EdgeWithPleats()));
+						iter = edgesWithPleats.find(rootEdgeId);
+						iter->second.vert_id_s = rootEdge.id_v_s;
+						iter->second.vert_id_e = rootEdge.id_v_e;
 					}
-					iter->second.pleatsIds.push_back(newEdgeIds[1]);
-					iter->second.splittedIds.push_back(newEdgeIds[0]);
+					newEdgesToRootSplitEdgesMap.insert(std::make_pair(splittedEdgeId, rootEdgeId));
+					newEdgesToRootSplitEdgesMap.insert(std::make_pair(newEdgeIds[0], rootEdgeId));
+					newEdgesToRootSplitEdgesMap.insert(std::make_pair(newEdgeIds[1], rootEdgeId));
+					iter->second.splittedEdgeIds.insert(splittedEdgeId);
+					iter->second.splittedEdgeIds.insert(newEdgeIds[0]);
+					iter->second.pleatsEdgeIds.insert(newEdgeIds[1]);
+					pleatsToPathIdMap.insert(std::make_pair(newEdgeIds[1], path_i->getId()));
+					pathIdToPleatsMap.insert(std::make_pair(path_i->getId(), newEdgeIds[1]));
 					printf("add pleat %d to loop %d\n", path_i->getId(), foundLoopId);
-				}
+				} // end if edge id
+				else if (mergedVertId)
+				{
+					pleatsToPathIdMap.insert(std::make_pair(newEdgeIds[0], path_i->getId()));
+					pathIdToPleatsMap.insert(std::make_pair(path_i->getId(), newEdgeIds[0]));
+					printf("add pleat-1 %d to loop %d\n", path_i->getId(), foundLoopId);
+				} // end if vert id
 				else
 					printf("add hemline %d to loop %d\n", path_i->getId(), foundLoopId);
 			} // end if foundLoopId > 0
 		} //
 	} // end for iPoly
 
+	// 1.2.1 make the added pleats edges ordered and compute the lenths
+	for (auto& iter : edgesWithPleats)
+		iter.second.makeOrdered(cad_2d);
+
 	// 1.3 make stitchings -------------------------------------------------------------------------
+	std::vector< std::pair<unsigned int, unsigned int> > loopEdgePairsBeforePleats;
 	std::vector< std::pair<unsigned int, unsigned int> > aIdECad_Stitch;
-	for (auto eg : edgeGroups)
+	// collect directly usable pairs and thoses borken by pleats
+	for (const auto& eg : edgeGroups)
 	{
-		for (auto g1 : eg->group){
+		for (const auto& g1 : eg->group){
 			auto iter1 = svg2loopMap.find(g1.first->getId());
 			if (iter1 == svg2loopMap.end()) continue;
 			auto loop1 = iter1->second;
-			for (auto g2 : eg->group){
-				auto iter2 = svg2loopMap.find(g2.first->getId());
+			for (const auto& g2 : eg->group){
+				const auto& iter2 = svg2loopMap.find(g2.first->getId());
 				if (iter2 == svg2loopMap.end()) continue;
-				auto loop2 = iter2->second;
+				const auto& loop2 = iter2->second;
 				if (loop1->id_l_add < loop2->id_l_add) continue;
 				if (loop1->id_l_add == loop2->id_l_add && g1.second <= g2.second) continue;
-				aIdECad_Stitch.push_back(std::make_pair(loop1->aIdE[g1.second], loop2->aIdE[g2.second]));
+				int edge1 = loop1->aIdE[g1.second];
+				int edge2 = loop2->aIdE[g2.second];
+				const auto& edge1_s_iter = edgesWithPleats.find(edge1);
+				const auto& edge2_s_iter = edgesWithPleats.find(edge2);
+				if (edge1_s_iter == edgesWithPleats.end() && edge2_s_iter == edgesWithPleats.end())
+					aIdECad_Stitch.push_back(std::make_pair(edge1, edge2));
+				else
+					loopEdgePairsBeforePleats.push_back(std::make_pair(edge1, edge2));
 			} // end for g2
 		} // end for g1
 	} // end for eg
+	// collect pleats pairs
+	for (const auto& eg : edgeGroups)
+	{
+		for (const auto& g1 : eg->group){
+			const auto& iter1 = pathIdToPleatsMap.find(g1.first->getId());
+			if (iter1 == pathIdToPleatsMap.end()) continue;
+			for (const auto& g2 : eg->group){
+				const auto& iter2 = pathIdToPleatsMap.find(g2.first->getId());
+				if (iter2 == pathIdToPleatsMap.end()) continue;
+				if (iter1->second <= iter2->second) continue;
+				aIdECad_Stitch.push_back(std::make_pair(iter1->second, iter2->second));
+				for (auto& epiter : edgesWithPleats)
+					epiter.second.addPleatPair(cad_2d, iter1->second, iter2->second);
+			} // end for g2
+		} // end for g1
+	} // end for eg
+	// collect edge pairs broken by pleats
+	for (const auto& pair_iter : loopEdgePairsBeforePleats)
+	{
+		int edge1 = pair_iter.first;
+		int edge2 = pair_iter.second;
+		auto edge1_s_iter = edgesWithPleats.find(pair_iter.first);
+		auto edge2_s_iter = edgesWithPleats.find(pair_iter.second);
+		if (edge1_s_iter == edgesWithPleats.end() && edge2_s_iter != edgesWithPleats.end()){
+			std::swap(edge1_s_iter, edge2_s_iter);
+			std::swap(edge1, edge2);
+		}
+		EdgeWithPleats newEdgeIdOrdered;
+		if (edge1_s_iter != edgesWithPleats.end() && edge2_s_iter == edgesWithPleats.end()){
+			edge1_s_iter->second.divideAnotherEdgeByThis(cad_2d, edge1, edge2, newEdgeIdOrdered);
+			for (size_t i = 0, j = 0; i < edge1_s_iter->second.splittedEdgeIdsOrdered.size(); i++){
+				if (!edge1_s_iter->second.splittedEdgeValid[i])
+					continue;
+				aIdECad_Stitch.push_back(std::make_pair(newEdgeIdOrdered.splittedEdgeIdsOrdered[j++],
+					edge1_s_iter->second.splittedEdgeIdsOrdered[i]));
+			}
+		}
+	} // end for loopEdgePairsBeforePleats
 
 	// 2. triangulation and make stitch-------------------------------------------------------------
 	mesh_2d.SetMeshingMode_ElemSize(3000);

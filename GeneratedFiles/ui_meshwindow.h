@@ -40,9 +40,11 @@ public:
     QStatusBar *statusbar;
     QDockWidget *dockWidgetRight;
     QWidget *dockWidgetRightContents;
+    QGridLayout *gridLayout_3;
     QGroupBox *groupBox;
-    QComboBox *cbThickness;
+    QGridLayout *gridLayout_2;
     QLabel *label;
+    QComboBox *cbThickness;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -78,15 +80,27 @@ public:
         dockWidgetRight->setFeatures(QDockWidget::NoDockWidgetFeatures);
         dockWidgetRightContents = new QWidget();
         dockWidgetRightContents->setObjectName(QStringLiteral("dockWidgetRightContents"));
+        gridLayout_3 = new QGridLayout(dockWidgetRightContents);
+        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
         groupBox = new QGroupBox(dockWidgetRightContents);
         groupBox->setObjectName(QStringLiteral("groupBox"));
-        groupBox->setGeometry(QRect(30, 20, 221, 191));
-        cbThickness = new QComboBox(groupBox);
-        cbThickness->setObjectName(QStringLiteral("cbThickness"));
-        cbThickness->setGeometry(QRect(100, 20, 69, 22));
+        groupBox->setMinimumSize(QSize(0, 0));
+        gridLayout_2 = new QGridLayout(groupBox);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
         label = new QLabel(groupBox);
         label->setObjectName(QStringLiteral("label"));
-        label->setGeometry(QRect(10, 20, 61, 16));
+
+        gridLayout_2->addWidget(label, 0, 0, 1, 1);
+
+        cbThickness = new QComboBox(groupBox);
+        cbThickness->setObjectName(QStringLiteral("cbThickness"));
+        cbThickness->setMinimumSize(QSize(0, 0));
+
+        gridLayout_2->addWidget(cbThickness, 0, 1, 1, 1);
+
+
+        gridLayout_3->addWidget(groupBox, 0, 0, 1, 1);
+
         dockWidgetRight->setWidget(dockWidgetRightContents);
         MeshWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
         dockWidgetLeft = new QDockWidget(MeshWindow);
@@ -116,6 +130,7 @@ public:
         actionOpen->setText(QApplication::translate("MeshWindow", "open", 0));
         menuFile->setTitle(QApplication::translate("MeshWindow", "file", 0));
         groupBox->setTitle(QApplication::translate("MeshWindow", "cloth param", 0));
+        label->setText(QApplication::translate("MeshWindow", "Thickness", 0));
         cbThickness->clear();
         cbThickness->insertItems(0, QStringList()
          << QApplication::translate("MeshWindow", "thick", 0)
@@ -124,7 +139,6 @@ public:
          << QApplication::translate("MeshWindow", "very thin", 0)
         );
         cbThickness->setCurrentText(QApplication::translate("MeshWindow", "thin", 0));
-        label->setText(QApplication::translate("MeshWindow", "Thickness", 0));
     } // retranslateUi
 
 };

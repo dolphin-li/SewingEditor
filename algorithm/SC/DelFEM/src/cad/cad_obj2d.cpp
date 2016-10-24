@@ -1675,15 +1675,52 @@ bool CCadObj2D::addPleat_HemLine(Com::CVector2D p0, Com::CVector2D p1, double po
 			}
 		} // end if p0_on and p1_in
 		// hemline
-		if (p_on[0] && p_on[1]){
+		if (p_on[0] && p_on[1])
+		{
 			// LDP TODO : how to handle hemlines?
-			//for (int k = 0; k < 2; k++)
-			//{
-			//	if (p_dists_s[k] < p_dists_e[k])
-			//		m_VertexSet.GetObj(p_edges[k]->id_v_s).point = p0;
-			//	else
-			//		m_VertexSet.GetObj(p_edges[k]->id_v_e).point = p0;
-			//}
+			int nb_v[2] = { 0 };
+			for (int k = 0; k < 2; k++)
+			{
+				if (p_dists_s[k] < p_dists_e[k])
+				{
+					m_VertexSet.GetObj(p_edges[k]->id_v_s).point = p[k];
+					nb_v[k] = p_edges[k]->id_v_s;
+					Cad::CEdge2D other;
+					p_edges[k]->Split(other, p[k]);
+					p_edges[k]->aRelCoMesh = other.aRelCoMesh;
+				}
+				else
+				{
+					m_VertexSet.GetObj(p_edges[k]->id_v_e).point = p[k];
+					nb_v[k] = p_edges[k]->id_v_e;
+					Cad::CEdge2D other;
+					p_edges[k]->Split(other, p[k]);
+				}
+			} // end for k
+
+			unsigned int eid_between = 0;
+			auto iter = m_BRep.GetItrVertex(nb_v[0]);
+			for (iter.Begin(); !iter.IsEnd(); ++iter)
+			{
+				unsigned int id_e = 0;
+				bool is_same_dir = true;
+				if (iter.GetIdEdge_Ahead(id_e, is_same_dir))
+				{
+					if (GetEdgeRef(id_e).id_v_s == nb_v[1])
+						eid_between = id_e;
+				}
+				if (iter.GetIdEdge_Behind(id_e, is_same_dir))
+				{
+					if (GetEdgeRef(id_e).id_v_e == nb_v[1])
+						eid_between = id_e;
+				}
+			} // end for iter
+			assert(eid_between);
+			auto& edge_between = GetEdgeRef(eid_between);
+			edge_between.itype = 0; // straight
+			edge_between.po_s = p[0];
+			edge_between.po_e = p[1];
+			newEdgeIds[0] = eid_between;
 		} // end if p1_on and p0_on
 	} // end for loopId
 

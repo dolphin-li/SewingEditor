@@ -52,58 +52,66 @@
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetRightContents">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>20</y>
-       <width>141</width>
-       <height>53</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string>cloth param</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Thickness</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="cbThickness">
-        <property name="currentText">
-         <string>thin</string>
-        </property>
-        <property name="currentIndex">
-         <number>2</number>
-        </property>
-        <item>
-         <property name="text">
-          <string>thick</string>
-         </property>
+    <layout class="QGridLayout" name="gridLayout_3">
+     <item row="0" column="0">
+      <widget class="QGroupBox" name="groupBox">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>cloth param</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Thickness</string>
+          </property>
+         </widget>
         </item>
-        <item>
-         <property name="text">
-          <string>medium</string>
-         </property>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="cbThickness">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="currentText">
+           <string>thin</string>
+          </property>
+          <property name="currentIndex">
+           <number>2</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>thick</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>medium</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>thin</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>very thin</string>
+           </property>
+          </item>
+         </widget>
         </item>
-        <item>
-         <property name="text">
-          <string>thin</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>very thin</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+       </layout>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLeft">

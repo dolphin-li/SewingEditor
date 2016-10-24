@@ -1030,7 +1030,7 @@ void CAnalysis2D_Cloth_Static::RotateClothLoopInitialPosition(unsigned int id_l,
 {
 	const Fem::Field::CIDConvEAMshCad& conv = world.GetIDConverter(id_field_base);
 	unsigned int id_ea = conv.GetIdEA_fromCad(id_l, Cad::LOOP);
-	
+
 	ldp::Double3 p, n, h;
 	if (!clothHandler_.GetAnchor_3D(p.ptr(), n.ptr(), h.ptr(), id_ea)) { return; }
 	clothHandler_.Transform_Cloth_Rot(id_l, R, false);
@@ -2153,7 +2153,8 @@ bool CAnalysis2D_Cloth_Static::Pick(ldp::Double2 screenPos, const ldp::Camera& c
 			es.GetNodes(ielem, no);
 			ldp::Double3 C[3], u[3], c0[3], C1[3];
 			ldp::Double2 c1[3];
-			for (int k = 0; k < 3; k++){
+			for (int k = 0; k < 3; k++)
+			{
 				ns_c.GetValue(no[k], C[k].ptr());
 				ns_u.GetValue(no[k], u[k].ptr());
 				c0[k] = C[k] + u[k];
@@ -2179,7 +2180,8 @@ bool CAnalysis2D_Cloth_Static::Pick(ldp::Double2 screenPos, const ldp::Camera& c
 			ldp::Double3 tmpScreenPos = picked_elem_ratio[0] * C1[0] + picked_elem_ratio[1] * C1[1]
 				+ picked_elem_ratio[2] * C1[2];
 			// we only want the nearest..
-			if (id_l_cad == 0 || (id_l_cad && tmpScreenPos[2] < pickedScreenPos[2])){
+			if (id_l_cad == 0 || (id_l_cad && tmpScreenPos[2] < pickedScreenPos[2]))
+			{
 				std::cout << "hit " << id_ea << " " << ielem << std::endl;
 				pickedScreenPos = tmpScreenPos;
 				const Fem::Field::CIDConvEAMshCad& conv = world.GetIDConverter(id_field_base);
@@ -2511,15 +2513,36 @@ static unsigned int MakeHingeField_Tri(Fem::Field::CFieldWorld& world, unsigned 
 
 ////////////////////////////////////////////////////////////ldp////////////////////////////////////////////////////
 
-static void makeCurveFromSvgCurve(Cad::CCadObj2D_Move& cad_2d, const svg::SvgPolyPath* path, 
+static void makeCurveFromSvgCurve(Cad::CCadObj2D_Move& cad_2d, const std::vector<float>& pathCoords, 
+	int eid, float pixel2meter)
+{
+	const auto& coords = pathCoords;
+	std::vector<Com::CVector2D> pc;
+	if (coords.size() <= 4)
+		return; // only two points, must be a straight line
+	ldp::Float2 lastp(coords[0], coords[1]); // we should avoid overlapped points
+	for (size_t i = 2; i < coords.size() - 2; i += 2)
+	{
+		ldp::Float2 p(coords[i], coords[i + 1]);
+		if ((p - lastp).length() < std::numeric_limits<float>::epsilon())
+			continue;
+		pc.push_back(Com::CVector2D(p[0], p[1])*pixel2meter);
+		lastp = p;
+	}
+	if (!cad_2d.SetCurve_Polyline(eid, pc))
+		printf("error: set curve failed: %d!\n", eid);
+}
+
+static void makeCurveFromSvgCurve(Cad::CCadObj2D_Move& cad_2d, const svg::SvgPolyPath* path,
 	const Cad::CCadObj2D::CResAddPolygon& loop, int iEdge, float pixel2meter)
 {
 	const auto& coords = path->getEdgeCoords(iEdge);
 	std::vector<Com::CVector2D> pc;
-	if (coords.size() <= 4) 
+	if (coords.size() <= 4)
 		return; // only two points, must be a straight line
 	ldp::Float2 lastp(coords[0], coords[1]); // we should avoid overlapped points
-	for (size_t i = 2; i < coords.size() - 2; i += 2){
+	for (size_t i = 2; i < coords.size() - 2; i += 2)
+	{
 		ldp::Float2 p(coords[i], coords[i + 1]);
 		if ((p - lastp).length() < std::numeric_limits<float>::epsilon())
 			continue;
@@ -2530,12 +2553,13 @@ static void makeCurveFromSvgCurve(Cad::CCadObj2D_Move& cad_2d, const svg::SvgPol
 		printf("error: set curve failed: %d %d!\n", path->getId(), iEdge);
 }
 
-struct EdgeWithPleats{
+struct EdgeWithPleats
+{
 	int vert_id_s;
 	int vert_id_e;
 	std::set<unsigned int> pleatsEdgeIds;
 	std::set<unsigned int> splittedEdgeIds;
-	EdgeWithPleats() : vert_id_s(0), vert_id_e(0){}
+	EdgeWithPleats() : vert_id_s(0), vert_id_e(0) {}
 
 	// filled by makeOrdered
 	std::vector<unsigned int> splittedEdgeIdsOrdered;
@@ -2549,7 +2573,8 @@ struct EdgeWithPleats{
 	{
 		splittedVertsToEdgeMap.clear();
 		// counting
-		for (auto eid : splittedEdgeIds){
+		for (auto eid : splittedEdgeIds)
+		{
 			auto edge = cad.GetEdge(eid);
 			std::set<unsigned int> eids;
 			eids.insert(eid);
@@ -2569,7 +2594,8 @@ struct EdgeWithPleats{
 
 		// find the minimal-cnt edge
 		int cnt1num = 0;
-		for (auto iter : splittedVertsToEdgeMap){
+		for (auto iter : splittedVertsToEdgeMap)
+		{
 			int cnt = iter.second.size();
 			int vid = iter.first;
 			if (cnt >= 3)
@@ -2592,10 +2618,12 @@ struct EdgeWithPleats{
 		splittedEdgeIdToArrayPosMap.clear();
 		int vid = vert_id_s;
 		std::set<unsigned int> eidVisited;
-		while (1){
+		while (1)
+		{
 			const auto& eids = splittedVertsToEdgeMap[vid];
 			int nvid = 0;
-			for (auto eid : eids){
+			for (auto eid : eids)
+			{
 				if (eidVisited.find(eid) != eidVisited.end())
 					continue;
 				auto edge = cad.GetEdge(eid);
@@ -2605,7 +2633,7 @@ struct EdgeWithPleats{
 				splittedEdgeIdToArrayPosMap.insert(std::make_pair(eid, (int)splittedEdgeIdsOrdered.size()));
 				splittedEdgeIdsOrdered.push_back(eid);
 				splittedEdgeLengths.push_back(edge.GetCurveLength());
-				splittedEdgeValid.push_back(true); 
+				splittedEdgeValid.push_back(true);
 				break;
 			} // end for eid
 			vid = nvid;
@@ -2615,14 +2643,17 @@ struct EdgeWithPleats{
 
 		// build edge-pleats connections
 		edgesWithContactPleats.clear();
-		for (auto eid : pleatsEdgeIds){
+		for (auto eid : pleatsEdgeIds)
+		{
 			auto edge = cad.GetEdge(eid);
 			const auto& siter = splittedVertsToEdgeMap.find(edge.id_v_s);
 			if (siter == splittedVertsToEdgeMap.end())
 				continue;
-			for (auto neid : siter->second){
+			for (auto neid : siter->second)
+			{
 				auto& piter = edgesWithContactPleats.find(neid);
-				if (piter == edgesWithContactPleats.end()){
+				if (piter == edgesWithContactPleats.end())
+				{
 					std::set<unsigned int> eids;
 					edgesWithContactPleats.insert(std::make_pair(neid, eids));
 					piter = edgesWithContactPleats.find(neid);
@@ -2638,7 +2669,8 @@ struct EdgeWithPleats{
 			|| pleatsEdgeIds.find(pleat2id) == pleatsEdgeIds.end())
 			return;
 
-		for (const auto& piter : edgesWithContactPleats){
+		for (const auto& piter : edgesWithContactPleats)
+		{
 			const auto& pleatIds = piter.second;
 			if (pleatIds.size() != 2)
 				continue;
@@ -2654,8 +2686,8 @@ struct EdgeWithPleats{
 			unsigned int id_l1_l, id_l1_r;
 			cad_2d.GetIdLoop_Edge(id_l1_l, id_l1_r, id_e1);
 			//assert( id_l1_l*id_l1_r == 0 );    // ldp comment this to enable pleats
-			if (id_l1_l == 0 && id_l1_r != 0){ is_left1 = false; }
-			if (id_l1_l != 0 && id_l1_r == 0){ is_left1 = true; }
+			if (id_l1_l == 0 && id_l1_r != 0) { is_left1 = false; }
+			if (id_l1_l != 0 && id_l1_r == 0) { is_left1 = true; }
 		}
 		bool is_left2 = false;
 		{
@@ -2675,7 +2707,8 @@ struct EdgeWithPleats{
 		bool dir = isSameDir(cad, this_edge_id, other_edge_id);
 		std::vector<float> sumLens;
 		sumLens.push_back(0);
-		for (size_t i = 0; i < splittedEdgeLengths.size(); i++){
+		for (size_t i = 0; i < splittedEdgeLengths.size(); i++)
+		{
 			if (!splittedEdgeValid[i]) continue;
 			sumLens.push_back(sumLens.back() + splittedEdgeLengths[i]);
 		}
@@ -2688,12 +2721,15 @@ struct EdgeWithPleats{
 		auto po_s = edge.po_s;
 		auto po_e = edge.po_e;
 		if (!dir) std::swap(po_s, po_e);
-		for (size_t i = 1; i < sumLens.size() - 1; i++){
+		for (size_t i = 1; i < sumLens.size() - 1; i++)
+		{
 			float s = sumLens[i] / sumLens.back();
 			Com::CVector2D p = po_s * (1 - s) + po_e * s;
 			auto res = cad.AddVertex(Cad::EDGE, other_edge_id, p);
-			if (res.id_e_add == 0){
-				for (auto eid : newEdgeIdOrdered.splittedEdgeIds){
+			if (res.id_e_add == 0)
+			{
+				for (auto eid : newEdgeIdOrdered.splittedEdgeIds)
+				{
 					res = cad.AddVertex(Cad::EDGE, eid, p);
 					if (res.id_e_add)
 						break;
@@ -2737,7 +2773,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		throw std::exception("no selected polypaths given!");
 	if (pixel2meter == 1.f)
 		printf("warning: are you sure 1 pixel = 1 meter? \npossibly you should select \
-			   the standard-4cm rectangle and click the \"pixel to meter\" button\n");
+			   			   the standard-4cm rectangle and click the \"pixel to meter\" button\n");
 	std::vector<Cad::CCadObj2D::CResAddPolygon> polyLoops;
 	std::vector<ldp::Float2> polyCenters;
 	std::vector<ldp::Float3> poly3dCenters;
@@ -2752,14 +2788,16 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		poly3dCenters.push_back(polyPath->get3dCenter());
 		poly3dRots.push_back(polyPath->get3dRot());
 		// if non-closed, we ignore it this time
-		if (!polyPath->isClosed()){
+		if (!polyPath->isClosed())
+		{
 			polyLoops.push_back(Cad::CCadObj2D::CResAddPolygon());
 			continue;
 		}
 		// if closed, we create a loop for it: 
 		// firstly, straght lines added
 		std::vector<Com::CVector2D> vec_ary;
-		for (size_t i = 0; i < polyPath->numCorners(); i ++){
+		for (size_t i = 0; i < polyPath->numCorners(); i++)
+		{
 			ldp::Float2 p = polyPath->getCorner(i) * pixel2meter;
 			vec_ary.push_back(Com::CVector2D(p[0], p[1]));
 		}
@@ -2799,10 +2837,10 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		{
 			int splittedEdgeId = 0, mergedVertId = 0;
 			int newEdgeIds[2] = { 0 };
-			cad_2d.addPleat_HemLine(pts[0], pts[1], on_segment_thre, foundLoopId, 
+			cad_2d.addPleat_HemLine(pts[0], pts[1], on_segment_thre, foundLoopId,
 				mergedVertId, splittedEdgeId, newEdgeIds);
-			if (foundLoopId > 0){
-				// ldp TO DO: we should fill edgesWithPleats ordered to construct the split array
+			if (foundLoopId > 0)
+			{
 				if (splittedEdgeId)
 				{
 					int rootEdgeId = splittedEdgeId;
@@ -2811,7 +2849,8 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 						rootEdgeId = rootIter->second;
 					const auto& rootEdge = cad_2d.GetEdge(rootEdgeId);
 					auto& iter = edgesWithPleats.find(rootEdgeId);
-					if (iter == edgesWithPleats.end()){
+					if (iter == edgesWithPleats.end())
+					{
 						edgesWithPleats.insert(std::make_pair((unsigned int)rootEdgeId, EdgeWithPleats()));
 						iter = edgesWithPleats.find(rootEdgeId);
 						iter->second.vert_id_s = rootEdge.id_v_s;
@@ -2834,7 +2873,10 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 					printf("add pleat-1 %d to loop %d\n", path_i->getId(), foundLoopId);
 				} // end if vert id
 				else
+				{
+					makeCurveFromSvgCurve(cad_2d, path_i->getEdgeCoords(0), newEdgeIds[0], pixel2meter);
 					printf("add hemline %d to loop %d\n", path_i->getId(), foundLoopId);
+				}
 			} // end if foundLoopId > 0
 		} //
 	} // end for iPoly
@@ -2849,11 +2891,13 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	// collect directly usable pairs and thoses borken by pleats
 	for (const auto& eg : edgeGroups)
 	{
-		for (const auto& g1 : eg->group){
+		for (const auto& g1 : eg->group)
+		{
 			auto iter1 = svg2loopMap.find(g1.first->getId());
 			if (iter1 == svg2loopMap.end()) continue;
 			auto loop1 = iter1->second;
-			for (const auto& g2 : eg->group){
+			for (const auto& g2 : eg->group)
+			{
 				const auto& iter2 = svg2loopMap.find(g2.first->getId());
 				if (iter2 == svg2loopMap.end()) continue;
 				const auto& loop2 = iter2->second;
@@ -2873,10 +2917,12 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	// collect pleats pairs
 	for (const auto& eg : edgeGroups)
 	{
-		for (const auto& g1 : eg->group){
+		for (const auto& g1 : eg->group)
+		{
 			const auto& iter1 = pathIdToPleatsMap.find(g1.first->getId());
 			if (iter1 == pathIdToPleatsMap.end()) continue;
-			for (const auto& g2 : eg->group){
+			for (const auto& g2 : eg->group)
+			{
 				const auto& iter2 = pathIdToPleatsMap.find(g2.first->getId());
 				if (iter2 == pathIdToPleatsMap.end()) continue;
 				if (iter1->second <= iter2->second) continue;
@@ -2893,14 +2939,17 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		int edge2 = pair_iter.second;
 		auto edge1_s_iter = edgesWithPleats.find(pair_iter.first);
 		auto edge2_s_iter = edgesWithPleats.find(pair_iter.second);
-		if (edge1_s_iter == edgesWithPleats.end() && edge2_s_iter != edgesWithPleats.end()){
+		if (edge1_s_iter == edgesWithPleats.end() && edge2_s_iter != edgesWithPleats.end())
+		{
 			std::swap(edge1_s_iter, edge2_s_iter);
 			std::swap(edge1, edge2);
 		}
 		EdgeWithPleats newEdgeIdOrdered;
-		if (edge1_s_iter != edgesWithPleats.end() && edge2_s_iter == edgesWithPleats.end()){
+		if (edge1_s_iter != edgesWithPleats.end() && edge2_s_iter == edgesWithPleats.end())
+		{
 			edge1_s_iter->second.divideAnotherEdgeByThis(cad_2d, edge1, edge2, newEdgeIdOrdered);
-			for (size_t i = 0, j = 0; i < edge1_s_iter->second.splittedEdgeIdsOrdered.size(); i++){
+			for (size_t i = 0, j = 0; i < edge1_s_iter->second.splittedEdgeIdsOrdered.size(); i++)
+			{
 				if (!edge1_s_iter->second.splittedEdgeValid[i])
 					continue;
 				aIdECad_Stitch.push_back(std::make_pair(newEdgeIdOrdered.splittedEdgeIdsOrdered[j++],
@@ -2925,11 +2974,11 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	// 3. load 3D human body -----------------------------------------------------------------------
 	clothHandler_.Clear();
 	if (pCT != 0) { delete pCT; pCT = 0; }
-	obj_mesh.SetIsNormal(true);   
+	obj_mesh.SetIsNormal(true);
 	CSurfaceMeshReader cnt_mesh;
 	obj_mesh.Load_Ply("models/wm2_15k.ply");
 	cnt_mesh.Load_Ply("models/wm2_cnt.ply");
-	double c[3], w[3]; 
+	double c[3], w[3];
 	obj_mesh.GetCenterWidth(c[0], c[1], c[2], w[0], w[1], w[2]);
 	double scale = 2 / std::max(std::max(w[0], w[1]), w[2]); // debug, the person should be of 1.65 meters
 	obj_mesh.Translate(-c[0], -c[1], -c[2]);  obj_mesh.Scale(scale);  obj_mesh.Rot_Bryant(90, 0, 180);

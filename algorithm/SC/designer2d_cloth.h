@@ -49,6 +49,7 @@ public:
 		pDrawerCAD = 0;
 		pDrawerMsh = 0;
 		pAnalysis = 0;
+		ldp_disable_update = false;
 	}
 	//! destructor
 	virtual ~CDesigner2D_Cloth()
@@ -171,6 +172,7 @@ public:
 public:
 	void SetAnalysisFromSvg(CAnalysis2D_Cloth_Static* pAnalysis, svg::SvgManager* svgManager,
 		std::map<unsigned int, int>& loopId2SvgIdMap);
+	bool ldp_disable_update;
 ////////////////////ldp//////////////////////////////////////////////
 protected:
 	void InitDrawer();

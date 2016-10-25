@@ -166,7 +166,7 @@ void BaseMeshViewer::timerEvent(QTimerEvent* ev)
 		return;
 	if (ev->timerId() == m_computeTimer && m_pAnalysis && m_pListener)
 	{
-		if (!m_pListener->GetCad().isEmpty())
+		if (!m_pListener->GetCad().isEmpty() && m_pListener->ldp_disable_update == false)
 		{
 			gtime_t t1 = ldp::gtime_now();
 			m_pListener->FollowMshToCad_ifNeeded();

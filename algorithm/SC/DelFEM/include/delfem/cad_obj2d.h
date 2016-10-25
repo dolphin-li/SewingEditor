@@ -223,6 +223,14 @@ namespace Cad
 		// return false if the given points cannot be a pleat
 		bool addPleat_HemLine(Com::CVector2D p0, Com::CVector2D p1, double point_on_seg_thre,
 			unsigned int& loopId, int& mergedVertId, int& splittedEdgeId, int newEdgeIds[2]);
+		// add a corner dart: a corner dart is a triangle that has two points on an edge
+		//	here p[0], p[1], p[2] is assumed to be ordered and p[1] in the loop
+		// newEdgeIds:
+		//  [0, 1] : the splitted edges, not including splittedEdgeId
+		//  [2, 3] : the added inner edges
+		// return false if the given points cannot be a corner dart
+		bool addCornerDart(Com::CVector2D p[3], double point_on_seg_thre,
+			unsigned int& loopId, int& splittedEdgeId, int newEdgeIds[4]);
 	protected:
 		// return edge with vertex id(id_vs, id_ve) and vertex coord  
 		CEdge2D& GetEdgeRef(unsigned int id_e);

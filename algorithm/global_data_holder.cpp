@@ -30,6 +30,7 @@ void GlobalDataHolder::generateClothDebug()
 
 void GlobalDataHolder::svgToCloth()
 {
+	m_clothUiListener->ldp_disable_update = true;
 	m_clothUiListener->SetAnalysisFromSvg(m_clothManger.get(), m_svgManager.get(), m_clothLoopId2svgIdMap);
 	m_svgId2clothLoopIdMap.clear();
 	for (auto it : m_clothLoopId2svgIdMap)
@@ -42,4 +43,5 @@ void GlobalDataHolder::svgToCloth()
 	//m_clothUiListener->Solve_fromCad_InitValue();
 	//m_clothManger->PerformStaticSolver();
 	m_clothManger->SetClothPiecePlacingMode();
+	m_clothUiListener->ldp_disable_update = false;
 }

@@ -507,4 +507,15 @@ namespace svg
 		} // eg
 		return true;
 	}
+
+	float SvgPolyPath::calcAreaCornerWise()const
+	{
+		float area = 0;
+		const int n = numCorners();
+		for (int i = 0, j = n - 1; i < n; j = i++)
+		{
+			area += getCorner(j).cross(getCorner(i));
+		}
+		return area;
+	}
 }

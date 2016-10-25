@@ -105,6 +105,8 @@ namespace svg
 		const std::set<SvgEdgeGroup*>& edgeGroups()const{ return m_edgeGroups; }
 		std::set<SvgEdgeGroup*>& edgeGroups(){ return m_edgeGroups; }
 
+		// calc the area based on corners, without considering the details
+		float calcAreaCornerWise()const;
 		/// 3d related
 		ldp::Float3 get3dCenter()const{ return m_3dCenter; }
 		void set3dCenter(ldp::Float3 c){ m_3dCenter = c; }

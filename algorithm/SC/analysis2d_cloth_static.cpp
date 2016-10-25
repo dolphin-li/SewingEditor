@@ -2751,6 +2751,15 @@ struct EdgeWithPleats
 	}
 };
 
+struct EdgeWithCornerDart
+{
+	int vert_id_s;
+	int vert_id_e;
+	std::set<unsigned int> dartEdgeIds;
+	std::set<unsigned int> splittedEdgeIds;
+	EdgeWithCornerDart() : vert_id_s(0), vert_id_e(0) {}
+};
+
 void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
 	svg::SvgManager* svgManager, CSliderDeform& slider_deform,
 	std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair,
@@ -2801,6 +2810,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 			ldp::Float2 p = polyPath->getCorner(i) * pixel2meter;
 			vec_ary.push_back(Com::CVector2D(p[0], p[1]));
 		}
+
 		// this is a hack of Li-Bao-Jian's code: we are adding curved polygons,
 		// firstly we add an straight polygon, we do not want intersection test here
 		// then we make the polygon curved, and we recover the interection test
@@ -2818,12 +2828,14 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 
 	// 1.2 add non-closed polygons as pleats -------------------------------------------------------
 	std::map<unsigned int, EdgeWithPleats> edgesWithPleats;
-	std::map<unsigned int, unsigned int> newEdgesToRootSplitEdgesMap;
+	std::map<unsigned int, unsigned int> newEdgesToRootSplitEdgesMap, cornerDartPair;
 	std::map<unsigned int, int> pleatsToPathIdMap, pathIdToPleatsMap;
 	for (size_t iPoly = 0; iPoly < polyPaths.size(); iPoly++)
 	{
 		const auto& path_i = polyPaths[iPoly];
 		const auto& loop_i = polyLoops[iPoly];
+		if (loop_i.id_l_add)
+			continue; // closed loops that we have handled
 		std::vector<Com::CVector2D> pts;
 		for (size_t i = 0; i < path_i->numCorners(); i++)
 			pts.push_back(Com::CVector2D(path_i->getCorner(i)[0], path_i->getCorner(i)[1])*pixel2meter);
@@ -2870,7 +2882,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 				{
 					pleatsToPathIdMap.insert(std::make_pair(newEdgeIds[0], path_i->getId()));
 					pathIdToPleatsMap.insert(std::make_pair(path_i->getId(), newEdgeIds[0]));
-					printf("add pleat-1 %d to loop %d\n", path_i->getId(), foundLoopId);
+					printf("add pleat %d to loop %d\n", path_i->getId(), foundLoopId);
 				} // end if vert id
 				else
 				{
@@ -2878,7 +2890,39 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 					printf("add hemline %d to loop %d\n", path_i->getId(), foundLoopId);
 				}
 			} // end if foundLoopId > 0
-		} //
+		} // end if pts.size() == 2
+		else if (pts.size() == 3) // this means a corner dart
+		{
+			int splittedEdgeId = 0;
+			int newEdgeIds[4] = { 0 };
+			cad_2d.addCornerDart(pts.data(), on_segment_thre, foundLoopId, splittedEdgeId, newEdgeIds);
+			if (splittedEdgeId)
+			{
+				int rootEdgeId = splittedEdgeId;
+				const auto& rootIter = newEdgesToRootSplitEdgesMap.find(rootEdgeId);
+				if (rootIter != newEdgesToRootSplitEdgesMap.end())
+					rootEdgeId = rootIter->second;
+				const auto& rootEdge = cad_2d.GetEdge(rootEdgeId);
+				auto& iter = edgesWithPleats.find(rootEdgeId);
+				if (iter == edgesWithPleats.end())
+				{
+					edgesWithPleats.insert(std::make_pair((unsigned int)rootEdgeId, EdgeWithPleats()));
+					iter = edgesWithPleats.find(rootEdgeId);
+					iter->second.vert_id_s = rootEdge.id_v_s;
+					iter->second.vert_id_e = rootEdge.id_v_e;
+				}
+				newEdgesToRootSplitEdgesMap.insert(std::make_pair(splittedEdgeId, rootEdgeId));
+				newEdgesToRootSplitEdgesMap.insert(std::make_pair(newEdgeIds[0], rootEdgeId));
+				newEdgesToRootSplitEdgesMap.insert(std::make_pair(newEdgeIds[1], rootEdgeId));
+				iter->second.splittedEdgeIds.insert(splittedEdgeId);
+				iter->second.splittedEdgeIds.insert(newEdgeIds[0]);
+				iter->second.splittedEdgeIds.insert(newEdgeIds[1]);
+				iter->second.pleatsEdgeIds.insert(newEdgeIds[2]);
+				iter->second.pleatsEdgeIds.insert(newEdgeIds[3]);
+				cornerDartPair.insert(std::make_pair(newEdgeIds[2], newEdgeIds[3]));
+				printf("add corner dart %d to loop %d\n", path_i->getId(), foundLoopId);
+			} // end if edge id
+		} // end if pts.size() == 3
 	} // end for iPoly
 
 	// 1.2.1 make the added pleats edges ordered and compute the lenths
@@ -2932,6 +2976,13 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 			} // end for g2
 		} // end for g1
 	} // end for eg
+	// collect corner dart pairs
+	for (const auto& pair : cornerDartPair)
+	{
+		aIdECad_Stitch.push_back(pair);
+		for (auto& epiter : edgesWithPleats)
+			epiter.second.addPleatPair(cad_2d, pair.first, pair.second);
+	}
 	// collect edge pairs broken by pleats
 	for (const auto& pair_iter : loopEdgePairsBeforePleats)
 	{

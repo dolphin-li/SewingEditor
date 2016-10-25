@@ -447,8 +447,8 @@ bool CCadObj2D::CheckIsPointInsideLoop(unsigned int id_l1, const CVector2D& poin
 }
 
 
-double CCadObj2D::SignedDistPointLoop (unsigned int id_l1, const Com::CVector2D& point,
-unsigned int id_v_ignore, int* eid) const
+double CCadObj2D::SignedDistPointLoop(unsigned int id_l1, const Com::CVector2D& point,
+	unsigned int id_v_ignore, int* eid) const
 {
 	double min_sd = 0;
 	assert(m_LoopSet.IsObjID(id_l1));
@@ -471,8 +471,9 @@ unsigned int id_v_ignore, int* eid) const
 			double sd0 = DistPointItrLoop(itrl, point, &teid);
 			if (sd0 < 0) continue;
 			if (CheckIsPointInside_ItrLoop(itrl, point)) { sd0 = -sd0; }
-			if (fabs(sd0) < fabs(min_sd)) { 
-				min_sd = sd0; 
+			if (fabs(sd0) < fabs(min_sd))
+			{
+				min_sd = sd0;
 				if (eid)
 					*eid = teid;
 			}
@@ -500,8 +501,9 @@ double CCadObj2D::DistPointItrLoop(CBRepSurface::CItrLoop& itrl, const CVector2D
 		const CEdge2D& e = this->GetEdge(id_e);
 		const Com::CVector2D& v = e.GetNearestPoint(point);
 		const double d0 = Distance(v, point);
-		if (min_dist < 0 || d0 < min_dist) { 
-			min_dist = d0; 
+		if (min_dist < 0 || d0 < min_dist)
+		{
+			min_dist = d0;
 			if (eid)
 				*eid = id_e;
 		}
@@ -916,7 +918,7 @@ bool CCadObj2D::RemoveElement(Cad::CAD_ELEM_TYPE itype, unsigned int id)
 				const unsigned int ipo1 = e_tmp.id_v_e;
 				const Com::CBoundingBox2D& bb_i = e_tmp.GetBoundingBox(); // get bounding box of e_tmp
 				const std::vector<unsigned int>& aIdE = m_BRep.GetAryElemID(Cad::EDGE);
-				for (unsigned int ije = 0; ije<aIdE.size(); ije++)
+				for (unsigned int ije = 0; ije < aIdE.size(); ije++)
 				{
 					const unsigned int id_je = aIdE[ije];
 					if (id_je == id_e2 || id_je == id_e1) continue;
@@ -1005,7 +1007,7 @@ CCadObj2D::CResAddPolygon  Cad::CCadObj2D::AddPolygon(const std::vector<Com::CVe
 	for (unsigned int iedge = 0; iedge < npoint - 1; iedge++)
 	{
 		unsigned int id_e0 = this->ConnectVertex_Line(res.aIdV[iedge], res.aIdV[iedge + 1]).id_e_add;
-		if (id_e0 == 0) 
+		if (id_e0 == 0)
 			goto FAIL_ADD_POLYGON_INSIDE_LOOP;
 		res.aIdE.push_back(id_e0);
 	}
@@ -1251,7 +1253,7 @@ bool Cad::CCadObj2D::SetCurve_Polyline(unsigned int id_e, const std::vector<Com:
 	for (unsigned int iid_l = 0; iid_l < aID_Loop.size(); iid_l++)
 	{
 		unsigned int id_l = aID_Loop[iid_l];
-		if (this->CheckLoop(id_l) != 0) 
+		if (this->CheckLoop(id_l) != 0)
 			goto FAILURE;
 	}
 	return true;
@@ -1636,7 +1638,8 @@ bool CCadObj2D::addPleat_HemLine(Com::CVector2D p0, Com::CVector2D p1, double po
 		Cad::CEdge2D* p_edges[2] = { 0 };
 		double dists[2] = { 0 }, p_dists_s[2] = { 0 }, p_dists_e[2] = { 0 };
 		bool p_on[2] = { false }, p_in[2] = { false };
-		for (int k = 0; k < 2; k++){
+		for (int k = 0; k < 2; k++)
+		{
 			dists[k] = SignedDistPointLoop(loopId, p[k], 0, &p_eids[k]);
 			p_edges[k] = &GetEdgeRef(p_eids[k]);
 			p_dists_s[k] = (p_edges[k]->po_s - p[k]).Length();
@@ -1650,12 +1653,14 @@ bool CCadObj2D::addPleat_HemLine(Com::CVector2D p0, Com::CVector2D p1, double po
 		foundLoopId = loopId;
 
 		// pleat
-		if ((p_on[0] && p_in[1]) || (p_on[1] && p_in[0])){
+		if ((p_on[0] && p_in[1]) || (p_on[1] && p_in[0]))
+		{
 			int i[2] = { 0, 1 };
 			if (p_on[1]) std::swap(i[0], i[1]);
 			auto v1 = AddVertex(Cad::LOOP, foundLoopId, p[i[1]]);
 			assert(v1.id_v_add);
-			if (std::min(p_dists_e[i[0]], p_dists_s[i[0]]) > point_on_seg_thre){
+			if (std::min(p_dists_e[i[0]], p_dists_s[i[0]]) > point_on_seg_thre)
+			{
 				auto v0 = AddVertex(Cad::EDGE, p_eids[i[0]], p[i[0]]);
 				assert(v0.id_v_add && v0.id_e_add);
 				auto e01 = ConnectVertex_Line(v0.id_v_add, v1.id_v_add);
@@ -1664,7 +1669,8 @@ bool CCadObj2D::addPleat_HemLine(Com::CVector2D p0, Com::CVector2D p1, double po
 				newEdgeIds[0] = v0.id_e_add;
 				newEdgeIds[1] = e01.id_e_add;
 			}
-			else{
+			else
+			{
 				int v0_id = p_edges[i[0]]->id_v_s;
 				if (p_dists_e[i[0]] < p_dists_s[i[0]])
 					v0_id = p_edges[i[0]]->id_v_e;
@@ -1673,6 +1679,7 @@ bool CCadObj2D::addPleat_HemLine(Com::CVector2D p0, Com::CVector2D p1, double po
 				mergedVertId = v0_id;
 				newEdgeIds[0] = e01.id_e_add;
 			}
+			return true;
 		} // end if p0_on and p1_in
 		// hemline
 		if (p_on[0] && p_on[1])
@@ -1721,7 +1728,93 @@ bool CCadObj2D::addPleat_HemLine(Com::CVector2D p0, Com::CVector2D p1, double po
 			edge_between.po_s = p[0];
 			edge_between.po_e = p[1];
 			newEdgeIds[0] = eid_between;
+			return true;
 		} // end if p1_on and p0_on
+	} // end for loopId
+
+	return false;
+}
+
+bool CCadObj2D::addCornerDart(Com::CVector2D p[3], double point_on_seg_thre,
+	unsigned int& foundLoopId, int& splittedEdgeId, int newEdgeIds[4])
+{
+	foundLoopId = 0;
+	splittedEdgeId = 0;
+
+	const auto loopIds = m_LoopSet.GetAry_ObjID();
+	for (auto loopId : loopIds)
+	{
+		int p_eids[3] = { 0 };
+		double p_dists_s[3] = { 0 };
+		bool p_on[3] = { false }, p_in[3] = { false };
+		for (int k = 0; k < 3; k++)
+		{
+			auto d = SignedDistPointLoop(loopId, p[k], 0, &p_eids[k]);
+			const auto& e = GetEdgeRef(p_eids[k]);
+			p_dists_s[k] = (e.po_s - p[k]).Length();
+			p_on[k] = abs(d) < point_on_seg_thre;
+			p_in[k] = p_on[k] ? false : d > point_on_seg_thre;
+		} // k
+
+		if (!(p_on[0] && p_on[2] && p_in[1]))
+			continue;
+		if (p_eids[0] != p_eids[2])
+			continue;
+
+		// change the order of points based on their loop direction
+		unsigned int id_l1_l, id_l1_r;
+		GetIdLoop_Edge(id_l1_l, id_l1_r, p_eids[0]);
+		if (id_l1_l == 0)
+		{
+			if (p_dists_s[0] > p_dists_s[2])
+			{
+				std::swap(p[0], p[2]);
+				std::swap(p_dists_s[0], p_dists_s[2]);
+			}
+		}
+		else
+		{
+			if (p_dists_s[0] < p_dists_s[2])
+			{
+				std::swap(p[0], p[2]);
+				std::swap(p_dists_s[0], p_dists_s[2]);
+			}
+		}
+
+		foundLoopId = loopId;
+		splittedEdgeId = p_eids[0];
+		unsigned int v_s = GetEdge(p_eids[0]).id_v_s;
+
+		// add new vertices and split edges
+		Cad::CCadObj2D::CResAddVertex v[3];
+		v[1] = AddVertex(Cad::LOOP, foundLoopId, p[1]);
+		assert(v[1].id_v_add);
+		if (v[1].id_v_add == 0)
+			continue;
+		v[0] = AddVertex(Cad::EDGE, p_eids[0], p[0]);
+		assert(v[0].id_v_add);
+		if (v[0].id_v_add == 0)
+			continue;
+		v[2] = AddVertex(Cad::EDGE, p_eids[2], p[2]);
+		if (v[2].id_v_add == 0)
+			v[2] = AddVertex(Cad::EDGE, v[0].id_e_add, p[2]);
+		assert(v[2].id_v_add);
+		if (v[2].id_v_add == 0)
+			continue;
+
+		// output the splitted two new edges
+		newEdgeIds[0] = v[0].id_e_add;
+		newEdgeIds[1] = v[2].id_e_add;
+
+		// connect inner edges
+		auto e10 = ConnectVertex_Line(v[0].id_v_add, v[1].id_v_add);
+		assert(e10.id_e_add);
+		auto e12 = ConnectVertex_Line(v[2].id_v_add, v[1].id_v_add);
+		assert(e12.id_e_add);
+		newEdgeIds[2] = e10.id_e_add;
+		newEdgeIds[3] = e12.id_e_add;
+
+		return true;
 	} // end for loopId
 
 	return false;

@@ -2681,6 +2681,8 @@ struct EdgeWithPleats
 
 	static bool isSameDir(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh, int id_e1, int id_e2)
 	{
+		
+
 		bool is_left1 = true;
 		{
 			unsigned int id_l1_l, id_l1_r;
@@ -3048,19 +3050,20 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	((CContactTarget3D_AdaptiveDistanceField3D*)pCT)->BuildMarchingCubeEdge();
 
 	// 4. place 3D cloth pieces -------------------------------------------------------------
-	for (size_t i = 0; i < polyLoops.size(); i++)
+	for (size_t iLoop = 0; iLoop < polyLoops.size(); iLoop++)
 	{
-		const auto& polyLoop = polyLoops[i];
-		auto p = polyCenters[i] * pixel2meter;
-		auto c = poly3dCenters[i] * pixel2meter;
-		auto r = poly3dRots[i].toRotationMatrix3();
-		if (polyLoop.id_l_add)
-		{
-			clothHandler_.AddClothPiece(polyLoop.id_l_add, p[0], p[1]);
-			clothHandler_.Transform_Cloth_Pan(polyLoop.id_l_add, c[0], c[1], c[2]);
-			clothHandler_.Transform_Cloth_Rot(polyLoop.id_l_add, r, true);
-		}
-	}
+		const auto& polyLoop = polyLoops[iLoop];
+		if (!polyLoop.id_l_add) continue;
+		const auto& path = polyPaths[iLoop];
+		auto p = polyCenters[iLoop] * pixel2meter;
+		auto c = poly3dCenters[iLoop] * pixel2meter;
+		auto r = poly3dRots[iLoop].toRotationMatrix3();
+
+		clothHandler_.AddClothPiece(polyLoop.id_l_add, p[0], p[1]);
+		clothHandler_.Transform_Cloth_Pan(polyLoop.id_l_add, c[0], c[1], c[2]);
+		clothHandler_.Transform_Cloth_Rot(polyLoop.id_l_add, r, true);
+		
+	} // end for iLoop
 
 	// 5. finally, other parameters --------------------------------------------------------
 	cur_time_ = 0;

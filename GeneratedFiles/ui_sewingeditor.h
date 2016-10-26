@@ -49,6 +49,7 @@ public:
     QAction *actionRedo;
     QAction *actionSelect_connected;
     QAction *actionRemove_selected_corner;
+    QAction *actionSplit_selected_edge;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     SvgViewer *widget;
@@ -194,6 +195,8 @@ public:
         actionSelect_connected->setObjectName(QStringLiteral("actionSelect_connected"));
         actionRemove_selected_corner = new QAction(SewingEditorClass);
         actionRemove_selected_corner->setObjectName(QStringLiteral("actionRemove_selected_corner"));
+        actionSplit_selected_edge = new QAction(SewingEditorClass);
+        actionSplit_selected_edge->setObjectName(QStringLiteral("actionSplit_selected_edge"));
         centralWidget = new QWidget(SewingEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -424,6 +427,7 @@ public:
         menuPath->addAction(actionSplit_selected_path);
         menuPath->addAction(actionMerge_selected_path);
         menuPath->addAction(actionRemove_selected_corner);
+        menuPath->addAction(actionSplit_selected_edge);
         menuOp->addAction(actionUndo);
         menuOp->addAction(actionRedo);
 
@@ -465,6 +469,8 @@ public:
         actionSelect_connected->setText(QApplication::translate("SewingEditorClass", "select connected", 0));
         actionRemove_selected_corner->setText(QApplication::translate("SewingEditorClass", "remove selected Edge corner", 0));
         actionRemove_selected_corner->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+E", 0));
+        actionSplit_selected_edge->setText(QApplication::translate("SewingEditorClass", "Split selected edge", 0));
+        actionSplit_selected_edge->setShortcut(QApplication::translate("SewingEditorClass", "S", 0));
         menuFile->setTitle(QApplication::translate("SewingEditorClass", "file", 0));
         menuSelection->setTitle(QApplication::translate("SewingEditorClass", "selection", 0));
         menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));

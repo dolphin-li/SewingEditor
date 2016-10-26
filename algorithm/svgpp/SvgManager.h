@@ -95,6 +95,7 @@ namespace svg
 		void removeSelected();
 		void removeSingleNodeAndEmptyNode();
 		bool removeSelectedPolyCorners(); // return true if actually remove some corners
+		bool splitSelectedPolyEdgeByMidPoint();// return true if actually add some corners
 
 		///// path operations
 		void splitSelectedPath(); // split selected, non-closed paths

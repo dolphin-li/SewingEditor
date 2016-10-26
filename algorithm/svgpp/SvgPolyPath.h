@@ -39,6 +39,7 @@ namespace svg
 		void findCorners();
 		void setCorners(std::vector<int>& cns);
 		bool removeSelectedCorners(); // return true if actually remove some corners
+		bool splitSelectedEdgeMidPoint();
 
 		bool isClosed()const;
 		void makeClosed();
@@ -118,6 +119,7 @@ namespace svg
 		void configNvParams();
 		void updateEdgeRenderData();
 		bool removeCorner(int corner_arrayId);
+		bool splitSelectedEdgeMidPoint(int edge_arrayId);
 	protected:
 		std::vector<int> m_cornerPos;
 		std::set<int> m_selectedCorner_arrayIds;

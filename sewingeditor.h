@@ -35,6 +35,7 @@ public:
 	void leftDocButtonsClicked(int i); 
 	void on_pbGenerateMesh_clicked();
 	void on_actionRemove_selected_corner_triggered();
+	void on_actionSplit_selected_edge_triggered();
 protected:
 	void dragEnterEvent(QDragEnterEvent* ev);
 	void dropEvent(QDropEvent* ev);

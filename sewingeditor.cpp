@@ -920,12 +920,29 @@ void SewingEditor::on_actionRemove_selected_corner_triggered()
 	{
 		ui.widget->getSvgManager()->removeSelectedPolyCorners();
 		ui.widget->updateGL();
+		pushHistory("remove selected corners");
 	}
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
 	}
 	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void SewingEditor::on_actionSplit_selected_edge_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->splitSelectedPolyEdgeByMidPoint();
+		ui.widget->updateGL();
+		pushHistory("remove selected edges");
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
 	{
 		std::cout << "unknown error" << std::endl;
 	}

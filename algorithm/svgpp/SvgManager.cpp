@@ -1887,6 +1887,29 @@ namespace svg
 
 		return re;
 	}
+
+	bool SvgManager::splitSelectedPolyEdgeByMidPoint()
+	{
+		bool re = false;
+		for (auto layer : m_layers)
+		{
+			if (!layer.second->selected)
+				continue;
+			bool lyre = false;
+			auto rootPtr = (SvgGroup*)layer.second->root.get();
+			std::vector<std::shared_ptr<SvgAbstractObject>> polys;
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, polys, true);
+			for (auto poly : polys)
+			if (((SvgPolyPath*)poly.get())->splitSelectedEdgeMidPoint())
+				lyre = true;
+
+			if (!lyre) continue;
+			if (lyre)
+				re = true;
+		} // end for layer
+
+		return re;
+	}
 	//////////////////////////////////////////////////////////////////
 	/// layer related
 	SvgManager::Layer* SvgManager::addLayer(std::string name)

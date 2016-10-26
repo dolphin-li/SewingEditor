@@ -92,6 +92,12 @@ void CStitchAry::AddStitch(const Cad::CCadObj2D& cad_2d, const Msh::CMesher2D& m
 	aStitch.push_back(CStitch(id_e1, id_e2, dir));
 }
 
+void CStitchAry::AddStitch(const Cad::CCadObj2D& cad_2d, const Msh::CMesher2D& mesh_2d, 
+	unsigned int id_e1, unsigned int id_e2, bool sameDir)
+{
+	aStitch.push_back(CStitch(id_e1, id_e2, sameDir));
+}
+
 void CStitchAry::AddLinSys_BackwardEular(double dt, double& se,
 	Fem::Ls::CLinearSystem_Field& ls,
 	unsigned int id_field_disp,

@@ -28,7 +28,10 @@ public:
   void Clear(){ aStitch.clear(); }  
   void SetStiff(double val){ this->stitch_stiff = val; }
   void SetDampingCoeff(double val){ this->stitch_damp_coeff = val; }
-  void AddStitch(const Cad::CCadObj2D& cad_2d, const Msh::CMesher2D& mesh_2d, unsigned int id_e1, unsigned int id_e2);
+  void AddStitch(const Cad::CCadObj2D& cad_2d, const Msh::CMesher2D& mesh_2d, 
+	  unsigned int id_e1, unsigned int id_e2);
+  void AddStitch(const Cad::CCadObj2D& cad_2d, const Msh::CMesher2D& mesh_2d, 
+	  unsigned int id_e1, unsigned int id_e2, bool sameDir);
   void CopyCADSituation(const CStitchAry& sa);
   void AddLinSys_BackwardEular(double dt, double& se,                                
                                Fem::Ls::CLinearSystem_Field& ls,

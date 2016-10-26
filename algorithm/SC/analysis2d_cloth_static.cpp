@@ -2679,7 +2679,7 @@ struct EdgeWithPleats
 		}
 	}
 
-	static bool isSameDir(Cad::CCadObj2D_Move& cad_2d, int id_e1, int id_e2)
+	static bool isSameDir(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh, int id_e1, int id_e2)
 	{
 		bool is_left1 = true;
 		{
@@ -2701,10 +2701,10 @@ struct EdgeWithPleats
 		return dir;
 	}
 
-	void divideAnotherEdgeByThis(Cad::CCadObj2D_Move& cad, int this_edge_id,
-		int other_edge_id, EdgeWithPleats& newEdgeIdOrdered)const
+	void divideAnotherEdgeByThis(Cad::CCadObj2D_Move& cad, Msh::CMesher2D& mesh,
+		int this_edge_id, int other_edge_id, EdgeWithPleats& newEdgeIdOrdered, bool& sameDir)const
 	{
-		bool dir = isSameDir(cad, this_edge_id, other_edge_id);
+		sameDir = isSameDir(cad, mesh, this_edge_id, other_edge_id);
 		std::vector<float> sumLens;
 		sumLens.push_back(0);
 		for (size_t i = 0; i < splittedEdgeLengths.size(); i++)
@@ -2720,7 +2720,7 @@ struct EdgeWithPleats
 		newEdgeIdOrdered.vert_id_e = edge.id_v_e;
 		auto po_s = edge.po_s;
 		auto po_e = edge.po_e;
-		if (!dir) std::swap(po_s, po_e);
+		if (!sameDir) std::swap(po_s, po_e);
 		for (size_t i = 1; i < sumLens.size() - 1; i++)
 		{
 			float s = sumLens[i] / sumLens.back();
@@ -2739,7 +2739,7 @@ struct EdgeWithPleats
 			newEdgeIdOrdered.splittedEdgeIds.insert(res.id_e_add);
 		}
 		newEdgeIdOrdered.makeOrdered(cad);
-		if (!dir)
+		if (!sameDir)
 		{
 			auto tmp = newEdgeIdOrdered.splittedEdgeIdsOrdered;
 			std::copy(tmp.begin(), tmp.end(), newEdgeIdOrdered.splittedEdgeIdsOrdered.rbegin());
@@ -2749,15 +2749,6 @@ struct EdgeWithPleats
 			std::copy(tmp2.begin(), tmp2.end(), newEdgeIdOrdered.splittedEdgeValid.rbegin());
 		}
 	}
-};
-
-struct EdgeWithCornerDart
-{
-	int vert_id_s;
-	int vert_id_e;
-	std::set<unsigned int> dartEdgeIds;
-	std::set<unsigned int> splittedEdgeIds;
-	EdgeWithCornerDart() : vert_id_s(0), vert_id_e(0) {}
 };
 
 void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
@@ -2931,7 +2922,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 
 	// 1.3 make stitchings -------------------------------------------------------------------------
 	std::vector< std::pair<unsigned int, unsigned int> > loopEdgePairsBeforePleats;
-	std::vector< std::pair<unsigned int, unsigned int> > aIdECad_Stitch;
+	std::vector< std::tuple<unsigned int, unsigned int, bool > > aIdECad_Stitch;
 	// collect directly usable pairs and thoses borken by pleats
 	for (const auto& eg : edgeGroups)
 	{
@@ -2952,7 +2943,10 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 				const auto& edge1_s_iter = edgesWithPleats.find(edge1);
 				const auto& edge2_s_iter = edgesWithPleats.find(edge2);
 				if (edge1_s_iter == edgesWithPleats.end() && edge2_s_iter == edgesWithPleats.end())
-					aIdECad_Stitch.push_back(std::make_pair(edge1, edge2));
+				{
+					bool sameDir = EdgeWithPleats::isSameDir(cad_2d, mesh_2d, edge1, edge2);
+					aIdECad_Stitch.push_back(std::make_tuple(edge1, edge2, sameDir));
+				}
 				else
 					loopEdgePairsBeforePleats.push_back(std::make_pair(edge1, edge2));
 			} // end for g2
@@ -2970,7 +2964,8 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 				const auto& iter2 = pathIdToPleatsMap.find(g2.first->getId());
 				if (iter2 == pathIdToPleatsMap.end()) continue;
 				if (iter1->second <= iter2->second) continue;
-				aIdECad_Stitch.push_back(std::make_pair(iter1->second, iter2->second));
+				bool sameDir = EdgeWithPleats::isSameDir(cad_2d, mesh_2d, iter1->second, iter2->second);
+				aIdECad_Stitch.push_back(std::make_tuple(iter1->second, iter2->second, sameDir));
 				for (auto& epiter : edgesWithPleats)
 					epiter.second.addPleatPair(cad_2d, iter1->second, iter2->second);
 			} // end for g2
@@ -2979,7 +2974,8 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	// collect corner dart pairs
 	for (const auto& pair : cornerDartPair)
 	{
-		aIdECad_Stitch.push_back(pair);
+		bool sameDir = EdgeWithPleats::isSameDir(cad_2d, mesh_2d, pair.second, pair.second);
+		aIdECad_Stitch.push_back(std::make_tuple(pair.second, pair.second, sameDir));
 		for (auto& epiter : edgesWithPleats)
 			epiter.second.addPleatPair(cad_2d, pair.first, pair.second);
 	}
@@ -2998,13 +2994,14 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		EdgeWithPleats newEdgeIdOrdered;
 		if (edge1_s_iter != edgesWithPleats.end() && edge2_s_iter == edgesWithPleats.end())
 		{
-			edge1_s_iter->second.divideAnotherEdgeByThis(cad_2d, edge1, edge2, newEdgeIdOrdered);
+			bool sameDir = true;
+			edge1_s_iter->second.divideAnotherEdgeByThis(cad_2d, mesh_2d, edge1, edge2, newEdgeIdOrdered, sameDir);
 			for (size_t i = 0, j = 0; i < edge1_s_iter->second.splittedEdgeIdsOrdered.size(); i++)
 			{
 				if (!edge1_s_iter->second.splittedEdgeValid[i])
 					continue;
-				aIdECad_Stitch.push_back(std::make_pair(newEdgeIdOrdered.splittedEdgeIdsOrdered[j++],
-					edge1_s_iter->second.splittedEdgeIdsOrdered[i]));
+				aIdECad_Stitch.push_back(std::make_tuple(newEdgeIdOrdered.splittedEdgeIdsOrdered[j++],
+					edge1_s_iter->second.splittedEdgeIdsOrdered[i], sameDir));
 			}
 		}
 	} // end for loopEdgePairsBeforePleats
@@ -3016,9 +3013,8 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 
 	for (unsigned int ist = 0; ist < aIdECad_Stitch.size(); ist++)
 	{
-		const unsigned int id_e1 = aIdECad_Stitch[ist].first;
-		const unsigned int id_e2 = aIdECad_Stitch[ist].second;
-		stitch_ary_.AddStitch(cad_2d, mesh_2d, id_e1, id_e2);
+		stitch_ary_.AddStitch(cad_2d, mesh_2d, std::get<0>(aIdECad_Stitch[ist]), 
+			std::get<1>(aIdECad_Stitch[ist]), std::get<2>(aIdECad_Stitch[ist]));
 	}
 	std::cout << "stitch size : " << stitch_ary_.aStitch.size() << std::endl;
 

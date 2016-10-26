@@ -225,6 +225,13 @@ public:
 		svg::SvgManager* svgManager, CSliderDeform& slider_deform,
 		std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair,
 		std::map<unsigned int, int>& loopId2svgIdMap);
+	protected:
+		struct SelfStichLoop
+		{
+			std::vector<std::tuple<unsigned int, unsigned int, bool>> selfStiches;
+		};
+		std::map<unsigned int, SelfStichLoop> m_selfStichLoops;
+		void makeSelfStichedCylinder();
 private:
 	void ClearDetailField();
 	void MakeDetailField(const Cad::CCadObj2D& cad_2d, const Msh::CMesher2D& mesh_2d);

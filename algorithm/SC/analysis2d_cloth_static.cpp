@@ -2512,6 +2512,10 @@ static unsigned int MakeHingeField_Tri(Fem::Field::CFieldWorld& world, unsigned 
 }
 
 ////////////////////////////////////////////////////////////ldp////////////////////////////////////////////////////
+void CAnalysis2D_Cloth_Static::makeSelfStichedCylinder()
+{
+
+}
 
 static void makeCurveFromSvgCurve(Cad::CCadObj2D_Move& cad_2d, const std::vector<float>& pathCoords, 
 	int eid, float pixel2meter)
@@ -2766,6 +2770,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	slider_deform.Clear();
 	aSymIdVPair.clear();
 	loopId2svgIdMap.clear();
+	m_selfStichLoops.clear();
 
 	// 1. create 2D pieces from svg ------------------------------------------------------------
 	auto polyPaths = svgManager->collectPolyPaths(true);
@@ -2940,14 +2945,25 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 				const auto& loop2 = iter2->second;
 				if (loop1->id_l_add < loop2->id_l_add) continue;
 				if (loop1->id_l_add == loop2->id_l_add && g1.second <= g2.second) continue;
-				int edge1 = loop1->aIdE[g1.second];
-				int edge2 = loop2->aIdE[g2.second];
+				unsigned int edge1 = loop1->aIdE[g1.second];
+				unsigned int edge2 = loop2->aIdE[g2.second];
 				const auto& edge1_s_iter = edgesWithPleats.find(edge1);
 				const auto& edge2_s_iter = edgesWithPleats.find(edge2);
 				if (edge1_s_iter == edgesWithPleats.end() && edge2_s_iter == edgesWithPleats.end())
 				{
 					bool sameDir = EdgeWithPleats::isSameDir(cad_2d, mesh_2d, edge1, edge2);
 					aIdECad_Stitch.push_back(std::make_tuple(edge1, edge2, sameDir));
+					// the two edges are stiched inside the same loop, this possibly means a cylinder initialization
+					if (loop1->id_l_add == loop2->id_l_add)
+					{
+						auto& iter = m_selfStichLoops.find(loop1->id_l_add);
+						if (iter == m_selfStichLoops.end())
+						{
+							m_selfStichLoops.insert(std::make_pair(loop1->id_l_add, SelfStichLoop()));
+							iter = m_selfStichLoops.find(loop1->id_l_add);
+						}
+						iter->second.selfStiches.push_back(aIdECad_Stitch.back());
+					}
 				}
 				else
 					loopEdgePairsBeforePleats.push_back(std::make_pair(edge1, edge2));
@@ -2977,17 +2993,22 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	for (const auto& pair : cornerDartPair)
 	{
 		bool sameDir = EdgeWithPleats::isSameDir(cad_2d, mesh_2d, pair.second, pair.second);
-		aIdECad_Stitch.push_back(std::make_tuple(pair.second, pair.second, sameDir));
+		aIdECad_Stitch.push_back(std::make_tuple(pair.first, pair.second, sameDir));
 		for (auto& epiter : edgesWithPleats)
 			epiter.second.addPleatPair(cad_2d, pair.first, pair.second);
 	}
 	// collect edge pairs broken by pleats
 	for (const auto& pair_iter : loopEdgePairsBeforePleats)
 	{
-		int edge1 = pair_iter.first;
-		int edge2 = pair_iter.second;
+		unsigned int edge1 = pair_iter.first;
+		unsigned int edge2 = pair_iter.second;
 		auto edge1_s_iter = edgesWithPleats.find(pair_iter.first);
 		auto edge2_s_iter = edgesWithPleats.find(pair_iter.second);
+		unsigned int loop1, loop2, loop_tmpl, loop_tmpr;
+		cad_2d.GetIdLoop_Edge(loop_tmpl, loop_tmpr, edge1);
+		loop1 = loop_tmpl ? loop_tmpl : loop_tmpr;
+		cad_2d.GetIdLoop_Edge(loop_tmpl, loop_tmpr, edge2);
+		loop2 = loop_tmpl ? loop_tmpl : loop_tmpr;
 		if (edge1_s_iter == edgesWithPleats.end() && edge2_s_iter != edgesWithPleats.end())
 		{
 			std::swap(edge1_s_iter, edge2_s_iter);
@@ -3004,6 +3025,17 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 					continue;
 				aIdECad_Stitch.push_back(std::make_tuple(newEdgeIdOrdered.splittedEdgeIdsOrdered[j++],
 					edge1_s_iter->second.splittedEdgeIdsOrdered[i], sameDir));
+				// the two edges are stiched inside the same loop, this possibly means a cylinder initialization
+				if (loop1 == loop2)
+				{
+					auto& iter = m_selfStichLoops.find(loop1);
+					if (iter == m_selfStichLoops.end())
+					{
+						m_selfStichLoops.insert(std::make_pair(loop1, SelfStichLoop()));
+						iter = m_selfStichLoops.find(loop1);
+					}
+					iter->second.selfStiches.push_back(aIdECad_Stitch.back());
+				}
 			}
 		}
 	} // end for loopEdgePairsBeforePleats

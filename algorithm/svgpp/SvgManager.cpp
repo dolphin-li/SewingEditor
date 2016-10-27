@@ -197,6 +197,7 @@ namespace svg
 					if (c3.length() == 0) c3 = ldp::Float3((bd.x + bd.z) / 2, (bd.y + bd.w) / 2, 0);
 					poly->set3dCenter(ldp::Float3(c3[0], c3[1], c3[2]));
 					poly->set3dRot(q);
+					poly->setCylinderDir(shape->getPath()->ldp_poly_cylinder_dir);
 				}
 				else
 					path = new SvgPath();

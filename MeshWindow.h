@@ -17,6 +17,7 @@ public:
 	public slots:
 	void leftDocButtonsClicked(int i);
 	void on_cbThickness_currentTextChanged(const QString& s);
+	void on_pbInverseCylinder_clicked();
 protected:
 	void dragEnterEvent(QDragEnterEvent* ev);
 	void dropEvent(QDropEvent* ev);

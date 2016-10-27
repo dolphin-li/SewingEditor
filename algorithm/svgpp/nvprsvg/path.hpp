@@ -93,6 +93,7 @@ public:
 	std::vector<int> ldp_corner_ids;
 	float ldp_poly_3dCenter[3];
 	float ldp_poly_3dRot[4];
+	bool ldp_poly_cylinder_dir;
 
     Path(const PathStyle &style, const char *string);
     Path(const PathStyle &style, const vector<char> &cmds, const vector<float> &coords);

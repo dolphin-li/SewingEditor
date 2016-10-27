@@ -217,9 +217,11 @@ public:
 	bool Pick(ldp::Double2 screenPos, const ldp::Camera& cam,
 		ldp::UInt3& picked_ele_nodes, ldp::Double3& picked_elem_ratio,
 		unsigned int& id_l, ldp::Double3& pickedScreenPos);
-	const CClothHandler& getClothHandle(){ return clothHandler_; }
+	const CClothHandler& getClothHandle()const { return clothHandler_; }
+	CClothHandler& getClothHandle() { return clothHandler_; }
 	const Fem::Field::CFieldWorld& getWorld()const{ return world; }
-	const unsigned int get_id_field_base()const{ return id_field_base; }
+	const unsigned int get_id_field_base()const { return id_field_base; }
+	const unsigned int get_id_field_disp()const { return id_field_disp; }
 
 	void SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
 		svg::SvgManager* svgManager, CSliderDeform& slider_deform,
@@ -231,7 +233,6 @@ public:
 			std::vector<std::tuple<unsigned int, unsigned int, bool>> selfStiches;
 		};
 		std::map<unsigned int, SelfStichLoop> m_selfStichLoops;
-		void makeSelfStichedCylinder();
 private:
 	void ClearDetailField();
 	void MakeDetailField(const Cad::CCadObj2D& cad_2d, const Msh::CMesher2D& mesh_2d);

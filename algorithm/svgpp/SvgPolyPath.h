@@ -113,6 +113,8 @@ namespace svg
 		void set3dCenter(ldp::Float3 c){ m_3dCenter = c; }
 		ldp::QuaternionF get3dRot()const{ return m_3dRot; }
 		void set3dRot(ldp::QuaternionF r){ m_3dRot = r; }
+		bool getCylinderDir()const { return m_cylinderDir; }
+		void setCylinderDir(bool b) { m_cylinderDir = b; }
 	protected:
 		void cacheNvPaths();
 		void renderSelection(bool idxMode = false);
@@ -136,5 +138,6 @@ namespace svg
 		// info for 3D placement
 		ldp::Float3 m_3dCenter;
 		ldp::QuaternionF m_3dRot;
+		bool m_cylinderDir;
 	};
 }

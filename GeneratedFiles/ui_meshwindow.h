@@ -22,6 +22,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QWidget>
 #include "basemeshviewer.h"
@@ -45,6 +46,7 @@ public:
     QGridLayout *gridLayout_2;
     QLabel *label;
     QComboBox *cbThickness;
+    QPushButton *pbInverseCylinder;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -101,6 +103,11 @@ public:
 
         gridLayout_3->addWidget(groupBox, 0, 0, 1, 1);
 
+        pbInverseCylinder = new QPushButton(dockWidgetRightContents);
+        pbInverseCylinder->setObjectName(QStringLiteral("pbInverseCylinder"));
+
+        gridLayout_3->addWidget(pbInverseCylinder, 1, 0, 1, 1);
+
         dockWidgetRight->setWidget(dockWidgetRightContents);
         MeshWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
         dockWidgetLeft = new QDockWidget(MeshWindow);
@@ -139,6 +146,7 @@ public:
          << QApplication::translate("MeshWindow", "very thin", 0)
         );
         cbThickness->setCurrentText(QApplication::translate("MeshWindow", "thin", 0));
+        pbInverseCylinder->setText(QApplication::translate("MeshWindow", "inverse cylinder", 0));
     } // retranslateUi
 
 };

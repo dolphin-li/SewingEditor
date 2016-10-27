@@ -163,6 +163,7 @@ Path::Path(const vector<char> &cmds, const vector<float> &coords)
     , cmd(cmds)
 	, coord(coords)
 	, ldp_poly_id(-1)
+	, ldp_poly_cylinder_dir(false)
 {
     owner = this;
 	memset(ldp_poly_3dCenter, 0, sizeof(ldp_poly_3dCenter));
@@ -176,6 +177,7 @@ Path::Path(const PathStyle &s, const vector<char> &cmds, const vector<float> &co
     , coord(coords)
 	, style(s)
 	, ldp_poly_id(-1)
+	, ldp_poly_cylinder_dir(false)
 {
 	memset(ldp_poly_3dCenter, 0, sizeof(ldp_poly_3dCenter));
 	memset(ldp_poly_3dRot, 0, sizeof(ldp_poly_3dRot));
@@ -185,6 +187,7 @@ Path::Path(const char *string)
     : HasRendererState<Path>(this)
 	, has_logical_bbox(false)
 	, ldp_poly_id(-1)
+	, ldp_poly_cylinder_dir(false)
 {
     int ok = parse_svg_path(string, cmd, coord);
     if (!ok) {
@@ -201,6 +204,7 @@ Path::Path(const PathStyle &s, const char *string)
     , has_logical_bbox(false)
     , style(s)
 	, ldp_poly_id(-1)
+	, ldp_poly_cylinder_dir(false)
 {
     int ok = parse_svg_path(string, cmd, coord);
     if (!ok) {

@@ -573,12 +573,12 @@ std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair)
 			clothHandler_.Transform_Cloth_Pan(id_l3, +0.3*1.6, +0.0, +0.3*1.6);
 			clothHandler_.Transform_Cloth_RotBryantAngle(id_l3, 0, 0, -30);
 			//    clothHandler_.Transform_Cloth_RotBryantAngle(id_l3, 0, 0, 0);           
-			clothHandler_.SetRadius(id_l3, 0.09*1.6);
+			clothHandler_.SetRadius(id_l3, 0.09*1.6, false);
 			////
 			clothHandler_.AddClothPiece(id_l4, +0.65*1.6, -0.5*1.6);
 			clothHandler_.Transform_Cloth_Pan(id_l4, -0.3*1.6, +0.0, +0.3*1.6);
 			clothHandler_.Transform_Cloth_RotBryantAngle(id_l4, 0, 0, +30);
-			clothHandler_.SetRadius(id_l4, 0.09*1.6);
+			clothHandler_.SetRadius(id_l4, 0.09*1.6, false);
 		}
 		////////
 		const unsigned int is1 = slider_deform.AddSlider("length", 0, 0, 1);
@@ -2512,10 +2512,6 @@ static unsigned int MakeHingeField_Tri(Fem::Field::CFieldWorld& world, unsigned 
 }
 
 ////////////////////////////////////////////////////////////ldp////////////////////////////////////////////////////
-void CAnalysis2D_Cloth_Static::makeSelfStichedCylinder()
-{
-
-}
 
 static void makeCurveFromSvgCurve(Cad::CCadObj2D_Move& cad_2d, const std::vector<float>& pathCoords, 
 	int eid, float pixel2meter)
@@ -3096,6 +3092,29 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 		clothHandler_.Transform_Cloth_Rot(polyLoop.id_l_add, r, true);
 		
 	} // end for iLoop
+
+	// 4.1 make self-stiched pieces intialized with cylinder
+	for (const auto& loop_iter : m_selfStichLoops)
+	{
+		double dist = 0.;
+		for (auto pair : loop_iter.second.selfStiches)
+		{
+			auto e1 = cad_2d.GetEdge(std::get<0>(pair));
+			auto e2 = cad_2d.GetEdge(std::get<1>(pair));
+			bool sameDir = std::get<2>(pair);
+			if (!sameDir) std::swap(e2.po_s, e2.po_e);
+			dist = std::max(dist, (e1.po_s - e2.po_s).Length());
+			dist = std::max(dist, (e1.po_e - e2.po_e).Length());
+		}
+		dist = dist / 2 / M_PI;
+		printf("make loop %d a cylinder of radius %f\n", loop_iter.first, dist);
+		auto id = loopId2svgIdMap[loop_iter.first];
+		auto obj = svgManager->getObjectById(id);
+		if (obj->objectType() != svg::SvgAbstractObject::PolyPath)
+			throw std::exception("error: not a poly path");
+		auto poly = (svg::SvgPolyPath*)obj;
+		clothHandler_.SetRadius(loop_iter.first, dist, poly->getCylinderDir());
+	} // end for loop_iter
 
 	// 5. finally, other parameters --------------------------------------------------------
 	cur_time_ = 0;

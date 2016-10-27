@@ -53,6 +53,7 @@ namespace svg
 	{
 		m_3dCenter = 0.f;
 		m_3dRot.setIdentity();
+		m_cylinderDir = false;
 	}
 
 	SvgPolyPath::SvgPolyPath(int id) : SvgPath()
@@ -60,6 +61,7 @@ namespace svg
 		m_id = id;
 		m_3dCenter = 0.f;
 		m_3dRot.setIdentity();
+		m_cylinderDir = false;
 	}
 
 	SvgPolyPath::~SvgPolyPath()
@@ -354,6 +356,7 @@ namespace svg
 		ele->SetDoubleAttribute("ldp_3dry", m_3dRot.v[1]);
 		ele->SetDoubleAttribute("ldp_3drz", m_3dRot.v[2]);
 		ele->SetDoubleAttribute("ldp_3drw", m_3dRot.w);
+		ele->SetAttribute("ldp_cylinder_dir", m_cylinderDir);
 		ele->SetAttribute("stroke", "#231F20");
 		ele->SetDoubleAttribute("stroke-width", m_pathStyle.stroke_width);
 		ele->SetAttribute("stroke-linecap", strokeLineCapMap(m_pathStyle.line_cap));

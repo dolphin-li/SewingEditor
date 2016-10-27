@@ -1,6 +1,8 @@
 #include "MeshWindow.h"
 #include "global_data_holder.h"
 #include "SC\analysis2d_cloth_static.h"
+#include "svgpp\SvgManager.h"
+#include "svgpp\SvgPolyPath.h"
 MeshWindow::MeshWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -148,6 +150,40 @@ void MeshWindow::on_cbThickness_currentTextChanged(const QString& s)
 		std::cout << e.what() << std::endl;
 	}
 	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_pbInverseCylinder_clicked()
+{
+	try
+	{
+		if (ui.widget->pAnalysis()->GetMode() == CLOTH_INITIAL_LOCATION)
+		{
+			ldp::Double3 o, u, v;
+			int id_l;
+			if (ui.widget->getEventHandle(ui.widget->getEventHandleType())->getPickedMeshFrameInfo(o, u, v, id_l))
+			{
+				ui.widget->pAnalysis()->getClothHandle().inverseCylinder(id_l);
+				ui.widget->pAnalysis()->SetClothPiecePlacingMode();
+				auto iter = g_dataholder.m_clothLoopId2svgIdMap.find(id_l);
+				if (iter != g_dataholder.m_clothLoopId2svgIdMap.end())
+				{
+					auto obj = g_dataholder.m_svgManager->getObjectById(iter->second);
+					if (obj == nullptr)
+						throw std::exception("error: loop_to_svg index not valid!");
+					if (obj->objectType() != svg::SvgAbstractObject::PolyPath)
+						throw std::exception("error: loop_to_svg index not valid!");
+					auto poly = (svg::SvgPolyPath*)obj;
+					poly->setCylinderDir(ui.widget->pAnalysis()->getClothHandle().isCylinderInversed(id_l));
+				} // end if iter
+			}
+		} // end if initial_location
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
 	{
 		std::cout << "unknown error" << std::endl;
 	}

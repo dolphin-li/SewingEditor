@@ -47,13 +47,21 @@ public:
   void Transform_Cloth_Pan(unsigned int id_l, double anc_x, double anc_y, double anc_z);  
   void Transform_Cloth_RotBryantAngle(unsigned int id_l, double phi, double theta, double psi);
   void Transform_Cloth_Rot(unsigned int id_l, const ldp::Mat3d& R, bool resetPrevious);
-  void SetRadius(unsigned int id_l, double r);
+  void SetRadius(unsigned int id_l, double r, bool inverseRadius);
     /////
   bool SetClothLocation(unsigned int id_field_disp, Fem::Field::CFieldWorld& world);
   bool Pick(double scrx, double scry,
             const double trans0[3], const double rot[3], const double trans1[3],
             const double dir[3], const double org[3],            
             unsigned int id_field_disp, const Fem::Field::CFieldWorld& world );
+
+  ////////////ldp///////////////////////////////////////////////////////
+
+  // not finished..
+  bool MakeCylinderPiece(unsigned int id_field_disp, unsigned int id_l, 
+	  double axis[3], Fem::Field::CFieldWorld& world);
+  void inverseCylinder(unsigned int id_l);
+  bool isCylinderInversed(unsigned int id_l)const;
 private:
   unsigned int id_ea_hilight; // hilighted elemary
   unsigned int itype; // itype operation : 0:pan, 1:rot
@@ -81,6 +89,15 @@ private:
     CTriAryTopology topo;
     unsigned int id_ea;
     double radius;
+	/// ldp, inverse the radius dir
+	bool inverse_cylinder;
+	CClothPiece()
+	{
+		radius = 0;
+		id_ea = 0;
+		id_l = 0;
+		inverse_cylinder = false;
+	}
   };
 };
 

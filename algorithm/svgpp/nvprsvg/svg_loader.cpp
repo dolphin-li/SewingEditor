@@ -2174,6 +2174,7 @@ NodePtr SVGParser::parsePath(TiXmlElement* elem)
 
 	int ldp_poly = -1;
 	float ldp_c[3] = { 0 }, ldp_r[4] = { 0 };
+	bool ldp_poly_cylinder = false;
 	std::vector<int> cidx;
     for(TiXmlAttribute* a = elem->FirstAttribute(); a; a = a->Next()) {
         string name(a->Name());
@@ -2213,6 +2214,11 @@ NodePtr SVGParser::parsePath(TiXmlElement* elem)
 			ldp_r[3] = a->DoubleValue();
 			continue;
 		}
+		if (name == "ldp_cylinder_dir")
+		{
+			ldp_poly_cylinder = !!a->IntValue();
+			continue;
+		}
 		if (name == "ldp_corner"){
 			std::stringstream stm(a->Value());
 			while (!stm.eof()){
@@ -2229,6 +2235,7 @@ NodePtr SVGParser::parsePath(TiXmlElement* elem)
     PathPtr path = PathPtr(new Path(style().path, path_string.c_str()));
 	path->ldp_poly_id = ldp_poly;
 	path->ldp_corner_ids = cidx;
+	path->ldp_poly_cylinder_dir = ldp_poly_cylinder;
 	for (int k = 0; k < 3; k++)
 		path->ldp_poly_3dCenter[k] = ldp_c[k];
 	for (int k = 0; k < 4; k++)

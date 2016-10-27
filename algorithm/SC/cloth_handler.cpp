@@ -121,7 +121,7 @@ void CClothHandler::Transform_Cloth_Pan(unsigned int id_l, double anc_x, double 
 	cp->p[2] = anc_z;
 }
 
-void CClothHandler::SetRadius(unsigned int id_l, double r)
+void CClothHandler::SetRadius(unsigned int id_l, double r, bool inverseRadius)
 {
 	int icp0 = -1;
 	for (unsigned int i = 0; i < apPiece.size(); i++)
@@ -135,6 +135,7 @@ void CClothHandler::SetRadius(unsigned int id_l, double r)
 	if (icp0 == -1) { return; }
 	CClothPiece* cp = apPiece[icp0];
 	cp->radius = r;
+	cp->inverse_cylinder = inverseRadius;
 }
 
 static void MatVec3(const double m[9], const double x[3], double y[3])
@@ -324,6 +325,7 @@ bool CClothHandler::SetClothLocation(unsigned int id_field_disp, CFieldWorld& wo
 			const double* n = apPiece[piece_ary_ind]->n;
 			const double* p = apPiece[piece_ary_ind]->p;
 			const double  r = apPiece[piece_ary_ind]->radius;
+			const double ir = apPiece[piece_ary_ind]->inverse_cylinder ? -1 : 1;
 			double v[3]; Com::Cross3D(v, n, h);
 			assert(es.Length() == 3);
 			for (unsigned int ielem = 0; ielem < es.Size(); ielem++)
@@ -345,7 +347,7 @@ bool CClothHandler::SetClothLocation(unsigned int id_field_disp, CFieldWorld& wo
 					{
 						const double theta = Y / r;
 						double Y2 = sin(theta)*r;
-						double Z = (1 - cos(theta))*r;
+						double Z = ir*(1 - cos(theta))*r;
 						u[0] = p[0] + X*h[0] + Y2*v[0] - Z*n[0] - C[0];
 						u[1] = p[1] + X*h[1] + Y2*v[1] - Z*n[1] - C[1];
 						u[2] = p[2] + X*h[2] + Y2*v[2] - Z*n[2] - C[2];
@@ -701,4 +703,99 @@ void CClothHandler::SetObjectMesh(const std::vector<unsigned int>& aTri,
 		aNorm_[ino * 3 + 1] *= invlen;
 		aNorm_[ino * 3 + 2] *= invlen;
 	}
+}
+
+/////////////////////////////ldp/////////////////////////////////////////////////////
+bool CClothHandler::MakeCylinderPiece(unsigned int id_field_disp, unsigned int id_l,
+	double axis[3], Fem::Field::CFieldWorld& world)
+{
+	CField& field = world.GetField(id_field_disp);
+	const std::vector<unsigned int>& aIdEA = field.GetAryIdEA();
+	for (unsigned int iiea = 0; iiea < aIdEA.size(); iiea++)
+	{
+		unsigned int id_ea = aIdEA[iiea];
+		int piece_ary_ind = -1;
+		for (unsigned int i = 0; i < apPiece.size(); i++)
+		{
+			if (apPiece[i]->id_ea == id_ea && apPiece[i]->id_l == id_l)
+			{
+				piece_ary_ind = i;
+				break;
+			}
+		}
+		if (piece_ary_ind == -1) continue;
+		
+		const Fem::Field::CNodeAry::CNodeSeg& ns_c = field.GetNodeSeg(CORNER, false, world, VALUE);
+		Fem::Field::CNodeAry::CNodeSeg& ns_u = field.GetNodeSeg(CORNER, true, world, VALUE);
+		const Fem::Field::CElemAry::CElemSeg& es = field.GetElemSeg(id_ea, CORNER, true, world);
+		const double* cent = apPiece[piece_ary_ind]->cent;
+		const double* h = apPiece[piece_ary_ind]->h;
+		const double* n = apPiece[piece_ary_ind]->n;
+		const double* p = apPiece[piece_ary_ind]->p;
+		const double  r = apPiece[piece_ary_ind]->radius;
+		double v[3]; Com::Cross3D(v, n, h);
+		assert(es.Length() == 3);
+		for (unsigned int ielem = 0; ielem < es.Size(); ielem++)
+		{
+			unsigned int no[3];	es.GetNodes(ielem, no);
+			for (unsigned int inoel = 0; inoel < 3; inoel++)
+			{
+				double C[3];	ns_c.GetValue(no[inoel], C);
+				const double X = C[0] - cent[0];
+				const double Y = C[1] - cent[1];
+				double u[3];
+				if (r <= 0.0)
+				{
+					u[0] = p[0] + X*h[0] + Y*v[0] - C[0];
+					u[1] = p[1] + X*h[1] + Y*v[1] - C[1];
+					u[2] = p[2] + X*h[2] + Y*v[2] - C[2];
+				}
+				else
+				{
+					const double theta = Y / r;
+					double Y2 = sin(theta)*r;
+					double Z = (1 - cos(theta))*r;
+					u[0] = p[0] + X*h[0] + Y2*v[0] - Z*n[0] - C[0];
+					u[1] = p[1] + X*h[1] + Y2*v[1] - Z*n[1] - C[1];
+					u[2] = p[2] + X*h[2] + Y2*v[2] - Z*n[2] - C[2];
+				}
+				ns_u.SetValue(no[inoel], 0, u[0]);
+				ns_u.SetValue(no[inoel], 1, u[1]);
+				ns_u.SetValue(no[inoel], 2, u[2]);
+			} // end for inoel
+		} // end for ielem
+	} // end for iiea
+	return true;
+}
+
+bool CClothHandler::isCylinderInversed(unsigned int id_l)const
+{
+	int icp0 = -1;
+	for (unsigned int i = 0; i < apPiece.size(); i++)
+	{
+		if (apPiece[i]->id_l == id_l)
+		{
+			icp0 = i;
+			break;
+		}
+	}
+	if (icp0 == -1) { return false; }
+	CClothPiece* cp = apPiece[icp0];
+	return cp->inverse_cylinder;
+}
+
+void CClothHandler::inverseCylinder(unsigned int id_l)
+{
+	int icp0 = -1;
+	for (unsigned int i = 0; i < apPiece.size(); i++)
+	{
+		if (apPiece[i]->id_l == id_l)
+		{
+			icp0 = i;
+			break;
+		}
+	}
+	if (icp0 == -1) { return; }
+	CClothPiece* cp = apPiece[icp0];
+	cp->inverse_cylinder = !cp->inverse_cylinder;
 }

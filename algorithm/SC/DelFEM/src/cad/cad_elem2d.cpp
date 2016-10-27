@@ -1724,9 +1724,10 @@ bool Cad::CEdge2D::Split(Cad::CEdge2D& edge_a, const Com::CVector2D& pa)
 					min_dist = Com::Distance(pa, poi1);
 				}
 				const double t = FindNearestPointParameter_Line_Point(pa, poi0, poi1);
-				if (t < 0.01 || t > 0.99) continue;
+				//if (t < 0.01 || t > 0.99) continue;
+				if (t < 0 || t >= 1) continue;
 				Com::CVector2D po_mid = poi0 + (poi1 - poi0)*t;
-				if (Com::Distance(pa, po_mid) < min_dist)
+				if (Com::Distance(pa, po_mid) <= min_dist)
 				{
 					is_segment = true;
 					min_dist = Com::Distance(pa, po_mid);

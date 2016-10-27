@@ -1695,6 +1695,7 @@ bool CCadObj2D::addPleat_HemLine(Com::CVector2D p0, Com::CVector2D p1, double po
 					Cad::CEdge2D other;
 					p_edges[k]->Split(other, p[k]);
 					p_edges[k]->aRelCoMesh = other.aRelCoMesh;
+					p_edges[k]->itype = other.itype;
 				}
 				else
 				{

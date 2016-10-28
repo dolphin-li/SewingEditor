@@ -395,6 +395,7 @@
     <ClCompile Include="event_handles\ClothRotateEventHandle.cpp" />
     <ClCompile Include="event_handles\ClothSelectEventHandle.cpp" />
     <ClCompile Include="event_handles\ClothTranslateEventHandle.cpp" />
+    <ClCompile Include="event_handles\DeformEventHandle.cpp" />
     <ClCompile Include="event_handles\GroupEventHandle.cpp" />
     <ClCompile Include="event_handles\ShapeEventHandle.cpp" />
     <ClCompile Include="event_handles\ZoomEventHandle.cpp" />
@@ -742,6 +743,7 @@
     <ClInclude Include="event_handles\ClothRotateEventHandle.h" />
     <ClInclude Include="event_handles\ClothSelectEventHandle.h" />
     <ClInclude Include="event_handles\ClothTranslateEventHandle.h" />
+    <ClInclude Include="event_handles\DeformEventHandle.h" />
     <ClInclude Include="event_handles\GroupEventHandle.h" />
     <ClInclude Include="event_handles\ShapeEventHandle.h" />
     <ClInclude Include="event_handles\ZoomEventHandle.h" />

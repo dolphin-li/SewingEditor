@@ -8,6 +8,7 @@
 #include "ShapeEventHandle.h"
 #include "GroupEventHandle.h"
 #include "ZoomEventHandle.h"
+#include "DeformEventHandle.h"
 
 AbstractEventHandle::AbstractEventHandle(SvgViewer* v)
 {
@@ -52,6 +53,8 @@ AbstractEventHandle* AbstractEventHandle::create(ProcessorType type, SvgViewer* 
 		return new GroupEventHandle(v);
 	case AbstractEventHandle::ProcessorTypeZoom:
 		return new ZoomEventHandle(v);
+	case AbstractEventHandle::ProcessorTypeDeform:
+		return new DeformEventHandle(v);
 	case AbstractEventHandle::ProcessorTypeEnd:
 	default:
 		return nullptr;

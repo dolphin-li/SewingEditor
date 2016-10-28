@@ -18,6 +18,7 @@ public:
 		ProcessorTypeShape,
 		ProcessorTypeGroup,
 		ProcessorTypeZoom,
+		ProcessorTypeDeform,
 
 		ProcessorTypeEnd, // the end, no processor for this
 	};

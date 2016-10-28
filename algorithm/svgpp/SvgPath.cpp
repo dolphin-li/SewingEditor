@@ -328,8 +328,8 @@ namespace svg
 		for (size_t i_cmd = 0; i_cmd < m_cmds.size(); i_cmd++)
 		{
 			auto str = svgCmd(m_cmds[i_cmd]);
-			if (str == 'A')
-				throw std::exception("arc export not implemented!");
+			//if (str == 'A')
+			//	throw std::exception("arc export not implemented!");
 			cmdStr += str;
 			int bg = cmdPos[i_cmd], ed = cmdPos[i_cmd + 1];
 			for (int i = bg; i < ed; i++)

@@ -84,6 +84,7 @@ void SewingEditor::loadSvg(QString name)
 	ui.widget->updateGL();
 	initLayerList();
 	setWindowTitle(name);
+	ui.dbSmoothPolyThre->setValue(g_dataholder.m_param.m_smoothPolyThre);
 }
 
 void SewingEditor::initLeftDockActions()
@@ -880,7 +881,7 @@ void SewingEditor::on_sbPixelToMeter_valueChanged(double v)
 			throw std::exception("svgManger: nullptr");
 		double p1 = 1.0 / v;
 		double p2 = ui.widget->getSvgManager()->getPixelToMeters();
-		if (abs(p1 - p2) < std::numeric_limits<double>::epsilon())
+		if (abs(p1 - p2) > std::numeric_limits<double>::epsilon())
 		{
 			m_meshWindow->hide();
 			ui.widget->getSvgManager()->setPixelToMeters(p1);
@@ -939,6 +940,36 @@ void SewingEditor::on_actionSplit_selected_edge_triggered()
 		ui.widget->getSvgManager()->splitSelectedPolyEdgeByMidPoint();
 		ui.widget->updateGL();
 		pushHistory("remove selected edges");
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void SewingEditor::on_pbSmoothPoly_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->smoothSelectedPoly(g_dataholder.m_param.m_smoothPolyThre);
+		ui.widget->updateGL();
+		pushHistory("smooth poly");
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void SewingEditor::on_dbSmoothPolyThre_valueChanged(double v)
+{
+	try
+	{
+		g_dataholder.m_param.m_smoothPolyThre = v;
 	} catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;

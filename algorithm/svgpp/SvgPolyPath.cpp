@@ -417,6 +417,79 @@ namespace svg
 		invalid();
 	}
 
+	void SvgPolyPath::bilateralSmooth(double thre)
+	{
+		if (m_coords.size() <= 4)
+			return;
+		bool closed = isClosed();
+
+		// compute the average edge length
+		double avgLength = 0;
+		int nE = 0;
+		for (size_t i = 2; i < m_coords.size(); i += 2)
+		{
+			ldp::Float2 p1(m_coords[i], m_coords[i + 1]);
+			ldp::Float2 p2(m_coords[i - 2], m_coords[i - 1]);
+			avgLength += (p1 - p2).length();
+			nE++;
+		}
+		if (closed)
+		{
+			ldp::Float2 p1(m_coords[0], m_coords[1]);
+			ldp::Float2 p2(m_coords[m_coords.size() - 2], m_coords[m_coords.size() - 1]);
+			avgLength += (p1 - p2).length();
+			nE++;
+		}
+		avgLength /= nE;
+		const float avgLength2 = avgLength*avgLength;
+
+		// bilateral smoothing
+		std::vector<float> curCoords = m_coords;
+		for (size_t iter = 0; iter < 1; iter++)
+		{
+			for (size_t i = 0; i < m_coords.size(); i += 2)
+			{
+				if (!closed && (i < 2 || i > m_coords.size() - 2))
+					continue;
+				int in = (i + 2) % m_coords.size();
+				int ip = (i - 2 + m_coords.size()) % m_coords.size();
+				ldp::Float2 p(m_coords[i], m_coords[i + 1]);
+				ldp::Float2 pp(m_coords[ip], m_coords[ip + 1]);
+				ldp::Float2 pn(m_coords[in], m_coords[in + 1]);
+				float wp = exp(-(p - pp).sqrLength() / avgLength2);
+				float wn = exp(-(p - pn).sqrLength() / avgLength2);
+				ldp::Float2 q = (p + wp*pp + wn*pn) / (1 + wp + wn);
+				curCoords[i] = q[0];
+				curCoords[i + 1] = q[1];
+			} // end for i
+			m_coords = curCoords;
+		} // end for iter
+
+		// after smoothing, we findCorners again
+		auto oldCornerPos = m_cornerPos;
+		findCorners();
+		bool changed = false;
+		if (oldCornerPos.size() != m_cornerPos.size())
+			changed = true;
+		if (!changed)
+		{
+			for (size_t i = 0; i < oldCornerPos.size(); i++)
+			if (oldCornerPos[i] != m_cornerPos[i])
+			{
+				changed = true;
+				break;
+			}
+		}
+		if (changed)
+		{
+			m_selectedCorner_arrayIds.clear();
+			m_highlightedCorner_arrayIds.clear();
+			for (auto& eg : m_edgeGroups)
+				eg->group.clear();
+			m_edgeGroups.clear();
+		}
+	}
+
 	void SvgPolyPath::setCorners(std::vector<int>& cns)
 	{
 		m_cornerPos.clear();

@@ -20,4 +20,5 @@ public:
 	void changeClothThickness(ClothThickness ct);
 public:
 	std::shared_ptr<CClothParam> m_clothParam;
+	double m_smoothPolyThre;
 };

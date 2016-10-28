@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1176</width>
-    <height>949</height>
+    <height>864</height>
    </rect>
   </property>
   <property name="palette">
@@ -863,7 +863,7 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetRightContents">
     <layout class="QGridLayout" name="gridLayout_4">
-     <item row="0" column="0">
+     <item row="0" column="0" colspan="2">
       <widget class="QListWidget" name="listHistory">
        <property name="styleSheet">
         <string notr="true"/>
@@ -873,7 +873,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="1" column="0" colspan="2">
       <widget class="QGroupBox" name="gbLayers">
        <property name="title">
         <string>Layers</string>
@@ -955,7 +955,7 @@
        </layout>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="2" column="0" colspan="2">
       <widget class="QGroupBox" name="gbParam">
        <property name="minimumSize">
         <size>
@@ -1081,6 +1081,32 @@
          <widget class="QPushButton" name="pbGenerateMesh">
           <property name="text">
            <string>Generate Mesh</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Smooth Poly</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pbSmoothPoly">
+          <property name="text">
+           <string>smooth poly</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QDoubleSpinBox" name="dbSmoothPolyThre">
+          <property name="decimals">
+           <number>4</number>
+          </property>
+          <property name="maximum">
+           <double>999990000.000000000000000</double>
           </property>
          </widget>
         </item>

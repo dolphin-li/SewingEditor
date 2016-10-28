@@ -20,7 +20,7 @@
 using namespace ldp;
 namespace svg
 {
-	const static float PATH_CONTACT_DIST_THRE = 0.2f;
+	const static float PATH_CONTACT_DIST_THRE = 0.01f;
 	const static float PATH_COS_ANGLE_DIST_THRE = cos(15.f * ldp::PI_S / 180.f);
 #pragma region --helper
 	static std::vector<ldp::Float3> create_color_table()
@@ -1910,6 +1910,37 @@ namespace svg
 		} // end for layer
 
 		return re;
+	}
+
+	void SvgManager::smoothSelectedPoly(double thre)
+	{
+		bool re = false;
+		for (auto layer : m_layers)
+		{
+			if (!layer.second->selected)
+				continue;
+			auto rootPtr = (SvgGroup*)layer.second->root.get();
+			std::vector<std::shared_ptr<SvgAbstractObject>> polys;
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, polys, true);
+			for (auto poly : polys)
+				((SvgPolyPath*)poly.get())->bilateralSmooth(thre);
+
+			auto& edgeGroups = layer.second->edgeGroups;
+			auto tmpEdgeGroups = edgeGroups;
+			edgeGroups.clear();
+			for (auto eg : tmpEdgeGroups)
+			{
+				if (eg->group.size() > 1)
+					edgeGroups.push_back(eg);
+			}
+			// re-link
+			for (auto eg : tmpEdgeGroups)
+			for (auto g : eg->group)
+				g.first->edgeGroups().clear();
+			for (auto eg : edgeGroups)
+			for (auto g : eg->group)
+				g.first->edgeGroups().insert(eg.get());
+		} // end for layer
 	}
 	//////////////////////////////////////////////////////////////////
 	/// layer related

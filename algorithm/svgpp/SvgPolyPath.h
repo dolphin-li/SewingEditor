@@ -40,6 +40,7 @@ namespace svg
 		void setCorners(std::vector<int>& cns);
 		bool removeSelectedCorners(); // return true if actually remove some corners
 		bool splitSelectedEdgeMidPoint();
+		void bilateralSmooth(double thre); // smooth the poly, keeping corners
 
 		bool isClosed()const;
 		void makeClosed();

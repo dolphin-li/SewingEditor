@@ -84,6 +84,10 @@ public:
     QGroupBox *groupBox;
     QGridLayout *gridLayout_5;
     QPushButton *pbGenerateMesh;
+    QGroupBox *groupBox_2;
+    QGridLayout *gridLayout_6;
+    QPushButton *pbSmoothPoly;
+    QDoubleSpinBox *dbSmoothPolyThre;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -91,7 +95,7 @@ public:
     {
         if (SewingEditorClass->objectName().isEmpty())
             SewingEditorClass->setObjectName(QStringLiteral("SewingEditorClass"));
-        SewingEditorClass->resize(1176, 949);
+        SewingEditorClass->resize(1176, 864);
         QPalette palette;
         QBrush brush(QColor(255, 255, 255, 255));
         brush.setStyle(Qt::SolidPattern);
@@ -288,7 +292,7 @@ public:
         listHistory->setStyleSheet(QStringLiteral(""));
         listHistory->setTabKeyNavigation(false);
 
-        gridLayout_4->addWidget(listHistory, 0, 0, 1, 1);
+        gridLayout_4->addWidget(listHistory, 0, 0, 1, 2);
 
         gbLayers = new QGroupBox(dockWidgetRightContents);
         gbLayers->setObjectName(QStringLiteral("gbLayers"));
@@ -326,7 +330,7 @@ public:
         gridLayout_2->addWidget(pbRemoveLayers, 1, 2, 1, 1);
 
 
-        gridLayout_4->addWidget(gbLayers, 1, 0, 1, 1);
+        gridLayout_4->addWidget(gbLayers, 1, 0, 1, 2);
 
         gbParam = new QGroupBox(dockWidgetRightContents);
         gbParam->setObjectName(QStringLiteral("gbParam"));
@@ -378,7 +382,7 @@ public:
         gridLayout_3->addWidget(sbPixelToMeter, 3, 1, 1, 1);
 
 
-        gridLayout_4->addWidget(gbParam, 2, 0, 1, 1);
+        gridLayout_4->addWidget(gbParam, 2, 0, 1, 2);
 
         groupBox = new QGroupBox(dockWidgetRightContents);
         groupBox->setObjectName(QStringLiteral("groupBox"));
@@ -394,6 +398,27 @@ public:
 
 
         gridLayout_4->addWidget(groupBox, 3, 0, 1, 1);
+
+        groupBox_2 = new QGroupBox(dockWidgetRightContents);
+        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
+        gridLayout_6 = new QGridLayout(groupBox_2);
+        gridLayout_6->setSpacing(6);
+        gridLayout_6->setContentsMargins(11, 11, 11, 11);
+        gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
+        pbSmoothPoly = new QPushButton(groupBox_2);
+        pbSmoothPoly->setObjectName(QStringLiteral("pbSmoothPoly"));
+
+        gridLayout_6->addWidget(pbSmoothPoly, 0, 0, 1, 1);
+
+        dbSmoothPolyThre = new QDoubleSpinBox(groupBox_2);
+        dbSmoothPolyThre->setObjectName(QStringLiteral("dbSmoothPolyThre"));
+        dbSmoothPolyThre->setDecimals(4);
+        dbSmoothPolyThre->setMaximum(9.9999e+08);
+
+        gridLayout_6->addWidget(dbSmoothPolyThre, 1, 0, 1, 1);
+
+
+        gridLayout_4->addWidget(groupBox_2, 3, 1, 1, 1);
 
         dockWidgetRight->setWidget(dockWidgetRightContents);
         SewingEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
@@ -528,6 +553,8 @@ public:
         pbPixelToMeter->setText(QApplication::translate("SewingEditorClass", "pixel to meter", 0));
         groupBox->setTitle(QApplication::translate("SewingEditorClass", "mesh", 0));
         pbGenerateMesh->setText(QApplication::translate("SewingEditorClass", "Generate Mesh", 0));
+        groupBox_2->setTitle(QApplication::translate("SewingEditorClass", "Smooth Poly", 0));
+        pbSmoothPoly->setText(QApplication::translate("SewingEditorClass", "smooth poly", 0));
         dockWidgetLeft->setWindowTitle(QString());
     } // retranslateUi
 

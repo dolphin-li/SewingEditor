@@ -5,6 +5,7 @@
 Param::Param()
 {
 	m_clothParam.reset(new CClothParam);
+	m_smoothPolyThre = 0.2;
 }
 
 Param::~Param()

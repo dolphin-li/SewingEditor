@@ -433,29 +433,18 @@ namespace svg
 			avgLength += (p1 - p2).length();
 			nE++;
 		}
-		if (closed)
-		{
-			ldp::Float2 p1(m_coords[0], m_coords[1]);
-			ldp::Float2 p2(m_coords[m_coords.size() - 2], m_coords[m_coords.size() - 1]);
-			avgLength += (p1 - p2).length();
-			nE++;
-		}
 		avgLength /= nE;
 		const float avgLength2 = avgLength*avgLength;
 
 		// bilateral smoothing
 		std::vector<float> curCoords = m_coords;
-		for (size_t iter = 0; iter < 1; iter++)
+		for (size_t iter = 0; iter < 5; iter++)
 		{
-			for (size_t i = 0; i < m_coords.size(); i += 2)
+			for (size_t i = 2; i < m_coords.size()-2; i += 2)
 			{
-				if (!closed && (i < 2 || i > m_coords.size() - 2))
-					continue;
-				int in = (i + 2) % m_coords.size();
-				int ip = (i - 2 + m_coords.size()) % m_coords.size();
 				ldp::Float2 p(m_coords[i], m_coords[i + 1]);
-				ldp::Float2 pp(m_coords[ip], m_coords[ip + 1]);
-				ldp::Float2 pn(m_coords[in], m_coords[in + 1]);
+				ldp::Float2 pp(m_coords[i - 2], m_coords[i - 1]);
+				ldp::Float2 pn(m_coords[i + 2], m_coords[i + 3]);
 				float wp = exp(-(p - pp).sqrLength() / avgLength2);
 				float wn = exp(-(p - pn).sqrLength() / avgLength2);
 				ldp::Float2 q = (p + wp*pp + wn*pn) / (1 + wp + wn);
@@ -464,6 +453,33 @@ namespace svg
 			} // end for i
 			m_coords = curCoords;
 		} // end for iter
+
+		// perform merging
+		std::vector<int> mergeMap(m_cmds.size());
+		for (size_t i = 0; i < mergeMap.size(); i++)
+			mergeMap[i] = (int)i;
+		for (size_t i = 1; i < m_cmds.size() - 1; i++)
+		{
+			ldp::Float2 p(m_coords[i * 2], m_coords[i * 2 + 1]);
+			ldp::Float2 pp(m_coords[i * 2 - 2], m_coords[i * 2 - 1]);
+			float dist = (p - pp).length();
+			if (dist < avgLength * thre)
+			{
+				mergeMap[i] = i - 1;
+				while (mergeMap[i] != mergeMap[mergeMap[i]])
+					mergeMap[i] = mergeMap[mergeMap[i]];
+			}
+		} // enf for i
+		auto tmpCmds = m_cmds;
+		auto tmpCoords = m_coords;
+		m_cmds.clear();
+		m_coords.clear();
+		for (size_t i = 0; i < mergeMap.size(); i++)
+		{
+			if (mergeMap[i] != i) continue;
+			m_cmds.push_back(tmpCmds[i]);
+			m_coords.insert(m_coords.end(), tmpCoords.begin() + i * 2, tmpCoords.begin() + i * 2 + 2);
+		}
 
 		// after smoothing, we findCorners again
 		auto oldCornerPos = m_cornerPos;

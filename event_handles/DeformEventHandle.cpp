@@ -15,6 +15,16 @@ DeformEventHandle::~DeformEventHandle()
 
 }
 
+void DeformEventHandle::handleEnter()
+{
+
+}
+
+void DeformEventHandle::handleLeave()
+{
+
+}
+
 void DeformEventHandle::mousePressEvent(QMouseEvent *ev)
 {
 	AbstractEventHandle::mousePressEvent(ev);

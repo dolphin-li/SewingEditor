@@ -937,6 +937,9 @@
     <ClCompile Include="event_handles\DeformEventHandle.cpp">
       <Filter>event_handles</Filter>
     </ClCompile>
+    <ClCompile Include="algorithm\FreeFormDeform.cpp">
+      <Filter>algorithm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="sewingeditor.ui">
@@ -1612,6 +1615,9 @@
     </ClInclude>
     <ClInclude Include="event_handles\DeformEventHandle.h">
       <Filter>event_handles</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\FreeFormDeform.h">
+      <Filter>algorithm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

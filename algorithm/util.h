@@ -20,6 +20,8 @@ namespace ldp
 	typedef Eigen::SparseMatrix<float> SpMatf;
 	typedef Eigen::SparseVector<real> SpVec;
 	typedef Eigen::SparseVector<float> SpVecf;
+	typedef Eigen::SimplicialCholesky<SpMat> SpSolver;
+	typedef Eigen::SimplicialCholesky<SpMatf> SpSolverf;
 	typedef Eigen::LDLT<Mat> Solver;
 	typedef Eigen::LDLT<Matf> Solverf;
 
@@ -350,6 +352,13 @@ namespace ldp
 			rx = RX[1];
 			ry = RY[1];
 		}
+	}
+
+	inline void GetInnerCoordinate(ldp::Float2& r, ldp::Float2 a,
+		ldp::Float2 p1, ldp::Float2 p2, ldp::Float2 p3, ldp::Float2 p4)
+	{
+		GetInnerCoordinate(r[0], r[1], a[0], a[1], p1[0], p1[1],
+			p2[0], p2[1], p3[0], p3[1], p4[0], p4[1]);
 	}
 
 

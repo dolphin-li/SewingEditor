@@ -26,6 +26,17 @@ AbstractEventHandle::~AbstractEventHandle()
 
 }
 
+
+void AbstractEventHandle::handleEnter()
+{
+
+}
+
+void AbstractEventHandle::handleLeave()
+{
+
+}
+
 void AbstractEventHandle::setMainUI(MainUI* ui)
 {
 	m_mainUI = ui;

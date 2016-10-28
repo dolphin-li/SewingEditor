@@ -36,7 +36,10 @@ AbstractEventHandle::ProcessorType SvgViewer::getEventHandleType()const
 
 void SvgViewer::setEventHandleType(AbstractEventHandle::ProcessorType type)
 {
+	if (m_currentEventHandle)
+		m_currentEventHandle->handleLeave();
 	m_currentEventHandle = m_eventHandles[size_t(type)].get();
+	m_currentEventHandle->handleEnter();
 	setCursor(m_currentEventHandle->cursor());
 }
 

@@ -145,6 +145,7 @@
     <ClCompile Include="algorithm\conv\ConvolutionPyramid.cpp" />
     <ClCompile Include="algorithm\conv\Convolution_Helper.cpp" />
     <ClCompile Include="algorithm\conv\ImageData.cpp" />
+    <ClCompile Include="algorithm\FreeFormDeform.cpp" />
     <ClCompile Include="algorithm\FreeImage\CFreeImage.cpp" />
     <ClCompile Include="algorithm\global_data_holder.cpp" />
     <ClCompile Include="algorithm\kdtree\AABB.cpp" />
@@ -503,6 +504,7 @@
     <ClInclude Include="algorithm\conv\ConvolutionPyramid.h" />
     <ClInclude Include="algorithm\conv\Convolution_Helper.h" />
     <ClInclude Include="algorithm\conv\ImageData.h" />
+    <ClInclude Include="algorithm\FreeFormDeform.h" />
     <ClInclude Include="algorithm\FreeImage\CFreeImage.h" />
     <ClInclude Include="algorithm\FreeImage\FreeImage.h" />
     <ClInclude Include="algorithm\global_data_holder.h" />

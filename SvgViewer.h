@@ -54,6 +54,7 @@ protected:
 
 	bool m_isDragBox;
 	QPoint m_dragBoxBegin;
+
 protected:
 	AbstractEventHandle* m_currentEventHandle;
 	std::vector<std::shared_ptr<AbstractEventHandle>> m_eventHandles;

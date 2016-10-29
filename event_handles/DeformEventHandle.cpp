@@ -24,7 +24,7 @@ void DeformEventHandle::handleEnter()
 	if (svg && deformer)
 	{
 		auto objs = svg->collectPolyPaths();
-		deformer->init(objs);
+		deformer->init(objs, 1000);
 		m_viewer->beginDeformMode();
 		m_viewer->updateGL();
 	} // end if svg

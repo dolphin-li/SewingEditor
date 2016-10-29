@@ -375,6 +375,12 @@ namespace ldp
 		w[2] = rx*ry;
 	}
 
+	inline ldp::Float4 CalcBilinearCoef(Float2 p, const Float2 v[4])
+	{
+		ldp::Float4 w;
+		CalcBilinearCoef(w, p, v);
+		return w;
+	}
 	//the order of the 4 vertices should be
 	//0 3
 	//1 2

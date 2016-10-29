@@ -353,18 +353,17 @@ namespace svg
 
 	void SvgManager::symmetryCopySelectedPoly(int axis)
 	{
-		if (axis == -1)
-			axis = width() > height();
-		if (axis < 0 || axis > 1)
-			throw std::exception("invalid axis configuration!");
-
 		for (auto layer_iter : m_layers)
 		{
 			auto layer = layer_iter.second;
 			if (!layer->selected) continue;
-			
+			int l_axis = axis;
+			if (l_axis == -1)
+				l_axis = layer->root->width() > layer->root->height();
+			if (l_axis < 0 || l_axis > 1)
+				throw std::exception("invalid axis configuration!");
 			ldp::Float4 box = layer->root->getBound();
-			const float axis_sympos = box[axis * 2 + 1];
+			const float axis_sympos = box[l_axis * 2 + 1];
 			// clone edgeGroups: since we have not updated index yet, we can use index to match groups
 			auto rootPtr = (SvgGroup*)layer->root.get();
 			std::vector<std::shared_ptr<SvgAbstractObject>> oldPaths;
@@ -377,7 +376,7 @@ namespace svg
 				auto newpoly = (SvgPolyPath*)newp.get();
 				for (size_t i = 0; i < newpoly->m_coords.size(); i += 2){
 					float* coord = newpoly->m_coords.data() + i;
-					coord[axis] = 2 * axis_sympos - coord[axis];
+					coord[l_axis] = 2 * axis_sympos - coord[l_axis];
 				}
 				auto c = oldpoly->get3dCenter();
 				c[0] = -c[0];

@@ -41,7 +41,7 @@ namespace svg
 			box = child->unionBound(box);
 		}
 
-		setBound(unionBound(box));
+		setBound(box);
 	}
 
 	TiXmlElement* SvgGroup::toXML(TiXmlNode* parent)const

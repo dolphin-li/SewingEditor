@@ -32,12 +32,6 @@ public:
 	void clear();
 	std::shared_ptr<FreeFormDeform> clone()const;
 
-	int numQuads()const { return m_quads.size(); }
-	int numPoints()const { return m_points.size(); }
-	const ldp::Int4& getQuad(int i)const { return m_quads[i]; }
-	const ldp::Float2& getPoint(int i)const { return m_points[i]; }
-	const ldp::Float2& getPointInit(int i)const { return m_points_init[i]; }
-
 	// return the idx of the added control points, -1 means not added
 	int addControlPoint(ldp::Float2 pos);
 	void clearControlPoints();
@@ -47,30 +41,40 @@ public:
 	int numControlPoints()const { return m_controlPoints.size(); }
 	const ControlPoint& getControlPoint(int i)const { return m_controlPoints[i]; }
 	ldp::Float2 calcPosition(const ControlPoint&  cp);
-
-	// given a position p, find the quad contains it
-	int findQuadIdx(ldp::Float2 p);
 protected:
-	void factor();
+	// given a position p, find the quad contains it
+	int findQuadIdx(ldp::Float2 p)const;
+
 	void solve();
 
 	void setupSimilarityMatrix();
 	void setupControlMatrix();
+	void setupLineMatrix();
 
 	void buildPolyQuads();
 	void updatePoly();
+
+	void buildLineSegments();
+	void cutLineIntoQuadSegs(const ControlPoint& cp_s, const ControlPoint& cp_e, std::vector<ControlPoint>& segs);
 private:
 	std::vector<svg::SvgPolyPath*> m_polys;
 	std::vector<std::vector<ControlPoint>> m_polys_coords;
+	std::vector<ControlPoint> m_lineSegsInQuads; // for line preserving
+	std::vector<int> m_lineBinIdx; // for line preserving
 	std::vector<ControlPoint> m_controlPoints;
 	std::vector<ldp::Float2> m_points;
 	std::vector<ldp::Float2> m_points_init;
 	std::vector<ldp::Int4> m_quads;
 	int m_nX;
 	int m_nY;
+	float m_X0;
+	float m_Y0;
+	float m_step;
+	std::vector<float> m_thetas; // for line preserving
 	ldp::SpMat m_AtA_similarity;
 	ldp::Vec m_Atb_similarity;
 	ldp::SpMat m_AtA_control;
 	ldp::Vec m_Atb_control;
+	ldp::SpMat m_AtA_line;
 	ldp::SpSolver m_solver;
 };

@@ -70,11 +70,26 @@ void DeformEventHandle::mousePressEvent(QMouseEvent *ev)
 			{
 				m_viewer->setActiveDeformNodeId(idx);
 				if (m_mainUI)
-					m_mainUI->pushHistory("add control points");
+					m_mainUI->pushHistory(("add control points: " + std::to_string(idx)).c_str());
 			} // end if idx
 		} // end if control
 		m_viewer->setActiveDeformNodeId(-1);
 	} // end if left button
+	if (m_viewer->buttons() & Qt::RightButton)
+	{
+		if (ev->modifiers() == Qt::CTRL)
+		{
+			auto idx = m_viewer->getHighLightedDeformNodeId();
+			if (idx >= 0)
+			{
+				deformer->removeControlPoint(idx);
+				m_viewer->setActiveDeformNodeId(-1);
+				m_viewer->setHighLightedDeformNodeId(-1);
+				if (m_mainUI)
+					m_mainUI->pushHistory(("remove control points: " + std::to_string(idx)).c_str());
+			} // end if idx
+		} // end if control
+	}
 }
 
 void DeformEventHandle::mouseReleaseEvent(QMouseEvent *ev)
@@ -90,8 +105,7 @@ void DeformEventHandle::mouseReleaseEvent(QMouseEvent *ev)
 		if (ev->pos() != m_mouse_press_pt)
 		{
 			deformer->setControlPointTargetPos(aid, m_viewer->viewCoord2svgCoord(ldp::Float2(ev->x(), ev->y())));
-			if (m_mainUI)
-				m_mainUI->pushHistory("deform drag");
+			m_mainUI->pushHistory(("drag control points: " + std::to_string(aid)).c_str());
 		}
 	}
 	m_viewer->setActiveDeformNodeId(-1);

@@ -9,6 +9,10 @@ namespace svg
 class FreeFormDeform
 {
 public:
+	enum
+	{
+		INDEX_BEGIN = 10000000
+	};
 	struct ControlPoint
 	{
 		int quad_id;
@@ -25,6 +29,8 @@ public:
 
 	// bbox: left, right, top, bottom
 	void init(const std::vector<svg::SvgPolyPath*>& polys, int numQuadsProxy = 400);
+	void clear();
+	std::shared_ptr<FreeFormDeform> clone()const;
 
 	int numQuads()const { return m_quads.size(); }
 	int numPoints()const { return m_points.size(); }
@@ -45,7 +51,6 @@ public:
 	// given a position p, find the quad contains it
 	int findQuadIdx(ldp::Float2 p);
 protected:
-	void clear();
 	void factor();
 	void solve();
 
@@ -64,6 +69,7 @@ private:
 	int m_nX;
 	int m_nY;
 	ldp::SpMat m_AtA_similarity;
+	ldp::Vec m_Atb_similarity;
 	ldp::SpMat m_AtA_control;
 	ldp::Vec m_Atb_control;
 	ldp::SpSolver m_solver;

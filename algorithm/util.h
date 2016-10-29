@@ -11,7 +11,7 @@
 class ObjMesh;
 namespace ldp
 {
-	typedef float real;
+	typedef double real;
 	typedef Eigen::Matrix<real, -1, -1> Mat;
 	typedef Eigen::Matrix<real, -1, 1> Vec;
 	typedef Eigen::Matrix<float, -1, -1> Matf;

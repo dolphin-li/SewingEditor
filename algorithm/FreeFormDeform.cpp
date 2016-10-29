@@ -34,12 +34,12 @@ void FreeFormDeform::init(const std::vector<svg::SvgPolyPath*>& polys, int numQu
 	m_nY = std::ceil((Y1 - Y0) / step) + 1;
 	m_points_init.reserve(m_nX * m_nY);
 	m_quads.reserve((m_nX - 1) * (m_nY - 1));
-	for (int iX = 0; iX < m_nX; iX++)
+	for (int iY = 0; iY < m_nY; iY++)
 	{
-		float x = X0 + iX * step;
-		for (int iY = 0; iY < m_nY; iY++)
+		const float y = Y0 + iY * step;
+		for (int iX = 0; iX < m_nX; iX++)
 		{
-			float y = Y0 + iY * step;
+			const float x = X0 + iX * step;
 			m_points_init.push_back(ldp::Float2(x, y));
 
 			if (iX < m_nX - 1 && iY < m_nY - 1)
@@ -47,8 +47,8 @@ void FreeFormDeform::init(const std::vector<svg::SvgPolyPath*>& polys, int numQu
 				int idx = iY * m_nX + iX;
 				m_quads.push_back(ldp::Int4(idx, idx + 1, idx + 1 + m_nX, idx + m_nX));
 			}
-		} // iY
-	} // iX
+		} // iX
+	} // iY
 	m_points = m_points_init;
 
 	buildPolyQuads();
@@ -65,6 +65,27 @@ void FreeFormDeform::clear()
 	m_points_init.clear();
 	m_quads.clear();
 	m_controlPoints.clear();
+}
+
+std::shared_ptr<FreeFormDeform> FreeFormDeform::clone()const
+{
+	std::shared_ptr<FreeFormDeform> rhs(new FreeFormDeform);
+	rhs->m_polys = m_polys;
+	rhs->m_polys_coords = m_polys_coords;
+	rhs->m_controlPoints = m_controlPoints;
+	rhs->m_points = m_points;
+	rhs->m_points_init = m_points_init;
+	rhs->m_quads = m_quads;
+	rhs->m_nX = m_nX;
+	rhs->m_nY = m_nY;
+	rhs->m_AtA_similarity = m_AtA_similarity;
+	rhs->m_Atb_similarity = m_Atb_similarity;
+	rhs->m_AtA_control = m_AtA_control;
+	rhs->m_Atb_control = m_Atb_control;
+	rhs->m_solver.analyzePattern(m_AtA_similarity);
+	if (m_AtA_control.size() == m_AtA_similarity.size())
+		rhs->m_solver.factorize(m_AtA_similarity + m_AtA_control);
+	return rhs;
 }
 
 int FreeFormDeform::findQuadIdx(ldp::Float2 p)
@@ -139,6 +160,8 @@ void FreeFormDeform::removeControlPoint(int i)
 
 void FreeFormDeform::setControlPointTargetPos(int i, ldp::Float2 p)
 {
+	if (i < 0 || i >= numControlPoints())
+		return;
 	m_controlPoints[i].tarPos = p;
 	setupControlMatrix();
 	solve();
@@ -210,16 +233,65 @@ void FreeFormDeform::buildPolyQuads()
 void FreeFormDeform::setupSimilarityMatrix()
 {
 	std::vector<Eigen::Triplet<ldp::real>> cooSys;
-	int nRows = 0;
+	std::vector<ldp::real> cooRhs;
+
+	const float sim_w = sqrt(1.f / m_quads.size());
 
 	// adding quads to the linear system: as-similar-as-possible style.
+	ldp::Mat A, M;
+	A.resize(8, 4);
+	M.resize(8, 8);
+	ldp::Mat I = M;
+	I.setIdentity();
+	for (const auto& q : m_quads)
+	{
+		for (int k = 0; k < 4; k++)
+		{
+			const auto& p = m_points[q[k]];
+			A(k * 2 + 0, 0) = p[0];
+			A(k * 2 + 0, 1) = -p[1];
+			A(k * 2 + 0, 2) = 1;
+			A(k * 2 + 0, 3) = 0;
+			A(k * 2 + 1, 0) = p[1];
+			A(k * 2 + 1, 1) = p[0];
+			A(k * 2 + 1, 2) = 0;
+			A(k * 2 + 1, 3) = 1;
+		} // end for k
+		M = A*(A.transpose()*A).inverse()*A.transpose() - I;
+
+		for (int r = 0; r < 8; r++)
+		{
+			for (int k = 0; k < 4; k++)
+			{
+				cooSys.push_back(Eigen::Triplet<ldp::real>(cooRhs.size(), q[k] * 2 + 0, sim_w * M(r, k * 2 + 0)));
+				cooSys.push_back(Eigen::Triplet<ldp::real>(cooRhs.size(), q[k] * 2 + 1, sim_w * M(r, k * 2 + 1)));
+			} // end for k
+			cooRhs.push_back(0);
+		} // end for r
+	} // end for q
+
+	// add regularity term
+	const ldp::real reg_w = sqrt(1e-6 / m_points.size());
+	for (size_t i = 0; i < m_points.size(); i++)
+	{
+		for (int r = 0; r < 2; r++)
+		{
+			cooSys.push_back(Eigen::Triplet<ldp::real>(cooRhs.size(), i * 2 + r, reg_w));
+			cooRhs.push_back(m_points[i][r] * reg_w);
+		}
+	}
 
 	// setup similarity matrix
 	ldp::SpMat A_similarity;
-	A_similarity.resize(nRows, m_points.size() * 2);
+	A_similarity.resize(cooRhs.size(), m_points.size() * 2);
 	if (cooSys.size())
 		A_similarity.setFromTriplets(cooSys.begin(), cooSys.end());
+	ldp::Vec b_similarity;
+	b_similarity.resize(cooRhs.size());
+	for (size_t i = 0; i < cooRhs.size(); i++)
+		b_similarity[i] = cooRhs[i];
 	m_AtA_similarity = A_similarity.transpose() * A_similarity;
+	m_Atb_similarity = A_similarity.transpose() * b_similarity;
 	m_solver.analyzePattern(m_AtA_similarity);
 }
 
@@ -228,19 +300,17 @@ void FreeFormDeform::setupControlMatrix()
 	std::vector<Eigen::Triplet<ldp::real>> cooSys;
 	std::vector<ldp::real> cooRhs;
 
+	const float cp_w = sqrt(100000.f / m_controlPoints.size());
+
 	// adding control points to the linear system
 	for (const auto& cp : m_controlPoints)
 	{
 		const auto& q = m_quads[cp.quad_id];
 		for (int r = 0; r < 2; r++)
 		{
-			float dif = cp.tarPos[r];
 			for (int k = 0; k < 4; k++)
-			{
-				cooSys.push_back(Eigen::Triplet<ldp::real>(cooRhs.size(), q[k] * 2 + r, cp.quad_w[k]));
-				dif -= cp.quad_w[k] * m_points_init[q[k]][r];
-			} // end for k
-			cooRhs.push_back(dif);
+				cooSys.push_back(Eigen::Triplet<ldp::real>(cooRhs.size(), q[k] * 2 + r, cp_w * cp.quad_w[k]));
+			cooRhs.push_back(cp_w * cp.tarPos[r]);
 		} // end for r
 	} // end for cp
 
@@ -249,7 +319,7 @@ void FreeFormDeform::setupControlMatrix()
 	A.resize(cooRhs.size(), m_points.size() * 2);
 	if (cooSys.size())
 		A.setFromTriplets(cooSys.begin(), cooSys.end());
-	m_Atb_control = A.transpose() * A;
+	m_AtA_control = A.transpose() * A;
 	ldp::Vec b;
 	b.resize(cooRhs.size());
 	for (size_t i = 0; i < b.size(); i++)
@@ -286,7 +356,7 @@ void FreeFormDeform::factor()
 
 void FreeFormDeform::solve()
 {
-	auto X = m_solver.solve(m_Atb_control);
+	ldp::Vec X = m_solver.solve(m_Atb_similarity + m_Atb_control);
 	for (size_t i = 0; i < m_points.size(); i++)
 		m_points[i] = ldp::Float2(X[i * 2], X[i * 2 + 1]);
 	updatePoly();

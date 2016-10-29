@@ -101,8 +101,6 @@ void AbstractEventHandle::mouseMoveEvent(QMouseEvent *ev)
 			ldp::Float4 color(qRed(cl), qGreen(cl), qBlue(cl), qAlpha(cl));
 			color /= 255.f;
 			int id = svg::SvgAbstractObject::index_from_color(color);
-			if (id != 0)
-				id = id;
 			m_viewer->getSvgManager()->highlightShapeByIndex(m_lastHighlightShapeId, id);
 			m_lastHighlightShapeId = id;
 		}

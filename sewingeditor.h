@@ -5,6 +5,7 @@
 #include "event_handles\AbstractEventHandle.h"
 #include <QMap>
 #include <QSharedPointer>
+class FreeFormDeform;
 class MeshWindow;
 class SewingEditor : public QMainWindow
 {
@@ -77,6 +78,7 @@ protected:
 	struct RollBackControl{
 		QString name;
 		std::shared_ptr<svg::SvgManager> data;
+		std::shared_ptr<FreeFormDeform> deformer;
 	};
 	enum {
 		MAX_ROLLBACK_STEP = 100,

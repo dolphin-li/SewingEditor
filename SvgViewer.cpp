@@ -5,6 +5,7 @@
 #include "Renderable.h"
 #include "svgpp\SvgManager.h"
 #include "svgpp\SvgAbstractObject.h"
+#include "FreeFormDeform.h"
 
 SvgViewer::SvgViewer(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -12,7 +13,9 @@ SvgViewer::SvgViewer(QWidget *parent)
 	setMouseTracking(true);
 	m_buttons = Qt::MouseButton::NoButton;
 	m_svgManager = nullptr;
+	m_svgDeformer = nullptr;
 	m_isDragBox = false;
+	m_isDeformMode = false;
 
 	m_eventHandles.resize((size_t)AbstractEventHandle::ProcessorTypeEnd, nullptr);
 	for (size_t i = (size_t)AbstractEventHandle::ProcessorTypeGeneral; 
@@ -21,6 +24,7 @@ SvgViewer::SvgViewer(QWidget *parent)
 		m_eventHandles[i] = std::shared_ptr<AbstractEventHandle>(
 			AbstractEventHandle::create(AbstractEventHandle::ProcessorType(i), this));
 	}
+	m_currentEventHandle = nullptr;
 	setEventHandleType(AbstractEventHandle::ProcessorTypeShape);
 }
 
@@ -113,6 +117,16 @@ void SvgViewer::setSvgManager(svg::SvgManager* manager)
 	m_svgManager = manager;
 }
 
+FreeFormDeform* SvgViewer::getSvgDeformer()
+{
+	return m_svgDeformer;
+}
+
+void SvgViewer::setSvgDeformer(FreeFormDeform* deformer)
+{
+	m_svgDeformer = deformer;
+}
+
 void SvgViewer::paintGL()
 {
 	renderFbo();
@@ -135,6 +149,8 @@ void SvgViewer::paintGL()
 	renderDragBox();
 	if (m_svgManager)
 		m_svgManager->render();
+	m_camera.apply();
+	renderDeformMode(false);
 }
 
 void SvgViewer::renderFbo()
@@ -157,7 +173,8 @@ void SvgViewer::renderFbo()
 	m_camera.apply();
 	if (m_svgManager)
 		m_svgManager->renderIndex();
-
+	m_camera.apply();
+	renderDeformMode(true);
 	m_fbo->release();
 	m_fboImage = m_fbo->toImage();
 }
@@ -202,6 +219,69 @@ void SvgViewer::renderDragBox()
 	glEnd();
 
 	glPopAttrib();
+}
+
+void SvgViewer::beginDeformMode()
+{
+	m_isDeformMode = true;
+	m_activeDeformNodeId = -1;
+}
+
+void SvgViewer::endDeformMode()
+{
+	m_isDeformMode = false;
+}
+
+void SvgViewer::renderDeformMode(bool idxMode)
+{
+	if (!m_isDeformMode || !m_svgDeformer || !m_svgManager)
+		return;
+
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	glDisable(GL_STENCIL_TEST);
+	if (!idxMode)
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	else
+		glDisable(GL_BLEND);
+	glBegin(GL_QUADS);
+	for (int i = 0; i < m_svgDeformer->numControlPoints(); i++)
+	{
+		const auto& cp = m_svgDeformer->getControlPoint(i);
+		auto p = m_svgDeformer->calcPosition(cp);
+		float r = m_svgManager->width() * 0.01 / 3.f;
+		if (i == m_activeDeformNodeId || i == m_highLightedDeformNodeId)
+			r *= 2;
+		if (!idxMode)
+		{
+			glColor4f(1, 0, 1, 0.5);
+		}
+		else
+		{
+			glColor4fv(svg::SvgAbstractObject::color_from_index(FreeFormDeform::INDEX_BEGIN + i).ptr());
+		}
+		glVertex2f(p[0] - r, p[1] - r);
+		glVertex2f(p[0] + r, p[1] - r);
+		glVertex2f(p[0] + r, p[1] + r);
+		glVertex2f(p[0] - r, p[1] + r);
+	} // end for i
+	glEnd();
+
+	glPopAttrib();
+}
+
+ldp::Float2 SvgViewer::svgCoord2viewCoord(ldp::Float2 p)const
+{
+	ldp::Float3 p1 = m_camera.getScreenCoords(ldp::Float3(p[0], p[1], 0));
+	return ldp::Float2(p1[0], height()-1-p1[1]);
+}
+
+ldp::Float2 SvgViewer::viewCoord2svgCoord(ldp::Float2 p)const
+{
+	ldp::Float3 p1 = m_camera.getWorldCoords(ldp::Float3(p[0], height()-1-p[1], 0));
+	return ldp::Float2(p1[0], p1[1]);
 }
 
 void SvgViewer::keyPressEvent(QKeyEvent*ev)

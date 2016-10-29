@@ -3,6 +3,7 @@
 #include "sewingeditor.h"
 #include "global_data_holder.h"
 #include "svgpp\SvgAbstractObject.h"
+#include "FreeFormDeform.h"
 SewingEditor::SewingEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -19,6 +20,7 @@ SewingEditor::SewingEditor(QWidget *parent)
 	{
 		g_dataholder.init();
 		ui.widget->setSvgManager(g_dataholder.m_svgManager.get());
+		ui.widget->setSvgDeformer(g_dataholder.m_svgDefomer.get());
 		m_meshWindow->getViewer()->initCloth(g_dataholder.m_clothManger.get(), g_dataholder.m_clothUiListener.get());
 		initLayerList();
 		resetRoll();
@@ -470,7 +472,9 @@ void SewingEditor::rollBackTo(int pos)
 		m_rollPos = (m_rollHead + pos) % MAX_ROLLBACK_STEP;
 		ldp::Float4 lastBound = ui.widget->getSvgManager()->getBound();
 		g_dataholder.m_svgManager = m_rollBackControls[m_rollPos].data->clone();
+		g_dataholder.m_svgDefomer = m_rollBackControls[m_rollPos].deformer->clone();
 		ui.widget->setSvgManager(g_dataholder.m_svgManager.get());
+		ui.widget->setSvgDeformer(g_dataholder.m_svgDefomer.get());
 		ldp::Float4 thisBound = ui.widget->getSvgManager()->getBound();
 		if (lastBound != thisBound)
 			ui.widget->resetCamera();
@@ -507,6 +511,7 @@ void SewingEditor::pushHistory(QString name)
 		m_rollPos = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
 		m_rollBackControls[m_rollPos].name = name;
 		m_rollBackControls[m_rollPos].data = ui.widget->getSvgManager()->clone();
+		m_rollBackControls[m_rollPos].deformer = ui.widget->getSvgDeformer()->clone();
 
 		m_rollTail = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
 		if (m_rollTail == m_rollHead)

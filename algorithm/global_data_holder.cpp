@@ -2,12 +2,14 @@
 #include "SvgManager.h"
 #include "analysis2d_cloth_static.h"
 #include "designer2d_cloth.h"
+#include "FreeFormDeform.h"
 GlobalDataHolder g_dataholder;
 
 void GlobalDataHolder::init()
 {
 	// 2D patterns from svg
 	m_svgManager.reset(new svg::SvgManager);
+	m_svgDefomer.reset(new FreeFormDeform);
 
 	// clothes related
 	m_clothManger.reset(new CAnalysis2D_Cloth_Static);

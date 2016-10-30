@@ -1,5 +1,6 @@
 #include "FreeFormDeform.h"
 #include "SvgPolyPath.h"
+#include "SvgManager.h"
 #include "kdtree\PointTree.h"
 
 const static int NUM_BINS = 50;
@@ -80,10 +81,19 @@ void FreeFormDeform::clear()
 	m_AtA_line.resize(0, 0);
 }
 
-std::shared_ptr<FreeFormDeform> FreeFormDeform::clone()const
+std::shared_ptr<FreeFormDeform> FreeFormDeform::clone(const svg::SvgManager* manager)const
 {
 	std::shared_ptr<FreeFormDeform> rhs(new FreeFormDeform);
 	rhs->m_polys = m_polys;
+	for (auto& poly : rhs->m_polys)
+	{
+		auto obj = manager->getObjectById(poly->getId());
+		if (obj == nullptr)
+			throw std::exception("not clonable!");
+		if (obj->objectType() != svg::SvgAbstractObject::PolyPath)
+			throw std::exception("not clonable 1!");
+		poly = (svg::SvgPolyPath*)obj;
+	}
 	rhs->m_polys_coords = m_polys_coords;
 	rhs->m_controlPoints = m_controlPoints;
 	rhs->m_points = m_points;

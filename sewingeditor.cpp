@@ -472,7 +472,7 @@ void SewingEditor::rollBackTo(int pos)
 		m_rollPos = (m_rollHead + pos) % MAX_ROLLBACK_STEP;
 		ldp::Float4 lastBound = ui.widget->getSvgManager()->getBound();
 		g_dataholder.m_svgManager = m_rollBackControls[m_rollPos].data->clone();
-		g_dataholder.m_svgDefomer = m_rollBackControls[m_rollPos].deformer->clone();
+		g_dataholder.m_svgDefomer = m_rollBackControls[m_rollPos].deformer->clone(g_dataholder.m_svgManager.get());
 		ui.widget->setSvgManager(g_dataholder.m_svgManager.get());
 		ui.widget->setSvgDeformer(g_dataholder.m_svgDefomer.get());
 		ldp::Float4 thisBound = ui.widget->getSvgManager()->getBound();
@@ -511,7 +511,7 @@ void SewingEditor::pushHistory(QString name)
 		m_rollPos = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
 		m_rollBackControls[m_rollPos].name = name;
 		m_rollBackControls[m_rollPos].data = ui.widget->getSvgManager()->clone();
-		m_rollBackControls[m_rollPos].deformer = ui.widget->getSvgDeformer()->clone();
+		m_rollBackControls[m_rollPos].deformer = ui.widget->getSvgDeformer()->clone(g_dataholder.m_svgManager.get());
 
 		m_rollTail = (m_rollPos + 1) % MAX_ROLLBACK_STEP;
 		if (m_rollTail == m_rollHead)

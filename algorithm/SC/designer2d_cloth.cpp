@@ -654,6 +654,18 @@ void CDesigner2D_Cloth::Solve_ifNeeded()
 		const std::vector< std::pair<unsigned int, unsigned int> > aNewL;
 		this->pAnalysis->BuildFEM_InterpValueField(cad_2d, mesh_2d, aNewL);
 	}
+
+	//// ldp test, remesh if needed........................
+	//unsigned int numrec = 0;
+	//mesh_2d.SmoothingMesh_Delaunay(numrec);
+	//if (numrec)
+	//{
+	//	printf("==========================remesh: %d\n", numrec);
+	//	const std::vector< std::pair<unsigned int, unsigned int> > aNewL;
+	//	this->pAnalysis->BuildFEM_InterpValueField(cad_2d, mesh_2d, aNewL);
+	//}
+	//// ldp end test..........................................
+
 	is_updated_coord = false;
 	is_updated_edge = false;
 }

@@ -5,6 +5,7 @@
 namespace svg
 {
 	class SvgPolyPath;
+	class SvgManager;
 }
 class FreeFormDeform
 {
@@ -30,7 +31,7 @@ public:
 	// bbox: left, right, top, bottom
 	void init(const std::vector<svg::SvgPolyPath*>& polys, int numQuadsProxy = 400);
 	void clear();
-	std::shared_ptr<FreeFormDeform> clone()const;
+	std::shared_ptr<FreeFormDeform> clone(const svg::SvgManager* manager)const;
 
 	// return the idx of the added control points, -1 means not added
 	int addControlPoint(ldp::Float2 pos);

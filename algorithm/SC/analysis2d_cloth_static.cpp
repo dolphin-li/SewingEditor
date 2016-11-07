@@ -43,6 +43,8 @@ using namespace Fem::Field;
 
 static unsigned int MakeHingeField_Tri(Fem::Field::CFieldWorld& world, unsigned int id_field_base);
 
+const static int G_NUM_COARSE_MESH = 3000;
+const static int G_NUM_FINE_MESH = 20000;
 
 CAnalysis2D_Cloth_Static::CAnalysis2D_Cloth_Static()
 {
@@ -2230,9 +2232,7 @@ void CAnalysis2D_Cloth_Static::MakeDetailField(const Cad::CCadObj2D& cad_2d, con
 			mesh_2d_detail.AddIdLCad_CutMesh(id_l);
 		}
 	}
-	//  mesh_2d_detail.SetMeshingMode_ElemSize(10000);
-	mesh_2d_detail.SetMeshingMode_ElemSize(20000);
-	//  mesh_2d_detail.SetMeshingMode_ElemSize(15000);  
+	mesh_2d_detail.SetMeshingMode_ElemSize(G_NUM_FINE_MESH);
 	mesh_2d_detail.Meshing(cad_2d);
 	std::cout << " number of fine mesh node " << mesh_2d_detail.GetVectorAry().size() << std::endl;
 	id_field_base_detail = world.AddMesh(Msh::CMeshProjector2Dto3D(mesh_2d_detail));
@@ -3037,7 +3037,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	} // end for loopEdgePairsBeforePleats
 
 	// 2. triangulation and make stitch-------------------------------------------------------------
-	mesh_2d.SetMeshingMode_ElemSize(3000);
+	mesh_2d.SetMeshingMode_ElemSize(G_NUM_COARSE_MESH);
 	mesh_2d.Meshing(cad_2d);
 	std::cout << "Node size : " << mesh_2d.GetVectorAry().size() << std::endl;
 

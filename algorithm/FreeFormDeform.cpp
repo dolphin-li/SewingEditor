@@ -544,6 +544,22 @@ void FreeFormDeform::updatePoly()
 
 void FreeFormDeform::solve()
 {
+	// if only one control points, this means translation
+	if (m_controlPoints.size() == 1)
+	{
+		const auto& q = m_quads[m_controlPoints[0].quad_id];
+		ldp::Float2 pts[4];
+		for (int k = 0; k < 4; k++)
+			pts[k] = m_points_init[q[k]];
+		ldp::Float2 p0 = ldp::BilinearInterpolate(m_controlPoints[0].quad_w, pts);
+		ldp::Float2 dif = m_controlPoints[0].tarPos - p0;
+		for (size_t i = 0; i < m_points.size(); i++)
+			m_points[i] = m_points_init[i] + dif;
+		updatePoly();
+		return;
+	} // end if 1 control points
+
+	// 
 	std::fill(m_thetas.begin(), m_thetas.end(), 0.f);
 	for (int iter = 0; iter < 10; iter++)
 	{

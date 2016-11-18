@@ -38,6 +38,7 @@ public:
 	void on_actionRemove_selected_corner_triggered();
 	void on_actionSplit_selected_edge_triggered();
 	void on_pbPathSplitByIntersect_clicked();
+	void on_actionDouble_path_width_triggered();
 protected:
 	void dragEnterEvent(QDragEnterEvent* ev);
 	void dropEvent(QDropEvent* ev);

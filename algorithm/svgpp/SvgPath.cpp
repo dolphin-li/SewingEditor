@@ -368,6 +368,12 @@ namespace svg
 		return false;
 	}
 
+	void SvgPath::setPathWidth(float w)
+	{
+		m_pathStyle.stroke_width = w;
+		invalid();
+	}
+
 	ldp::Float2 SvgPath::getStartPoint()const
 	{
 		if (m_cmds.size() == 0)

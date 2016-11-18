@@ -1839,6 +1839,27 @@ namespace svg
 		} // end for layer_iter
 	}
 
+	void SvgManager::doublePathWidth()
+	{
+		typedef std::shared_ptr<SvgAbstractObject> ObjPtr;
+		for (auto layer_iter : m_layers)
+		{
+			auto layer = layer_iter.second;
+			if (!layer->selected) continue;
+			auto rootPtr = (SvgGroup*)layer->root.get();
+			std::vector<ObjPtr> paths;
+			rootPtr->collectObjects(SvgAbstractObject::Path, paths, true);
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, paths, true);
+			if (paths.size() < 2)
+				continue;
+			for (size_t iPath = 0; iPath < paths.size(); iPath++)
+			{
+				SvgPath* path_i = (SvgPath*)paths[iPath].get();
+				path_i->setPathWidth(2 * path_i->getPathWidth());
+			} // end for iPath 
+		} // end for layer_iter
+	}
+
 	std::vector<SvgPolyPath*> SvgManager::collectPolyPaths(bool selectionOnly)const
 	{
 		std::vector<SvgPolyPath*> polyPaths;

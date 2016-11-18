@@ -779,6 +779,7 @@
     <addaction name="actionMerge_selected_path"/>
     <addaction name="actionRemove_selected_corner"/>
     <addaction name="actionSplit_selected_edge"/>
+    <addaction name="actionDouble_path_width"/>
    </widget>
    <widget class="QMenu" name="menuOp">
     <property name="styleSheet">
@@ -1281,6 +1282,11 @@
    </property>
    <property name="shortcut">
     <string>S</string>
+   </property>
+  </action>
+  <action name="actionDouble_path_width">
+   <property name="text">
+    <string>double path width</string>
    </property>
   </action>
  </widget>

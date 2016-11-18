@@ -1000,3 +1000,19 @@ void SewingEditor::on_pbPathSplitByIntersect_clicked()
 	}
 }
 
+void SewingEditor::on_actionDouble_path_width_triggered()
+{
+	try
+	{
+		ui.widget->getSvgManager()->doublePathWidth();
+		ui.widget->updateGL();
+		pushHistory("double path width");
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+

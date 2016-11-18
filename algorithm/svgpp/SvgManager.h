@@ -107,6 +107,7 @@ namespace svg
 		std::vector<SvgEdgeGroup*> collectEdgeGroups(bool selectionOnly = true)const;
 		void smoothSelectedPoly(double thre);
 		void selectedPathsSplitByIntersect();
+		void doublePathWidth();
 
 		///// pair operations
 		void makeSelectedToPair();

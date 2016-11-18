@@ -3061,7 +3061,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	obj_mesh.Translate(-c[0], -c[1], -c[2]);  obj_mesh.Scale(scale);  obj_mesh.Rot_Bryant(90, 0, 180);
 	cnt_mesh.Translate(-c[0], -c[1], -c[2]);  cnt_mesh.Scale(scale);  cnt_mesh.Rot_Bryant(90, 0, 180);
 	obj_mesh.GetCenterWidth(c[0], c[1], c[2], w[0], w[1], w[2]);
-	std::cout << "Scaled Armadillo " << " " << w[0] << " " << w[1] << " " << w[2] << std::endl;
+	std::cout << "Scaled mesh " << " " << w[0] << " " << w[1] << " " << w[2] << std::endl;
 	////
 	std::vector<unsigned int> aTri;
 	std::vector<double> aXYZ;

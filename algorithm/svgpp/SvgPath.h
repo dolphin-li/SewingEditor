@@ -25,6 +25,8 @@ namespace svg
 		bool isClosed()const;
 
 		virtual void updateBoundFromGeometry();
+		void setPathWidth(float w);
+		float getPathWidth()const { return m_pathStyle.stroke_width; }
 
 		// split all segments to individual paths
 		// if there is only one segment, we do not split and return an nullptr

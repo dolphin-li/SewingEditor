@@ -50,6 +50,7 @@ public:
     QAction *actionSelect_connected;
     QAction *actionRemove_selected_corner;
     QAction *actionSplit_selected_edge;
+    QAction *actionDouble_path_width;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     SvgViewer *widget;
@@ -202,6 +203,8 @@ public:
         actionRemove_selected_corner->setObjectName(QStringLiteral("actionRemove_selected_corner"));
         actionSplit_selected_edge = new QAction(SewingEditorClass);
         actionSplit_selected_edge->setObjectName(QStringLiteral("actionSplit_selected_edge"));
+        actionDouble_path_width = new QAction(SewingEditorClass);
+        actionDouble_path_width->setObjectName(QStringLiteral("actionDouble_path_width"));
         centralWidget = new QWidget(SewingEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -459,6 +462,7 @@ public:
         menuPath->addAction(actionMerge_selected_path);
         menuPath->addAction(actionRemove_selected_corner);
         menuPath->addAction(actionSplit_selected_edge);
+        menuPath->addAction(actionDouble_path_width);
         menuOp->addAction(actionUndo);
         menuOp->addAction(actionRedo);
 
@@ -502,6 +506,7 @@ public:
         actionRemove_selected_corner->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+E", 0));
         actionSplit_selected_edge->setText(QApplication::translate("SewingEditorClass", "Split selected edge", 0));
         actionSplit_selected_edge->setShortcut(QApplication::translate("SewingEditorClass", "S", 0));
+        actionDouble_path_width->setText(QApplication::translate("SewingEditorClass", "double path width", 0));
         menuFile->setTitle(QApplication::translate("SewingEditorClass", "file", 0));
         menuSelection->setTitle(QApplication::translate("SewingEditorClass", "selection", 0));
         menuGroup->setTitle(QApplication::translate("SewingEditorClass", "group", 0));

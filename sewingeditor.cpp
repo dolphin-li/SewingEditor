@@ -144,7 +144,7 @@ void SewingEditor::on_actionLoad_svg_triggered()
 {
 	try
 	{
-		QString name = QFileDialog::getOpenFileName(this, "load svg", "data", "*.svg");
+		QString name = QFileDialog::getOpenFileName(this, "load svg", "", "*.svg");
 		if (name.isEmpty())
 			return;
 		loadSvg(name);
@@ -163,7 +163,7 @@ void SewingEditor::on_actionSave_svg_triggered()
 {
 	try
 	{
-		QString name = QFileDialog::getSaveFileName(this, "save svg", "data", "*.svg");
+		QString name = QFileDialog::getSaveFileName(this, "save svg", "", "*.svg");
 		if (name.isEmpty())
 			return;
 		if (ui.widget->getSvgManager() == nullptr)
@@ -975,6 +975,22 @@ void SewingEditor::on_dbSmoothPolyThre_valueChanged(double v)
 	try
 	{
 		g_dataholder.m_param.m_smoothPolyThre = v;
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void SewingEditor::on_pbPathSplitByIntersect_clicked()
+{
+	try
+	{
+		ui.widget->getSvgManager()->selectedPathsSplitByIntersect();
+		ui.widget->updateGL();
+		pushHistory("split path by intersect");
 	} catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;

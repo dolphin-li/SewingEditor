@@ -37,6 +37,9 @@ namespace svg
 			bool to_single_segment = false)const;
 		std::shared_ptr<SvgAbstractObject> subPath(const std::vector<int>& cmdsBegins,
 			const std::vector<int>& cmdsEnds, bool to_single_segment = false)const;
+
+		// check the intersection with other and insert a point if intersected
+		bool insertPointByIntersection(const SvgPath* other, float thre);
 	protected:
 		void cacheNvPaths();
 		void renderSelection();

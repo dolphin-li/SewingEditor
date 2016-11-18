@@ -967,55 +967,13 @@
         <string>param</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="QPushButton" name="pbSymmetricCopy">
+        <item row="2" column="1">
+         <widget class="QPushButton" name="pbSelectClosed">
           <property name="toolTip">
-           <string>symmetrically copy selected polygons (ALT+S)</string>
+           <string>select closed polygons</string>
           </property>
           <property name="text">
-           <string>Symmetric copy</string>
-          </property>
-          <property name="shortcut">
-           <string>Alt+S</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="pbToConnectedGroups">
-          <property name="toolTip">
-           <string>convert selected path to polygons (ALT+C)</string>
-          </property>
-          <property name="text">
-           <string>Connected groups</string>
-          </property>
-          <property name="shortcut">
-           <string>Alt+C</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="pbMakePair">
-          <property name="toolTip">
-           <string>make selected poly edges to pairs (ALT+M)</string>
-          </property>
-          <property name="text">
-           <string>Make pair</string>
-          </property>
-          <property name="shortcut">
-           <string>Alt+M</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="pbRemovePairs">
-          <property name="toolTip">
-           <string>remove selected pairs</string>
-          </property>
-          <property name="text">
-           <string>Remove pairs</string>
-          </property>
-          <property name="shortcut">
-           <string>Alt+R</string>
+           <string>select closed</string>
           </property>
          </widget>
         </item>
@@ -1032,13 +990,65 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QPushButton" name="pbSelectClosed">
+        <item row="1" column="1">
+         <widget class="QPushButton" name="pbRemovePairs">
           <property name="toolTip">
-           <string>select closed polygons</string>
+           <string>remove selected pairs</string>
           </property>
           <property name="text">
-           <string>select closed</string>
+           <string>Remove pairs</string>
+          </property>
+          <property name="shortcut">
+           <string>Alt+R</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="pbMakePair">
+          <property name="toolTip">
+           <string>make selected poly edges to pairs (ALT+M)</string>
+          </property>
+          <property name="text">
+           <string>Make pair</string>
+          </property>
+          <property name="shortcut">
+           <string>Alt+M</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="pbToConnectedGroups">
+          <property name="toolTip">
+           <string>convert selected path to polygons (ALT+C)</string>
+          </property>
+          <property name="text">
+           <string>Connected groups</string>
+          </property>
+          <property name="shortcut">
+           <string>Alt+C</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QDoubleSpinBox" name="sbPixelToMeter">
+          <property name="decimals">
+           <number>4</number>
+          </property>
+          <property name="maximum">
+           <double>999999.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pbSymmetricCopy">
+          <property name="toolTip">
+           <string>symmetrically copy selected polygons (ALT+S)</string>
+          </property>
+          <property name="text">
+           <string>Symmetric copy</string>
+          </property>
+          <property name="shortcut">
+           <string>Alt+S</string>
           </property>
          </widget>
         </item>
@@ -1052,13 +1062,10 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QDoubleSpinBox" name="sbPixelToMeter">
-          <property name="decimals">
-           <number>4</number>
-          </property>
-          <property name="maximum">
-           <double>999999.000000000000000</double>
+        <item row="4" column="0">
+         <widget class="QPushButton" name="pbPathSplitByIntersect">
+          <property name="text">
+           <string>path split by intersect</string>
           </property>
          </widget>
         </item>

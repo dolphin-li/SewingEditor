@@ -73,14 +73,15 @@ public:
     QPushButton *pbRemoveLayers;
     QGroupBox *gbParam;
     QGridLayout *gridLayout_3;
-    QPushButton *pbSymmetricCopy;
-    QPushButton *pbToConnectedGroups;
-    QPushButton *pbMakePair;
-    QPushButton *pbRemovePairs;
-    QPushButton *pbClosePolygon;
     QPushButton *pbSelectClosed;
-    QPushButton *pbPixelToMeter;
+    QPushButton *pbClosePolygon;
+    QPushButton *pbRemovePairs;
+    QPushButton *pbMakePair;
+    QPushButton *pbToConnectedGroups;
     QDoubleSpinBox *sbPixelToMeter;
+    QPushButton *pbSymmetricCopy;
+    QPushButton *pbPixelToMeter;
+    QPushButton *pbPathSplitByIntersect;
     QGroupBox *groupBox;
     QGridLayout *gridLayout_5;
     QPushButton *pbGenerateMesh;
@@ -339,40 +340,30 @@ public:
         gridLayout_3->setSpacing(6);
         gridLayout_3->setContentsMargins(11, 11, 11, 11);
         gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
-        pbSymmetricCopy = new QPushButton(gbParam);
-        pbSymmetricCopy->setObjectName(QStringLiteral("pbSymmetricCopy"));
+        pbSelectClosed = new QPushButton(gbParam);
+        pbSelectClosed->setObjectName(QStringLiteral("pbSelectClosed"));
 
-        gridLayout_3->addWidget(pbSymmetricCopy, 0, 0, 1, 1);
-
-        pbToConnectedGroups = new QPushButton(gbParam);
-        pbToConnectedGroups->setObjectName(QStringLiteral("pbToConnectedGroups"));
-
-        gridLayout_3->addWidget(pbToConnectedGroups, 0, 1, 1, 1);
-
-        pbMakePair = new QPushButton(gbParam);
-        pbMakePair->setObjectName(QStringLiteral("pbMakePair"));
-
-        gridLayout_3->addWidget(pbMakePair, 1, 0, 1, 1);
-
-        pbRemovePairs = new QPushButton(gbParam);
-        pbRemovePairs->setObjectName(QStringLiteral("pbRemovePairs"));
-
-        gridLayout_3->addWidget(pbRemovePairs, 1, 1, 1, 1);
+        gridLayout_3->addWidget(pbSelectClosed, 2, 1, 1, 1);
 
         pbClosePolygon = new QPushButton(gbParam);
         pbClosePolygon->setObjectName(QStringLiteral("pbClosePolygon"));
 
         gridLayout_3->addWidget(pbClosePolygon, 2, 0, 1, 1);
 
-        pbSelectClosed = new QPushButton(gbParam);
-        pbSelectClosed->setObjectName(QStringLiteral("pbSelectClosed"));
+        pbRemovePairs = new QPushButton(gbParam);
+        pbRemovePairs->setObjectName(QStringLiteral("pbRemovePairs"));
 
-        gridLayout_3->addWidget(pbSelectClosed, 2, 1, 1, 1);
+        gridLayout_3->addWidget(pbRemovePairs, 1, 1, 1, 1);
 
-        pbPixelToMeter = new QPushButton(gbParam);
-        pbPixelToMeter->setObjectName(QStringLiteral("pbPixelToMeter"));
+        pbMakePair = new QPushButton(gbParam);
+        pbMakePair->setObjectName(QStringLiteral("pbMakePair"));
 
-        gridLayout_3->addWidget(pbPixelToMeter, 3, 0, 1, 1);
+        gridLayout_3->addWidget(pbMakePair, 1, 0, 1, 1);
+
+        pbToConnectedGroups = new QPushButton(gbParam);
+        pbToConnectedGroups->setObjectName(QStringLiteral("pbToConnectedGroups"));
+
+        gridLayout_3->addWidget(pbToConnectedGroups, 0, 1, 1, 1);
 
         sbPixelToMeter = new QDoubleSpinBox(gbParam);
         sbPixelToMeter->setObjectName(QStringLiteral("sbPixelToMeter"));
@@ -380,6 +371,21 @@ public:
         sbPixelToMeter->setMaximum(999999);
 
         gridLayout_3->addWidget(sbPixelToMeter, 3, 1, 1, 1);
+
+        pbSymmetricCopy = new QPushButton(gbParam);
+        pbSymmetricCopy->setObjectName(QStringLiteral("pbSymmetricCopy"));
+
+        gridLayout_3->addWidget(pbSymmetricCopy, 0, 0, 1, 1);
+
+        pbPixelToMeter = new QPushButton(gbParam);
+        pbPixelToMeter->setObjectName(QStringLiteral("pbPixelToMeter"));
+
+        gridLayout_3->addWidget(pbPixelToMeter, 3, 0, 1, 1);
+
+        pbPathSplitByIntersect = new QPushButton(gbParam);
+        pbPathSplitByIntersect->setObjectName(QStringLiteral("pbPathSplitByIntersect"));
+
+        gridLayout_3->addWidget(pbPathSplitByIntersect, 4, 0, 1, 1);
 
 
         gridLayout_4->addWidget(gbParam, 2, 0, 1, 2);
@@ -519,38 +525,39 @@ public:
         pbRemoveLayers->setShortcut(QApplication::translate("SewingEditorClass", "Ctrl+R", 0));
         gbParam->setTitle(QApplication::translate("SewingEditorClass", "param", 0));
 #ifndef QT_NO_TOOLTIP
-        pbSymmetricCopy->setToolTip(QApplication::translate("SewingEditorClass", "symmetrically copy selected polygons (ALT+S)", 0));
+        pbSelectClosed->setToolTip(QApplication::translate("SewingEditorClass", "select closed polygons", 0));
 #endif // QT_NO_TOOLTIP
-        pbSymmetricCopy->setText(QApplication::translate("SewingEditorClass", "Symmetric copy", 0));
-        pbSymmetricCopy->setShortcut(QApplication::translate("SewingEditorClass", "Alt+S", 0));
-#ifndef QT_NO_TOOLTIP
-        pbToConnectedGroups->setToolTip(QApplication::translate("SewingEditorClass", "convert selected path to polygons (ALT+C)", 0));
-#endif // QT_NO_TOOLTIP
-        pbToConnectedGroups->setText(QApplication::translate("SewingEditorClass", "Connected groups", 0));
-        pbToConnectedGroups->setShortcut(QApplication::translate("SewingEditorClass", "Alt+C", 0));
-#ifndef QT_NO_TOOLTIP
-        pbMakePair->setToolTip(QApplication::translate("SewingEditorClass", "make selected poly edges to pairs (ALT+M)", 0));
-#endif // QT_NO_TOOLTIP
-        pbMakePair->setText(QApplication::translate("SewingEditorClass", "Make pair", 0));
-        pbMakePair->setShortcut(QApplication::translate("SewingEditorClass", "Alt+M", 0));
-#ifndef QT_NO_TOOLTIP
-        pbRemovePairs->setToolTip(QApplication::translate("SewingEditorClass", "remove selected pairs", 0));
-#endif // QT_NO_TOOLTIP
-        pbRemovePairs->setText(QApplication::translate("SewingEditorClass", "Remove pairs", 0));
-        pbRemovePairs->setShortcut(QApplication::translate("SewingEditorClass", "Alt+R", 0));
+        pbSelectClosed->setText(QApplication::translate("SewingEditorClass", "select closed", 0));
 #ifndef QT_NO_TOOLTIP
         pbClosePolygon->setToolTip(QApplication::translate("SewingEditorClass", "make selected polygon closed (ALT+L)", 0));
 #endif // QT_NO_TOOLTIP
         pbClosePolygon->setText(QApplication::translate("SewingEditorClass", "cLose polygon", 0));
         pbClosePolygon->setShortcut(QApplication::translate("SewingEditorClass", "Alt+L", 0));
 #ifndef QT_NO_TOOLTIP
-        pbSelectClosed->setToolTip(QApplication::translate("SewingEditorClass", "select closed polygons", 0));
+        pbRemovePairs->setToolTip(QApplication::translate("SewingEditorClass", "remove selected pairs", 0));
 #endif // QT_NO_TOOLTIP
-        pbSelectClosed->setText(QApplication::translate("SewingEditorClass", "select closed", 0));
+        pbRemovePairs->setText(QApplication::translate("SewingEditorClass", "Remove pairs", 0));
+        pbRemovePairs->setShortcut(QApplication::translate("SewingEditorClass", "Alt+R", 0));
+#ifndef QT_NO_TOOLTIP
+        pbMakePair->setToolTip(QApplication::translate("SewingEditorClass", "make selected poly edges to pairs (ALT+M)", 0));
+#endif // QT_NO_TOOLTIP
+        pbMakePair->setText(QApplication::translate("SewingEditorClass", "Make pair", 0));
+        pbMakePair->setShortcut(QApplication::translate("SewingEditorClass", "Alt+M", 0));
+#ifndef QT_NO_TOOLTIP
+        pbToConnectedGroups->setToolTip(QApplication::translate("SewingEditorClass", "convert selected path to polygons (ALT+C)", 0));
+#endif // QT_NO_TOOLTIP
+        pbToConnectedGroups->setText(QApplication::translate("SewingEditorClass", "Connected groups", 0));
+        pbToConnectedGroups->setShortcut(QApplication::translate("SewingEditorClass", "Alt+C", 0));
+#ifndef QT_NO_TOOLTIP
+        pbSymmetricCopy->setToolTip(QApplication::translate("SewingEditorClass", "symmetrically copy selected polygons (ALT+S)", 0));
+#endif // QT_NO_TOOLTIP
+        pbSymmetricCopy->setText(QApplication::translate("SewingEditorClass", "Symmetric copy", 0));
+        pbSymmetricCopy->setShortcut(QApplication::translate("SewingEditorClass", "Alt+S", 0));
 #ifndef QT_NO_TOOLTIP
         pbPixelToMeter->setToolTip(QApplication::translate("SewingEditorClass", "1 meter  == ? pixels", 0));
 #endif // QT_NO_TOOLTIP
         pbPixelToMeter->setText(QApplication::translate("SewingEditorClass", "pixel to meter", 0));
+        pbPathSplitByIntersect->setText(QApplication::translate("SewingEditorClass", "path split by intersect", 0));
         groupBox->setTitle(QApplication::translate("SewingEditorClass", "mesh", 0));
         pbGenerateMesh->setText(QApplication::translate("SewingEditorClass", "Generate Mesh", 0));
         groupBox_2->setTitle(QApplication::translate("SewingEditorClass", "Smooth Poly", 0));

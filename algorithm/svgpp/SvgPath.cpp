@@ -385,6 +385,88 @@ namespace svg
 		return ldp::Float2(m_coords[m_coords.size() - 2], m_coords[m_coords.size() - 1]);
 	}
 
+	// a + t(b-a) = c + s(d-c), return t
+	// if the intersection point is outside cd then return -1
+	inline float seg_intersect_seg(ldp::Float2 a, ldp::Float2 b, ldp::Float2 c, ldp::Float2 d, float thre)
+	{
+		ldp::Float2 dc = d - c, ad = a - d, ba = b - a;
+		if (dc.length() < std::numeric_limits<float>::epsilon()
+			|| ba.length() < std::numeric_limits<float>::epsilon())
+			return -1;
+		float t = dc.cross(ad) / ba.cross(dc);
+
+		ldp::Float2 p = a + t * ba;
+		float pc_pd = (p - c).dot(p - d);
+		if (pc_pd >= thre * dc.length())
+			t = -1;
+		return t;
+	}
+
+	bool SvgPath::insertPointByIntersection(const SvgPath* other, float thre)
+	{
+		if (m_cmds.size() < 2 || other->m_cmds.size() < 2)
+			return false;
+		// we only handle line segments
+		for (auto cmd : m_cmds)
+		{
+			if (cmd != GL_MOVE_TO_NV && cmd != GL_LINE_TO_NV)
+				throw std::exception("SvgPath::insertPointByIntersection: we only handle line segments");
+		}
+		for (auto cmd : other->m_cmds)
+		{
+			if (cmd != GL_MOVE_TO_NV && cmd != GL_LINE_TO_NV)
+				throw std::exception("SvgPath::insertPointByIntersection: we only handle line segments");
+		}
+
+		// collect points
+		std::vector<ldp::Float2> pts, other_pts;
+		for (size_t i = 0; i < m_coords.size(); i += 2)
+			pts.push_back(ldp::Float2(m_coords[i], m_coords[i + 1]));
+		if (m_cmds.back() == GL_CLOSE_PATH_NV)
+			pts.push_back(ldp::Float2(m_coords[0], m_coords[1]));
+		for (size_t i = 0; i < other->m_coords.size(); i += 2)
+			other_pts.push_back(ldp::Float2(other->m_coords[i], other->m_coords[i + 1]));
+		if (other->m_cmds.back() == GL_CLOSE_PATH_NV)
+			other_pts.push_back(ldp::Float2(other->m_coords[0], other->m_coords[1]));
+
+		int idx = -1;
+		ldp::Float2 p;
+		for (int i = 0; i < (int)pts.size() - 1; i++)
+		{
+			ldp::Float2 a = pts[i], b = pts[i + 1];
+			for (int j = 0; j < (int)other_pts.size() - 1; j++)
+			{
+				ldp::Float2 c = other_pts[j], d = other_pts[j + 1];
+				float t = seg_intersect_seg(a, b, c, d, thre);
+				if (t > 0.01 && t < 0.99)
+				{
+					p = a + t * (b - a);
+					idx = i;
+					break;
+				} // end if t
+			} // end for j
+			if (idx >= 0)
+				break;
+		} // end for i
+
+		if (idx >= 0)
+		{
+			std::vector<GLubyte> cmd;
+			cmd.push_back(GL_LINE_TO_NV);
+			cmd.push_back(GL_MOVE_TO_NV);
+			m_cmds.insert(m_cmds.begin() + idx + 1, cmd.begin(), cmd.end());
+			std::vector<float> coord;
+			coord.push_back(p[0]);
+			coord.push_back(p[1]);
+			coord.push_back(p[0]);
+			coord.push_back(p[1]);
+			m_coords.insert(m_coords.begin() + (idx+1) * 2, coord.begin(), coord.end());
+			invalid();
+			return true;
+		}
+		return false;
+	}
+
 #pragma region --bounds helper
 	struct EndPointArc {
 		ldp::Float2 p[2],

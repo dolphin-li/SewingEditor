@@ -21,6 +21,7 @@ using namespace ldp;
 namespace svg
 {
 	const static float PATH_CONTACT_DIST_THRE = 0.01f;
+	const static float PATH_INTERSECT_DIST_THRE = 0.2f;
 	const static float PATH_COS_ANGLE_DIST_THRE = cos(15.f * ldp::PI_S / 180.f);
 #pragma region --helper
 	static std::vector<ldp::Float3> create_color_table()
@@ -1688,7 +1689,6 @@ namespace svg
 			std::vector<Point> points, validPoints;
 			std::vector<int> pointMapper, validPointIds; // map from points to merged points
 			rootPtr->collectObjects(SvgAbstractObject::Path, paths, true);
-			rootPtr->collectObjects(SvgAbstractObject::PolyPath, paths, true);
 			for (auto path : paths)
 			{
 				auto ptr = (SvgPath*)path.get();
@@ -1805,10 +1805,38 @@ namespace svg
 			} // end for gIds
 
 			// 6. remove old and insert new
+			paths.clear();
+			rootPtr->collectObjects(SvgAbstractObject::PolyPath, paths, true);
 			removeSelected(rootPtr);
 			rootPtr->m_children.insert(rootPtr->m_children.end(), newGroups.begin(), newGroups.end());
+			rootPtr->m_children.insert(rootPtr->m_children.end(), paths.begin(), paths.end());
 		} // end for all layers
 		removeSingleNodeAndEmptyNode();
+	}
+
+	void SvgManager::selectedPathsSplitByIntersect()
+	{
+		typedef std::shared_ptr<SvgAbstractObject> ObjPtr;
+		for (auto layer_iter : m_layers)
+		{
+			auto layer = layer_iter.second;
+			if (!layer->selected) continue;
+			auto rootPtr = (SvgGroup*)layer->root.get();
+			std::vector<ObjPtr> paths;
+			rootPtr->collectObjects(SvgAbstractObject::Path, paths, true);
+			if (paths.size() < 2)
+				continue;
+			for (size_t iPath = 0; iPath < paths.size(); iPath++)
+			{
+				SvgPath* path_i = (SvgPath*)paths[iPath].get();
+				for (size_t jPath = iPath+1; jPath < paths.size(); jPath++)
+				{
+					SvgPath* path_j = (SvgPath*)paths[jPath].get();
+					path_i->insertPointByIntersection(path_j, PATH_INTERSECT_DIST_THRE);
+					path_j->insertPointByIntersection(path_i, PATH_INTERSECT_DIST_THRE);
+				} // end for jPath
+			} // end for iPath
+		} // end for layer_iter
 	}
 
 	std::vector<SvgPolyPath*> SvgManager::collectPolyPaths(bool selectionOnly)const

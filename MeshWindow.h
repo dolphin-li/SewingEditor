@@ -14,10 +14,23 @@ public:
 
 	BaseMeshViewer* getViewer();
 	const BaseMeshViewer* getViewer()const;
+	void updateParamUI();
 	public slots:
 	void leftDocButtonsClicked(int i);
 	void on_cbThickness_currentTextChanged(const QString& s);
 	void on_pbInverseCylinder_clicked();
+	void on_dbStiffBend_valueChanged(double v);
+	void on_dbStiffMyu_valueChanged(double v);
+	void on_dbStiffLambda_valueChanged(double v);
+	void on_dbRho_valueChanged(double v);
+	void on_dbMyuK_valueChanged(double v);
+	void on_dbMyuS_valueChanged(double v);
+	void on_dbStiffN_valueChanged(double v);
+	void on_dbStiffF_valueChanged(double v);
+	void on_dbOffset_valueChanged(double v);
+	void on_sbCoarseMesh_valueChanged(int v);
+	void on_sbDetailMesh_valueChanged(int v);
+	void on_pbReInitMesh_clicked();
 protected:
 	void dragEnterEvent(QDragEnterEvent* ev);
 	void dropEvent(QDropEvent* ev);

@@ -226,7 +226,8 @@ public:
 	void SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
 		svg::SvgManager* svgManager, CSliderDeform& slider_deform,
 		std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair,
-		std::map<unsigned int, int>& loopId2svgIdMap);
+		std::map<unsigned int, int>& loopId2svgIdMap,
+		int num_coarse_mesh_tri, int num_detail_mesh_tri);
 	protected:
 		struct SelfStichLoop
 		{
@@ -308,6 +309,9 @@ private:
 
 	Fem::Field::View::CDrawerArrayField m_aDrawerField_detail;
 	Fem::Field::View::CDrawerFace *pDF_detail;
+
+	int m_num_coarse_mesh_tri;
+	int m_num_detail_mesh_tri;
 };
 
 #endif

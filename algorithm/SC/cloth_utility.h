@@ -35,7 +35,7 @@ public:
   double stiff_bend;
   double stiff_myu;
   double stiff_lambda;
-  double rho;      
+  double rho; 
 };
 
 class CContactParam{    

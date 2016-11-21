@@ -908,6 +908,7 @@ void SewingEditor::on_pbGenerateMesh_clicked()
 	try
 	{
 		g_dataholder.svgToCloth();
+		m_meshWindow->updateParamUI();
 		m_meshWindow->show();
 	}
 	catch (std::exception e)

@@ -43,9 +43,6 @@ using namespace Fem::Field;
 
 static unsigned int MakeHingeField_Tri(Fem::Field::CFieldWorld& world, unsigned int id_field_base);
 
-const static int G_NUM_COARSE_MESH = 3000;
-const static int G_NUM_FINE_MESH = 20000;
-
 CAnalysis2D_Cloth_Static::CAnalysis2D_Cloth_Static()
 {
 	face_color[0] = 1.0;
@@ -2232,7 +2229,7 @@ void CAnalysis2D_Cloth_Static::MakeDetailField(const Cad::CCadObj2D& cad_2d, con
 			mesh_2d_detail.AddIdLCad_CutMesh(id_l);
 		}
 	}
-	mesh_2d_detail.SetMeshingMode_ElemSize(G_NUM_FINE_MESH);
+	mesh_2d_detail.SetMeshingMode_ElemSize(m_num_detail_mesh_tri);
 	mesh_2d_detail.Meshing(cad_2d);
 	std::cout << " number of fine mesh node " << mesh_2d_detail.GetVectorAry().size() << std::endl;
 	id_field_base_detail = world.AddMesh(Msh::CMeshProjector2Dto3D(mesh_2d_detail));
@@ -2756,7 +2753,8 @@ struct EdgeWithPleats
 void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d, Msh::CMesher2D& mesh_2d,
 	svg::SvgManager* svgManager, CSliderDeform& slider_deform,
 	std::vector< std::pair<unsigned int, unsigned int> >& aSymIdVPair,
-	std::map<unsigned int, int>& loopId2svgIdMap)
+	std::map<unsigned int, int>& loopId2svgIdMap,
+	int num_coarse_mesh_tri, int num_detail_mesh_tri)
 {
 	// clear---------------------------------------------------------------------
 	cad_2d.Clear();
@@ -2767,6 +2765,9 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	aSymIdVPair.clear();
 	loopId2svgIdMap.clear();
 	m_selfStichLoops.clear();
+
+	m_num_coarse_mesh_tri = num_coarse_mesh_tri;
+	m_num_detail_mesh_tri = num_detail_mesh_tri;
 
 	// 1. create 2D pieces from svg ------------------------------------------------------------
 	auto polyPaths = svgManager->collectPolyPaths(true);
@@ -3037,7 +3038,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	} // end for loopEdgePairsBeforePleats
 
 	// 2. triangulation and make stitch-------------------------------------------------------------
-	mesh_2d.SetMeshingMode_ElemSize(G_NUM_COARSE_MESH);
+	mesh_2d.SetMeshingMode_ElemSize(m_num_coarse_mesh_tri);
 	mesh_2d.Meshing(cad_2d);
 	std::cout << "Node size : " << mesh_2d.GetVectorAry().size() << std::endl;
 

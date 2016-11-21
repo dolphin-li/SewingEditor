@@ -15,6 +15,7 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDockWidget>
+#include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
@@ -23,6 +24,8 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QWidget>
 #include "basemeshviewer.h"
@@ -41,12 +44,42 @@ public:
     QStatusBar *statusbar;
     QDockWidget *dockWidgetRight;
     QWidget *dockWidgetRightContents;
-    QGridLayout *gridLayout_3;
+    QGridLayout *gridLayout_7;
     QGroupBox *groupBox;
     QGridLayout *gridLayout_2;
     QLabel *label;
     QComboBox *cbThickness;
+    QLabel *label_2;
+    QDoubleSpinBox *dbStiffBend;
+    QLabel *label_3;
+    QDoubleSpinBox *dbStiffMyu;
+    QLabel *label_4;
+    QDoubleSpinBox *dbStiffLambda;
+    QLabel *label_5;
+    QDoubleSpinBox *dbRho;
+    QSpacerItem *verticalSpacer;
+    QGroupBox *groupBox_2;
+    QGridLayout *gridLayout_3;
+    QLabel *label_6;
+    QDoubleSpinBox *dbMyuK;
+    QLabel *label_7;
+    QDoubleSpinBox *dbMyuS;
+    QLabel *label_8;
+    QDoubleSpinBox *dbStiffN;
+    QLabel *label_9;
+    QDoubleSpinBox *dbStiffF;
+    QLabel *label_14;
+    QDoubleSpinBox *dbOffset;
+    QGroupBox *groupBox_5;
+    QGridLayout *gridLayout_6;
     QPushButton *pbInverseCylinder;
+    QPushButton *pbReInitMesh;
+    QGroupBox *groupBox_4;
+    QGridLayout *gridLayout_5;
+    QLabel *label_17;
+    QSpinBox *sbCoarseMesh;
+    QLabel *label_18;
+    QSpinBox *sbDetailMesh;
     QDockWidget *dockWidgetLeft;
     QWidget *dockWidgetLeftContents;
 
@@ -54,7 +87,7 @@ public:
     {
         if (MeshWindow->objectName().isEmpty())
             MeshWindow->setObjectName(QStringLiteral("MeshWindow"));
-        MeshWindow->resize(800, 600);
+        MeshWindow->resize(800, 681);
         actionOpen = new QAction(MeshWindow);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         centralwidget = new QWidget(MeshWindow);
@@ -78,12 +111,12 @@ public:
         MeshWindow->setStatusBar(statusbar);
         dockWidgetRight = new QDockWidget(MeshWindow);
         dockWidgetRight->setObjectName(QStringLiteral("dockWidgetRight"));
-        dockWidgetRight->setMinimumSize(QSize(300, 200));
+        dockWidgetRight->setMinimumSize(QSize(300, 598));
         dockWidgetRight->setFeatures(QDockWidget::NoDockWidgetFeatures);
         dockWidgetRightContents = new QWidget();
         dockWidgetRightContents->setObjectName(QStringLiteral("dockWidgetRightContents"));
-        gridLayout_3 = new QGridLayout(dockWidgetRightContents);
-        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        gridLayout_7 = new QGridLayout(dockWidgetRightContents);
+        gridLayout_7->setObjectName(QStringLiteral("gridLayout_7"));
         groupBox = new QGroupBox(dockWidgetRightContents);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setMinimumSize(QSize(0, 0));
@@ -98,15 +131,164 @@ public:
         cbThickness->setObjectName(QStringLiteral("cbThickness"));
         cbThickness->setMinimumSize(QSize(0, 0));
 
-        gridLayout_2->addWidget(cbThickness, 0, 1, 1, 1);
+        gridLayout_2->addWidget(cbThickness, 0, 1, 1, 2);
+
+        label_2 = new QLabel(groupBox);
+        label_2->setObjectName(QStringLiteral("label_2"));
+
+        gridLayout_2->addWidget(label_2, 1, 0, 1, 2);
+
+        dbStiffBend = new QDoubleSpinBox(groupBox);
+        dbStiffBend->setObjectName(QStringLiteral("dbStiffBend"));
+        dbStiffBend->setDecimals(10);
+
+        gridLayout_2->addWidget(dbStiffBend, 1, 2, 1, 1);
+
+        label_3 = new QLabel(groupBox);
+        label_3->setObjectName(QStringLiteral("label_3"));
+
+        gridLayout_2->addWidget(label_3, 2, 0, 1, 1);
+
+        dbStiffMyu = new QDoubleSpinBox(groupBox);
+        dbStiffMyu->setObjectName(QStringLiteral("dbStiffMyu"));
+        dbStiffMyu->setDecimals(3);
+
+        gridLayout_2->addWidget(dbStiffMyu, 2, 2, 1, 1);
+
+        label_4 = new QLabel(groupBox);
+        label_4->setObjectName(QStringLiteral("label_4"));
+
+        gridLayout_2->addWidget(label_4, 3, 0, 1, 2);
+
+        dbStiffLambda = new QDoubleSpinBox(groupBox);
+        dbStiffLambda->setObjectName(QStringLiteral("dbStiffLambda"));
+        dbStiffLambda->setDecimals(3);
+
+        gridLayout_2->addWidget(dbStiffLambda, 3, 2, 1, 1);
+
+        label_5 = new QLabel(groupBox);
+        label_5->setObjectName(QStringLiteral("label_5"));
+
+        gridLayout_2->addWidget(label_5, 4, 0, 1, 2);
+
+        dbRho = new QDoubleSpinBox(groupBox);
+        dbRho->setObjectName(QStringLiteral("dbRho"));
+        dbRho->setDecimals(3);
+
+        gridLayout_2->addWidget(dbRho, 4, 2, 1, 1);
 
 
-        gridLayout_3->addWidget(groupBox, 0, 0, 1, 1);
+        gridLayout_7->addWidget(groupBox, 0, 0, 1, 1);
 
-        pbInverseCylinder = new QPushButton(dockWidgetRightContents);
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout_7->addItem(verticalSpacer, 3, 0, 1, 1);
+
+        groupBox_2 = new QGroupBox(dockWidgetRightContents);
+        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
+        gridLayout_3 = new QGridLayout(groupBox_2);
+        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        label_6 = new QLabel(groupBox_2);
+        label_6->setObjectName(QStringLiteral("label_6"));
+
+        gridLayout_3->addWidget(label_6, 0, 0, 1, 1);
+
+        dbMyuK = new QDoubleSpinBox(groupBox_2);
+        dbMyuK->setObjectName(QStringLiteral("dbMyuK"));
+        dbMyuK->setDecimals(3);
+
+        gridLayout_3->addWidget(dbMyuK, 0, 1, 1, 1);
+
+        label_7 = new QLabel(groupBox_2);
+        label_7->setObjectName(QStringLiteral("label_7"));
+
+        gridLayout_3->addWidget(label_7, 1, 0, 1, 1);
+
+        dbMyuS = new QDoubleSpinBox(groupBox_2);
+        dbMyuS->setObjectName(QStringLiteral("dbMyuS"));
+        dbMyuS->setDecimals(3);
+
+        gridLayout_3->addWidget(dbMyuS, 1, 1, 1, 1);
+
+        label_8 = new QLabel(groupBox_2);
+        label_8->setObjectName(QStringLiteral("label_8"));
+
+        gridLayout_3->addWidget(label_8, 2, 0, 1, 1);
+
+        dbStiffN = new QDoubleSpinBox(groupBox_2);
+        dbStiffN->setObjectName(QStringLiteral("dbStiffN"));
+        dbStiffN->setDecimals(3);
+
+        gridLayout_3->addWidget(dbStiffN, 2, 1, 1, 1);
+
+        label_9 = new QLabel(groupBox_2);
+        label_9->setObjectName(QStringLiteral("label_9"));
+
+        gridLayout_3->addWidget(label_9, 3, 0, 1, 1);
+
+        dbStiffF = new QDoubleSpinBox(groupBox_2);
+        dbStiffF->setObjectName(QStringLiteral("dbStiffF"));
+        dbStiffF->setDecimals(3);
+
+        gridLayout_3->addWidget(dbStiffF, 3, 1, 1, 1);
+
+        label_14 = new QLabel(groupBox_2);
+        label_14->setObjectName(QStringLiteral("label_14"));
+
+        gridLayout_3->addWidget(label_14, 4, 0, 1, 1);
+
+        dbOffset = new QDoubleSpinBox(groupBox_2);
+        dbOffset->setObjectName(QStringLiteral("dbOffset"));
+        dbOffset->setDecimals(3);
+
+        gridLayout_3->addWidget(dbOffset, 4, 1, 1, 1);
+
+
+        gridLayout_7->addWidget(groupBox_2, 1, 0, 1, 1);
+
+        groupBox_5 = new QGroupBox(dockWidgetRightContents);
+        groupBox_5->setObjectName(QStringLiteral("groupBox_5"));
+        gridLayout_6 = new QGridLayout(groupBox_5);
+        gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
+        pbInverseCylinder = new QPushButton(groupBox_5);
         pbInverseCylinder->setObjectName(QStringLiteral("pbInverseCylinder"));
 
-        gridLayout_3->addWidget(pbInverseCylinder, 1, 0, 1, 1);
+        gridLayout_6->addWidget(pbInverseCylinder, 0, 0, 1, 1);
+
+        pbReInitMesh = new QPushButton(groupBox_5);
+        pbReInitMesh->setObjectName(QStringLiteral("pbReInitMesh"));
+
+        gridLayout_6->addWidget(pbReInitMesh, 0, 1, 1, 1);
+
+
+        gridLayout_7->addWidget(groupBox_5, 4, 0, 1, 1);
+
+        groupBox_4 = new QGroupBox(dockWidgetRightContents);
+        groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
+        gridLayout_5 = new QGridLayout(groupBox_4);
+        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
+        label_17 = new QLabel(groupBox_4);
+        label_17->setObjectName(QStringLiteral("label_17"));
+
+        gridLayout_5->addWidget(label_17, 0, 0, 1, 1);
+
+        sbCoarseMesh = new QSpinBox(groupBox_4);
+        sbCoarseMesh->setObjectName(QStringLiteral("sbCoarseMesh"));
+
+        gridLayout_5->addWidget(sbCoarseMesh, 0, 1, 2, 1);
+
+        label_18 = new QLabel(groupBox_4);
+        label_18->setObjectName(QStringLiteral("label_18"));
+
+        gridLayout_5->addWidget(label_18, 1, 0, 2, 1);
+
+        sbDetailMesh = new QSpinBox(groupBox_4);
+        sbDetailMesh->setObjectName(QStringLiteral("sbDetailMesh"));
+
+        gridLayout_5->addWidget(sbDetailMesh, 2, 1, 1, 1);
+
+
+        gridLayout_7->addWidget(groupBox_4, 2, 0, 1, 1);
 
         dockWidgetRight->setWidget(dockWidgetRightContents);
         MeshWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgetRight);
@@ -146,7 +328,22 @@ public:
          << QApplication::translate("MeshWindow", "very thin", 0)
         );
         cbThickness->setCurrentText(QApplication::translate("MeshWindow", "thin", 0));
+        label_2->setText(QApplication::translate("MeshWindow", "stiff_bend", 0));
+        label_3->setText(QApplication::translate("MeshWindow", "stiff_myu", 0));
+        label_4->setText(QApplication::translate("MeshWindow", "stiff_lambda", 0));
+        label_5->setText(QApplication::translate("MeshWindow", "rho", 0));
+        groupBox_2->setTitle(QApplication::translate("MeshWindow", "contact param", 0));
+        label_6->setText(QApplication::translate("MeshWindow", "myu_k", 0));
+        label_7->setText(QApplication::translate("MeshWindow", "myu_s", 0));
+        label_8->setText(QApplication::translate("MeshWindow", "stiff_n", 0));
+        label_9->setText(QApplication::translate("MeshWindow", "stiff_f", 0));
+        label_14->setText(QApplication::translate("MeshWindow", "offset", 0));
+        groupBox_5->setTitle(QApplication::translate("MeshWindow", "GroupBox", 0));
         pbInverseCylinder->setText(QApplication::translate("MeshWindow", "inverse cylinder", 0));
+        pbReInitMesh->setText(QApplication::translate("MeshWindow", "re init mesh", 0));
+        groupBox_4->setTitle(QApplication::translate("MeshWindow", "mesh triangles", 0));
+        label_17->setText(QApplication::translate("MeshWindow", "coarse mesh", 0));
+        label_18->setText(QApplication::translate("MeshWindow", "detail mesh", 0));
     } // retranslateUi
 
 };

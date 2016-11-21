@@ -14,7 +14,6 @@ void GlobalDataHolder::init()
 	// clothes related
 	m_clothManger.reset(new CAnalysis2D_Cloth_Static);
 	m_clothUiListener.reset(new CDesigner2D_Cloth);
-	*m_param.m_clothParam = m_clothManger->GetParam_Cloth();
 }
 
 void GlobalDataHolder::generateClothDebug()
@@ -33,7 +32,8 @@ void GlobalDataHolder::generateClothDebug()
 void GlobalDataHolder::svgToCloth()
 {
 	m_clothUiListener->ldp_disable_update = true;
-	m_clothUiListener->SetAnalysisFromSvg(m_clothManger.get(), m_svgManager.get(), m_clothLoopId2svgIdMap);
+	m_clothUiListener->SetAnalysisFromSvg(m_clothManger.get(), m_svgManager.get(), m_clothLoopId2svgIdMap,
+		m_param.m_coarse_mesh_ntri, m_param.m_detail_mesh_ntri);
 	m_svgId2clothLoopIdMap.clear();
 	for (auto it : m_clothLoopId2svgIdMap)
 		m_svgId2clothLoopIdMap.insert(std::make_pair(it.second, it.first));

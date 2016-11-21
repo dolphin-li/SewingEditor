@@ -29,6 +29,25 @@ const BaseMeshViewer* MeshWindow::getViewer()const
 	return ui.widget;
 }
 
+void MeshWindow::updateParamUI()
+{
+	auto clothParam = g_dataholder.m_clothManger->GetParam_Cloth();
+	ui.dbStiffBend->setValue(clothParam.stiff_bend);
+	ui.dbStiffMyu->setValue(clothParam.stiff_myu);
+	ui.dbStiffLambda->setValue(clothParam.stiff_lambda);
+	ui.dbRho->setValue(clothParam.rho);
+
+	auto contactParam = g_dataholder.m_clothManger->GetParam_Contact();
+	ui.dbMyuK->setValue(contactParam.myu_k);
+	ui.dbMyuS->setValue(contactParam.myu_s);
+	ui.dbStiffN->setValue(contactParam.stiff_n);
+	ui.dbStiffF->setValue(contactParam.stiff_f);
+	ui.dbOffset->setValue(contactParam.offset);
+
+	ui.sbCoarseMesh->setValue(g_dataholder.m_param.m_coarse_mesh_ntri);
+	ui.sbDetailMesh->setValue(g_dataholder.m_param.m_detail_mesh_ntri);
+}
+
 void MeshWindow::timerEvent(QTimerEvent* ev)
 {
 	float fps = ui.widget->getFps();
@@ -126,30 +145,218 @@ void MeshWindow::on_cbThickness_currentTextChanged(const QString& s)
 {
 	try
 	{
+		auto param = g_dataholder.m_clothManger->GetParam_Cloth();
 		QString s1 = s.toLower();
 		if (s1 == "thin")
 		{
-			g_dataholder.m_param.changeClothThickness(Param::Thin);
+			ui.dbStiffBend->setValue(1e-10);
 		}
 		else if (s1 == "very thin")
 		{
-			g_dataholder.m_param.changeClothThickness(Param::VeryThin);
+			ui.dbStiffBend->setValue(0);
 		}
 		else if (s1 == "medium")
 		{
-			g_dataholder.m_param.changeClothThickness(Param::Medium);
+			ui.dbStiffBend->setValue(1e-5);
 		}
 		else if (s1 == "thick")
 		{
-			g_dataholder.m_param.changeClothThickness(Param::Thick);
+			ui.dbStiffBend->setValue(1e-2);
 		}
-		g_dataholder.m_clothManger->SetParam_Cloth(*g_dataholder.m_param.m_clothParam);
 	}
 	catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;
 	}
 	catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_dbStiffBend_valueChanged(double v)
+{
+	try
+	{
+		auto param = g_dataholder.m_clothManger->GetParam_Cloth();
+		param.stiff_bend = v;
+		g_dataholder.m_clothManger->SetParam_Cloth(param);
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_dbStiffMyu_valueChanged(double v)
+{
+	try
+	{
+		auto param = g_dataholder.m_clothManger->GetParam_Cloth();
+		param.stiff_myu = v;
+		g_dataholder.m_clothManger->SetParam_Cloth(param);
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_dbStiffLambda_valueChanged(double v)
+{
+	try
+	{
+		auto param = g_dataholder.m_clothManger->GetParam_Cloth();
+		param.stiff_lambda = v;
+		g_dataholder.m_clothManger->SetParam_Cloth(param);
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_dbRho_valueChanged(double v)
+{
+	try
+	{
+		auto param = g_dataholder.m_clothManger->GetParam_Cloth();
+		param.rho = v;
+		g_dataholder.m_clothManger->SetParam_Cloth(param);
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_dbMyuK_valueChanged(double v)
+{
+	try
+	{
+		auto param = g_dataholder.m_clothManger->GetParam_Contact();
+		param.myu_k = v;
+		g_dataholder.m_clothManger->SetParam_Contact(param);
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_dbMyuS_valueChanged(double v)
+{
+	try
+	{
+		auto param = g_dataholder.m_clothManger->GetParam_Contact();
+		param.myu_s = v;
+		g_dataholder.m_clothManger->SetParam_Contact(param);
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_dbStiffN_valueChanged(double v)
+{
+	try
+	{
+		auto param = g_dataholder.m_clothManger->GetParam_Contact();
+		param.stiff_n = v;
+		g_dataholder.m_clothManger->SetParam_Contact(param);
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_dbStiffF_valueChanged(double v)
+{
+	try
+	{
+		auto param = g_dataholder.m_clothManger->GetParam_Contact();
+		param.stiff_f = v;
+		g_dataholder.m_clothManger->SetParam_Contact(param);
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_dbOffset_valueChanged(double v)
+{
+	try
+	{
+		auto param = g_dataholder.m_clothManger->GetParam_Contact();
+		param.offset = v;
+		g_dataholder.m_clothManger->SetParam_Contact(param);
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_sbCoarseMesh_valueChanged(int v)
+{
+	try
+	{
+		g_dataholder.m_param.m_coarse_mesh_ntri = v;
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_sbDetailMesh_valueChanged(int v)
+{
+	try
+	{
+		g_dataholder.m_param.m_detail_mesh_ntri = v;
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void MeshWindow::on_pbReInitMesh_clicked()
+{
+	try
+	{
+		g_dataholder.svgToCloth();
+		updateParamUI();
+		ui.widget->updateGL();
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
 	{
 		std::cout << "unknown error" << std::endl;
 	}

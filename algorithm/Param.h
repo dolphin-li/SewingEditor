@@ -5,20 +5,12 @@ class CClothParam;
 class Param
 {
 public:
-	enum ClothThickness
-	{
-		Thick,
-		Medium,
-		Thin,
-		VeryThin
-	};
-public:
 	Param();
 	~Param();
 	void logToStamp(ldp::TimeStamp& st);
-
-	void changeClothThickness(ClothThickness ct);
 public:
-	std::shared_ptr<CClothParam> m_clothParam;
 	double m_smoothPolyThre;
+
+	int m_coarse_mesh_ntri;
+	int m_detail_mesh_ntri;
 };

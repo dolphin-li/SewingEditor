@@ -171,7 +171,7 @@ public:
 ////////////////////ldp//////////////////////////////////////////////
 public:
 	void SetAnalysisFromSvg(CAnalysis2D_Cloth_Static* pAnalysis, svg::SvgManager* svgManager,
-		std::map<unsigned int, int>& loopId2SvgIdMap);
+		std::map<unsigned int, int>& loopId2SvgIdMap, int coarse_ntri, int detail_ntri);
 	bool ldp_disable_update;
 ////////////////////ldp//////////////////////////////////////////////
 protected:

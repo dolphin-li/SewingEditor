@@ -3,10 +3,10 @@
 #include <GL\glew.h>
 #include <QtOpenGL>
 #include "Camera\camera.h"
-#include "event_handles\AbstractMeshEventHandle.h"
+#include "event_handles\AbstractSimEventHandle.h"
 class CAnalysis2D_Cloth_Static;
 class CDesigner2D_Cloth;
-class BaseMeshViewer : public QGLWidget
+class SimViewer : public QGLWidget
 {
 	Q_OBJECT
 
@@ -22,15 +22,11 @@ public:
 		TrackBall_Trans
 	};
 public:
-	BaseMeshViewer(QWidget *parent);
-	~BaseMeshViewer();
+	SimViewer(QWidget *parent);
+	~SimViewer();
 
-	void initCloth(CAnalysis2D_Cloth_Static* pAnalysis, CDesigner2D_Cloth* pListener);
-	CAnalysis2D_Cloth_Static* pAnalysis() { return m_pAnalysis; }
+	void initCloth();
 	void getModelBound(ldp::Float3& bmin, ldp::Float3& bmax);
-	const CAnalysis2D_Cloth_Static* pAnalysis()const { return m_pAnalysis; }
-	CDesigner2D_Cloth* pListener() { return m_pListener; }
-	const CDesigner2D_Cloth* pListener()const { return m_pListener; }
 
 	float getFps()const{ return m_fps; }
 	bool isEdgeMode()const{ return m_isEdgeMode; }
@@ -44,10 +40,10 @@ public:
 	Qt::MouseButtons buttons()const{ return m_buttons; }
 	QPoint lastMousePos()const{ return m_lastPos; }
 	const QImage& fboImage()const{ return m_fboImage; }
-	AbstractMeshEventHandle::ProcessorType getEventHandleType()const;
-	void setEventHandleType(AbstractMeshEventHandle::ProcessorType type);
-	const AbstractMeshEventHandle* getEventHandle(AbstractMeshEventHandle::ProcessorType type)const;
-	AbstractMeshEventHandle* getEventHandle(AbstractMeshEventHandle::ProcessorType type);
+	AbstractSimEventHandle::ProcessorType getEventHandleType()const;
+	void setEventHandleType(AbstractSimEventHandle::ProcessorType type);
+	const AbstractSimEventHandle* getEventHandle(AbstractSimEventHandle::ProcessorType type)const;
+	AbstractSimEventHandle* getEventHandle(AbstractSimEventHandle::ProcessorType type);
 	void beginDragBox(QPoint p);
 	void rotateTrackBall(ldp::Mat3d R);
 	void translateTrackBall(ldp::Double3 t);
@@ -88,11 +84,9 @@ protected:
 	float m_trackBallScale;
 	int m_activeTrackBallAxis;
 	int m_hoverTrackBallAxis;
-	AbstractMeshEventHandle* m_currentEventHandle;
-	std::vector<std::shared_ptr<AbstractMeshEventHandle>> m_eventHandles;
+	AbstractSimEventHandle* m_currentEventHandle;
+	std::vector<std::shared_ptr<AbstractSimEventHandle>> m_eventHandles;
 
-	CAnalysis2D_Cloth_Static* m_pAnalysis;
-	CDesigner2D_Cloth* m_pListener;
 	ldp::Float3 m_modelBound[2];
 	int m_computeTimer, m_renderTimer;
 	float m_fps;

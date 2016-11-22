@@ -7,6 +7,7 @@
 #include <QSharedPointer>
 class FreeFormDeform;
 class MeshWindow;
+class SimWindow;
 class SewingEditor : public QMainWindow
 {
 	Q_OBJECT
@@ -34,11 +35,12 @@ public:
 	void on_pbToConnectedGroups_clicked();
 	void on_pbSymmetricCopy_clicked();
 	void leftDocButtonsClicked(int i); 
-	void on_pbGenerateMesh_clicked();
 	void on_actionRemove_selected_corner_triggered();
 	void on_actionSplit_selected_edge_triggered();
 	void on_pbPathSplitByIntersect_clicked();
 	void on_actionDouble_path_width_triggered();
+	void on_pbGenerateMesh_clicked();
+	void on_pbGenerateSim_clicked();
 protected:
 	void dragEnterEvent(QDragEnterEvent* ev);
 	void dropEvent(QDropEvent* ev);
@@ -46,6 +48,7 @@ protected:
 private:
 	Ui::SewingEditorClass ui;
 	QSharedPointer<MeshWindow> m_meshWindow;
+	QSharedPointer<SimWindow> m_simWindow;
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////

@@ -86,6 +86,7 @@ public:
     QGroupBox *groupBox;
     QGridLayout *gridLayout_5;
     QPushButton *pbGenerateMesh;
+    QPushButton *pbGenerateSim;
     QGroupBox *groupBox_2;
     QGridLayout *gridLayout_6;
     QPushButton *pbSmoothPoly;
@@ -405,6 +406,11 @@ public:
 
         gridLayout_5->addWidget(pbGenerateMesh, 0, 0, 1, 1);
 
+        pbGenerateSim = new QPushButton(groupBox);
+        pbGenerateSim->setObjectName(QStringLiteral("pbGenerateSim"));
+
+        gridLayout_5->addWidget(pbGenerateSim, 1, 0, 1, 1);
+
 
         gridLayout_4->addWidget(groupBox, 3, 0, 1, 1);
 
@@ -565,6 +571,7 @@ public:
         pbPathSplitByIntersect->setText(QApplication::translate("SewingEditorClass", "path split by intersect", 0));
         groupBox->setTitle(QApplication::translate("SewingEditorClass", "mesh", 0));
         pbGenerateMesh->setText(QApplication::translate("SewingEditorClass", "Generate Mesh", 0));
+        pbGenerateSim->setText(QApplication::translate("SewingEditorClass", "Generate Sim", 0));
         groupBox_2->setTitle(QApplication::translate("SewingEditorClass", "Smooth Poly", 0));
         pbSmoothPoly->setText(QApplication::translate("SewingEditorClass", "smooth poly", 0));
         dockWidgetLeft->setWindowTitle(QString());

@@ -1,5 +1,5 @@
 #include <GL\glew.h>
-#include "basemeshviewer.h"
+#include "SimViewer.h"
 #include "designer2d_cloth.h"
 #include "analysis2d_cloth_static.h"
 #include "ldpMat\Quaternion.h"
@@ -71,7 +71,7 @@ inline ldp::Float4 selectIdToColor(unsigned int id)
 
 #pragma endregion
 
-BaseMeshViewer::BaseMeshViewer(QWidget *parent)
+SimViewer::SimViewer(QWidget *parent)
 {
 	setMouseTracking(true);
 	m_buttons = Qt::MouseButton::NoButton;
@@ -80,45 +80,41 @@ BaseMeshViewer::BaseMeshViewer(QWidget *parent)
 	m_trackBallMode = TrackBall_None;
 	m_currentEventHandle = nullptr;
 
-	m_eventHandles.resize((size_t)AbstractMeshEventHandle::ProcessorTypeEnd, nullptr);
-	for (size_t i = (size_t)AbstractMeshEventHandle::ProcessorTypeGeneral;
-		i < (size_t)AbstractMeshEventHandle::ProcessorTypeEnd; i++)
+	m_eventHandles.resize((size_t)AbstractSimEventHandle::ProcessorTypeEnd, nullptr);
+	for (size_t i = (size_t)AbstractSimEventHandle::ProcessorTypeGeneral;
+		i < (size_t)AbstractSimEventHandle::ProcessorTypeEnd; i++)
 	{
-		m_eventHandles[i] = std::shared_ptr<AbstractMeshEventHandle>(
-			AbstractMeshEventHandle::create(AbstractMeshEventHandle::ProcessorType(i), this));
+		m_eventHandles[i] = std::shared_ptr<AbstractSimEventHandle>(
+			AbstractSimEventHandle::create(AbstractSimEventHandle::ProcessorType(i), this));
 	}
-	setEventHandleType(AbstractMeshEventHandle::ProcessorTypeClothSelect);
-
-
-	m_pAnalysis = nullptr;
-	m_pListener = nullptr;
+	setEventHandleType(AbstractSimEventHandle::ProcessorTypeGeneral);
 	m_fps = 0;
 	m_computeTimer = startTimer(1);
 	m_renderTimer = startTimer(30);
 }
 
-BaseMeshViewer::~BaseMeshViewer()
+SimViewer::~SimViewer()
 {
 
 }
 
-void BaseMeshViewer::resetCamera()
+void SimViewer::resetCamera()
 {
 	m_camera.setPerspective(60, float(width()) / float(height()), 0.1, 100);
 	ldp::Float3 c = 0.f;
 	float l = 1.f;
-	if (m_pAnalysis)
-	{
-		ldp::Float3 bmin, bmax;
-		getModelBound(bmin, bmax);
-		c = (bmax + bmin) / 2.f;
-		l = (bmax - bmin).length();
-	}
+	//if (m_pAnalysis)
+	//{
+	//	ldp::Float3 bmin, bmax;
+	//	getModelBound(bmin, bmax);
+	//	c = (bmax + bmin) / 2.f;
+	//	l = (bmax - bmin).length();
+	//}
 	m_camera.lookAt(ldp::Float3(0, -l, 0) + c, c, ldp::Float3(0, 0, 1));
 	m_camera.arcballSetCenter(c);
 }
 
-void BaseMeshViewer::initializeGL()
+void SimViewer::initializeGL()
 {
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_MULTISAMPLE);
@@ -145,7 +141,7 @@ void BaseMeshViewer::initializeGL()
 		printf("%s\n", gluErrorString(glGetError()));
 }
 
-void BaseMeshViewer::resizeGL(int w, int h)
+void SimViewer::resizeGL(int w, int h)
 {
 	m_camera.setViewPort(0, w, 0, h);
 	m_camera.setPerspective(m_camera.getFov(), float(w) / float(h), 
@@ -159,32 +155,32 @@ void BaseMeshViewer::resizeGL(int w, int h)
 	m_fbo = new QGLFramebufferObject(width(), height(), fmt);
 }
 
-void BaseMeshViewer::timerEvent(QTimerEvent* ev)
+void SimViewer::timerEvent(QTimerEvent* ev)
 {
-	if (!m_pListener || !m_pAnalysis)
-		return;
-	if (ev->timerId() == m_computeTimer && m_pAnalysis && m_pListener)
-	{
-		if (!m_pListener->GetCad().isEmpty() && m_pListener->ldp_disable_update == false)
-		{
-			gtime_t t1 = ldp::gtime_now();
-			m_pListener->FollowMshToCad_ifNeeded();
-			m_pListener->Solve_ifNeeded();
-			if (m_pAnalysis->IsBlowUp())
-			{
-				std::cout << "BlowUp" << std::endl;
-				m_pListener->LoadTimeStamp();
-			}
-			gtime_t t2 = ldp::gtime_now();
-			double sec = ldp::gtime_seconds(t1, t2);
-			m_fps = 1 / sec;
-		}
-	}
+	//if (!m_pListener || !m_pAnalysis)
+	//	return;
+	//if (ev->timerId() == m_computeTimer && m_pAnalysis && m_pListener)
+	//{
+	//	if (!m_pListener->GetCad().isEmpty() && m_pListener->ldp_disable_update == false)
+	//	{
+	//		gtime_t t1 = ldp::gtime_now();
+	//		m_pListener->FollowMshToCad_ifNeeded();
+	//		m_pListener->Solve_ifNeeded();
+	//		if (m_pAnalysis->IsBlowUp())
+	//		{
+	//			std::cout << "BlowUp" << std::endl;
+	//			m_pListener->LoadTimeStamp();
+	//		}
+	//		gtime_t t2 = ldp::gtime_now();
+	//		double sec = ldp::gtime_seconds(t1, t2);
+	//		m_fps = 1 / sec;
+	//	}
+	//}
 	if (ev->timerId() == m_renderTimer)
 		updateGL();
 }
 
-void BaseMeshViewer::paintGL()
+void SimViewer::paintGL()
 {
 	// we first render for selection
 	renderSelectionOnFbo();
@@ -195,20 +191,20 @@ void BaseMeshViewer::paintGL()
 
 	// show cloth simulation=============================
 	m_camera.apply();
-	if (m_pListener)
-	{
-		if (isEdgeMode())
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		if (!m_pListener->GetCad().isEmpty())
-			m_pListener->Draw(4);
-	}
+	//if (m_pListener)
+	//{
+	//	if (isEdgeMode())
+	//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//	else
+	//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//	if (!m_pListener->GetCad().isEmpty())
+	//		m_pListener->Draw(4);
+	//}
 	renderTrackBall(false);
 	renderDragBox();
 }
 
-void BaseMeshViewer::renderSelectionOnFbo()
+void SimViewer::renderSelectionOnFbo()
 {
 	m_fbo->bind();
 	glClearColor(0.f, 0.f, 0.f, 0.0f);
@@ -230,7 +226,7 @@ void BaseMeshViewer::renderSelectionOnFbo()
 	glPopAttrib();
 }
 
-void BaseMeshViewer::mousePressEvent(QMouseEvent *ev)
+void SimViewer::mousePressEvent(QMouseEvent *ev)
 {
 	setFocus();
 	m_lastPos = ev->pos();
@@ -241,19 +237,19 @@ void BaseMeshViewer::mousePressEvent(QMouseEvent *ev)
 	updateGL();
 }
 
-void BaseMeshViewer::keyPressEvent(QKeyEvent*ev)
+void SimViewer::keyPressEvent(QKeyEvent*ev)
 {
 	m_currentEventHandle->keyPressEvent(ev);
 	updateGL();
 }
 
-void BaseMeshViewer::keyReleaseEvent(QKeyEvent*ev)
+void SimViewer::keyReleaseEvent(QKeyEvent*ev)
 {
 	m_currentEventHandle->keyReleaseEvent(ev);
 	updateGL();
 }
 
-void BaseMeshViewer::mouseReleaseEvent(QMouseEvent *ev)
+void SimViewer::mouseReleaseEvent(QMouseEvent *ev)
 {
 	m_currentEventHandle->mouseReleaseEvent(ev);
 
@@ -262,7 +258,7 @@ void BaseMeshViewer::mouseReleaseEvent(QMouseEvent *ev)
 	updateGL();
 }
 
-void BaseMeshViewer::mouseMoveEvent(QMouseEvent*ev)
+void SimViewer::mouseMoveEvent(QMouseEvent*ev)
 {
 	m_currentEventHandle->mouseMoveEvent(ev);
 
@@ -271,26 +267,26 @@ void BaseMeshViewer::mouseMoveEvent(QMouseEvent*ev)
 	updateGL();
 }
 
-void BaseMeshViewer::mouseDoubleClickEvent(QMouseEvent *ev)
+void SimViewer::mouseDoubleClickEvent(QMouseEvent *ev)
 {
 	m_currentEventHandle->mouseDoubleClickEvent(ev);
 
 	updateGL();
 }
 
-void BaseMeshViewer::wheelEvent(QWheelEvent*ev)
+void SimViewer::wheelEvent(QWheelEvent*ev)
 {
 	m_currentEventHandle->wheelEvent(ev);
 
 	updateGL();
 }
 
-AbstractMeshEventHandle::ProcessorType BaseMeshViewer::getEventHandleType()const
+AbstractSimEventHandle::ProcessorType SimViewer::getEventHandleType()const
 {
 	return m_currentEventHandle->type();
 }
 
-void BaseMeshViewer::setEventHandleType(AbstractMeshEventHandle::ProcessorType type)
+void SimViewer::setEventHandleType(AbstractSimEventHandle::ProcessorType type)
 {
 	if (m_currentEventHandle)
 		m_currentEventHandle->handleLeave();
@@ -299,28 +295,28 @@ void BaseMeshViewer::setEventHandleType(AbstractMeshEventHandle::ProcessorType t
 	setCursor(m_currentEventHandle->cursor());
 }
 
-const AbstractMeshEventHandle* BaseMeshViewer::getEventHandle(AbstractMeshEventHandle::ProcessorType type)const
+const AbstractSimEventHandle* SimViewer::getEventHandle(AbstractSimEventHandle::ProcessorType type)const
 {
 	return m_eventHandles[size_t(type)].get();
 }
 
-AbstractMeshEventHandle* BaseMeshViewer::getEventHandle(AbstractMeshEventHandle::ProcessorType type)
+AbstractSimEventHandle* SimViewer::getEventHandle(AbstractSimEventHandle::ProcessorType type)
 {
 	return m_eventHandles[size_t(type)].get();
 }
 
-void BaseMeshViewer::beginDragBox(QPoint p)
+void SimViewer::beginDragBox(QPoint p)
 {
 	m_dragBoxBegin = p;
 	m_isDragBox = true;
 }
 
-void BaseMeshViewer::endDragBox()
+void SimViewer::endDragBox()
 {
 	m_isDragBox = false;
 }
 
-void BaseMeshViewer::renderDragBox()
+void SimViewer::renderDragBox()
 {
 	if (!m_isDragBox)
 		return;
@@ -351,27 +347,27 @@ void BaseMeshViewer::renderDragBox()
 	glPopAttrib();
 }
 
-void BaseMeshViewer::initCloth(CAnalysis2D_Cloth_Static* pAnalysis, CDesigner2D_Cloth* pListener)
+void SimViewer::initCloth()
 {
-	if (pAnalysis == nullptr || pListener == nullptr)
-		throw std::exception("initCloth(): nullptr error");
-	m_pAnalysis = pAnalysis;
-	m_pListener = pListener;
+	//if (pAnalysis == nullptr || pListener == nullptr)
+	//	throw std::exception("initCloth(): nullptr error");
+	//m_pAnalysis = pAnalysis;
+	//m_pListener = pListener;
 }
 
-void BaseMeshViewer::getModelBound(ldp::Float3& bmin, ldp::Float3& bmax)
+void SimViewer::getModelBound(ldp::Float3& bmin, ldp::Float3& bmax)
 {
 	bmin = FLT_MAX;
 	bmax = -FLT_MAX;
-	if (m_pAnalysis)
-	{
-		auto box = m_pAnalysis->GetBoundingBox(nullptr);
-		bmin = ldp::Float3(box.x_min, box.y_min, box.z_min);
-		bmax = ldp::Float3(box.x_max, box.y_max, box.z_max);
-	}
+	//if (m_pAnalysis)
+	//{
+	//	auto box = m_pAnalysis->GetBoundingBox(nullptr);
+	//	bmin = ldp::Float3(box.x_min, box.y_min, box.z_min);
+	//	bmax = ldp::Float3(box.x_max, box.y_max, box.z_max);
+	//}
 }
 
-void BaseMeshViewer::beginTrackBall(TrackBallMode mode, ldp::Float3 p, ldp::Mat3f R, float scale)
+void SimViewer::beginTrackBall(TrackBallMode mode, ldp::Float3 p, ldp::Mat3f R, float scale)
 {
 	m_trackBallPos = p;
 	m_trackBallR = R;
@@ -381,24 +377,24 @@ void BaseMeshViewer::beginTrackBall(TrackBallMode mode, ldp::Float3 p, ldp::Mat3
 	m_hoverTrackBallAxis = -1;
 }
 
-void BaseMeshViewer::rotateTrackBall(ldp::Mat3d R)
+void SimViewer::rotateTrackBall(ldp::Mat3d R)
 {
 	m_trackBallR = R * m_trackBallR;
 }
 
-void BaseMeshViewer::translateTrackBall(ldp::Double3 t)
+void SimViewer::translateTrackBall(ldp::Double3 t)
 {
 	m_trackBallPos += t;
 }
 
-void BaseMeshViewer::endTrackBall()
+void SimViewer::endTrackBall()
 {
 	m_trackBallMode = TrackBall_None;
 	m_activeTrackBallAxis = -1;
 	m_hoverTrackBallAxis = -1;
 }
 
-int BaseMeshViewer::fboRenderedIndex(QPoint p)const
+int SimViewer::fboRenderedIndex(QPoint p)const
 {
 	if (m_fboImage.rect().contains(p))
 	{
@@ -408,7 +404,7 @@ int BaseMeshViewer::fboRenderedIndex(QPoint p)const
 	return 0;
 }
 
-void BaseMeshViewer::renderTrackBall(bool indexMode)
+void SimViewer::renderTrackBall(bool indexMode)
 {
 	if (m_trackBallMode == TrackBall_None)
 		return;

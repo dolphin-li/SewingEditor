@@ -1108,6 +1108,27 @@
     <ClCompile Include="algorithm\ldputil.cpp">
       <Filter>algorithm</Filter>
     </ClCompile>
+    <ClCompile Include="SimWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_SimWindow.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_SimWindow.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="SimViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_SimViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_SimViewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="event_handles\AbstractSimEventHandle.cpp">
+      <Filter>event_handles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="sewingeditor.ui">
@@ -1133,6 +1154,15 @@
     </CustomBuild>
     <CustomBuild Include="meshwindow.ui">
       <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SimWindow.h">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SimWindow.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SimViewer.h">
+      <Filter>Source Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -1945,6 +1975,12 @@
     </ClInclude>
     <ClInclude Include="algorithm\ldputil.h">
       <Filter>algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_SimWindow.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="event_handles\AbstractSimEventHandle.h">
+      <Filter>event_handles</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,6 @@
 #include "SvgManager.h"
 #include "MeshWindow.h"
+#include "SimWindow.h"
 #include "sewingeditor.h"
 #include "global_data_holder.h"
 #include "svgpp\SvgAbstractObject.h"
@@ -16,12 +17,15 @@ SewingEditor::SewingEditor(QWidget *parent)
 		this, SLOT(on_listWidgetEditEnd(QWidget*, QAbstractItemDelegate::EndEditHint)));
 	m_meshWindow.reset(new MeshWindow);
 	m_meshWindow->setWindowTitle("mesh window");
+	m_simWindow.reset(new SimWindow);
+	m_simWindow->setWindowTitle("simulation window");
 	try
 	{
 		g_dataholder.init();
 		ui.widget->setSvgManager(g_dataholder.m_svgManager.get());
 		ui.widget->setSvgDeformer(g_dataholder.m_svgDefomer.get());
 		m_meshWindow->getViewer()->initCloth(g_dataholder.m_clothManger.get(), g_dataholder.m_clothUiListener.get());
+		m_simWindow->getViewer()->initCloth();
 		initLayerList();
 		resetRoll();
 		initHistoryList();
@@ -1008,6 +1012,22 @@ void SewingEditor::on_actionDouble_path_width_triggered()
 		ui.widget->getSvgManager()->doublePathWidth();
 		ui.widget->updateGL();
 		pushHistory("double path width");
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
+void SewingEditor::on_pbGenerateSim_clicked()
+{
+	try
+	{
+		//g_dataholder.svgToCloth();
+		m_simWindow->updateParamUI();
+		m_simWindow->show();
 	} catch (std::exception e)
 	{
 		std::cout << e.what() << std::endl;

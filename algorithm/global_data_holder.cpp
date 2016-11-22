@@ -3,6 +3,7 @@
 #include "analysis2d_cloth_static.h"
 #include "designer2d_cloth.h"
 #include "FreeFormDeform.h"
+#include "SimulationManager.h"
 GlobalDataHolder g_dataholder;
 
 void GlobalDataHolder::init()
@@ -54,5 +55,5 @@ void GlobalDataHolder::svgToCloth()
 
 void GlobalDataHolder::svgToSim()
 {
-
+	m_simManager->init(*m_svgManager.get(), m_bodyFileName);
 }

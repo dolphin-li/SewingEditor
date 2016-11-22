@@ -3,7 +3,10 @@
 #include "ldputil.h"
 #include "Param.h"
 #include <map>
-#include "SimulationManager.h"
+namespace arcsim
+{
+	class SimulationManager;
+}
 namespace svg
 {
 class SvgManager;

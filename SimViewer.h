@@ -4,7 +4,10 @@
 #include <QtOpenGL>
 #include "Camera\camera.h"
 #include "event_handles\AbstractSimEventHandle.h"
-#include "SimulationManager.h"
+namespace arcsim
+{
+	class SimulationManager;
+}
 class SimViewer : public QGLWidget
 {
 	Q_OBJECT

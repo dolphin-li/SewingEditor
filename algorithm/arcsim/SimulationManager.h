@@ -10,12 +10,13 @@ namespace arcsim
 	class SimulationManager
 	{
 	public:
+		SimulationManager();
 		void init(const svg::SvgManager& svgManager, std::string bodyMeshFileName);
-
-		Simulation& getSimulator() { return m_sim; }
-		const Simulation& getSimulator()const { return m_sim; }
+		void clear();
+		Simulation& getSimulator() { return *m_sim.get(); }
+		const Simulation& getSimulator()const { return *m_sim.get(); }
 	private:
-		Simulation m_sim;
+		std::shared_ptr<Simulation> m_sim;
 	};
 
 }

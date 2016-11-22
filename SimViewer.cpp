@@ -4,7 +4,7 @@
 #include "SimViewer.h"
 #include "adaptiveCloth\simulation.hpp"
 #include "ldpMat\Quaternion.h"
-
+#include "SimulationManager.h"
 
 
 #pragma region --mat_utils

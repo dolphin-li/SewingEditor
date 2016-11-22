@@ -17,7 +17,7 @@ void GlobalDataHolder::init()
 	m_clothUiListener.reset(new CDesigner2D_Cloth);
 
 	// arcsim
-	m_bodyFileName = "models/wm2_15k.obj";
+	m_simConfigFileName = "conf/default.json";
 	m_simManager.reset(new arcsim::SimulationManager);
 }
 
@@ -55,5 +55,5 @@ void GlobalDataHolder::svgToCloth()
 
 void GlobalDataHolder::svgToSim()
 {
-	m_simManager->init(*m_svgManager.get(), m_bodyFileName);
+	m_simManager->init(*m_svgManager.get(), m_simConfigFileName);
 }

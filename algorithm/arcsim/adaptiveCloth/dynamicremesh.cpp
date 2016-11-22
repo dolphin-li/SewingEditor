@@ -152,7 +152,7 @@ namespace arcsim
 	{
 		Eig<n> eig = eigen_decomposition(A);
 		for (int i = 0; i < n; i++)
-			eig.l[i] = eig.l[i] >= 0 ? sqrt(eig.l[i]) : -sqrt(-eig.l[i]);
+			eig.l[i] = eig.l[i] >= 0 ? ::sqrt(eig.l[i]) : -::sqrt(-eig.l[i]);
 		return eig.Q*diag(eig.l)*eig.Q.t();
 	}
 

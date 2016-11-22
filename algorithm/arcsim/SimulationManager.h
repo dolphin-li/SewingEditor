@@ -11,7 +11,7 @@ namespace arcsim
 	{
 	public:
 		SimulationManager();
-		void init(const svg::SvgManager& svgManager, std::string bodyMeshFileName);
+		void init(const svg::SvgManager& svgManager, std::string configFileName);
 		void clear();
 		Simulation& getSimulator() { return *m_sim.get(); }
 		const Simulation& getSimulator()const { return *m_sim.get(); }

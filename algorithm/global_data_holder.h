@@ -34,7 +34,7 @@ public:
 	Param m_param;
 
 
-	std::string m_bodyFileName;
+	std::string m_simConfigFileName;
 	std::shared_ptr<arcsim::SimulationManager> m_simManager;
 };
 

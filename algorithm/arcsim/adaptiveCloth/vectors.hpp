@@ -106,7 +106,7 @@ namespace arcsim
 	tpl bool operator!= (const VecnT &u, const VecnT &v) { return !(u == v); }
 	tpl T dot(const VecnT &u, const VecnT &v) { T d = 0; for (int i = 0; i < n; i++) d += u[i] * v[i]; return d; }
 	tpl T norm2(const VecnT &u) { return dot(u, u); }
-	tpl T norm(const VecnT &u) { return sqrt(norm2(u)); }
+	tpl T norm(const VecnT &u) { return ::sqrt(norm2(u)); }
 	tpl VecnT normalize(const VecnT &u) { T m = norm(u); return m == 0 ? VecnT(0) : u / m; }
 	tpl std::ostream &operator<< (std::ostream &out, const VecnT &u) { out << "("; for (int i = 0; i < n; i++) out << (i == 0 ? "" : ", ") << u[i]; out << ")"; return out; }
 	template <typename T> Vec<3, T> cross(const Vec<3, T> &u, const Vec<3, T> &v) { Vec<3, T> w; w[0] = u[1] * v[2] - u[2] * v[1]; w[1] = u[2] * v[0] - u[0] * v[2]; w[2] = u[0] * v[1] - u[1] * v[0]; return w; }

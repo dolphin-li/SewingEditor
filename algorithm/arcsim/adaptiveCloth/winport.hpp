@@ -53,7 +53,8 @@ namespace arcsim
 	template <class T> inline bool isfinite(const T& number) { return boost::math::isfinite(number); }
 	template <class T> inline bool   finite(const T& number) { return boost::math::isfinite(number); }
 
-	inline double sqrt(int n) { return ::sqrt(double(n)); }
+	// ldp: it is dangerous to define such an int type..
+	//inline double sqrt(int n) { return ::sqrt(double(n)); }
 
 	template <class T> inline T log2(const T& number) { return log(number) / log(T(2)); }
 

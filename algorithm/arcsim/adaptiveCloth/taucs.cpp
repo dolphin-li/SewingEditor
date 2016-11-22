@@ -35,11 +35,6 @@ namespace arcsim
 
 	extern "C" {
 #include "taucs\include\taucs.h"
-#pragma comment(lib, "blas.lib")
-#pragma comment(lib, "clapack.lib")
-#pragma comment(lib, "libmetis.lib")
-#pragma comment(lib, "libtaucs.lib")
-#pragma comment(lib, "vcf2c.lib")
 		int taucs_linsolve(taucs_ccs_matrix* A, // input matrix
 			void** factorization, // an approximate inverse
 			int nrhs, // number of right-hand sides

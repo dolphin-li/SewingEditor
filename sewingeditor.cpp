@@ -25,7 +25,7 @@ SewingEditor::SewingEditor(QWidget *parent)
 		ui.widget->setSvgManager(g_dataholder.m_svgManager.get());
 		ui.widget->setSvgDeformer(g_dataholder.m_svgDefomer.get());
 		m_meshWindow->getViewer()->initCloth(g_dataholder.m_clothManger.get(), g_dataholder.m_clothUiListener.get());
-		m_simWindow->getViewer()->initCloth(g_dataholder.m_simulator.get());
+		m_simWindow->getViewer()->initCloth(g_dataholder.m_simManager.get());
 		initLayerList();
 		resetRoll();
 		initHistoryList();

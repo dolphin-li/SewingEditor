@@ -3,7 +3,6 @@
 #include "analysis2d_cloth_static.h"
 #include "designer2d_cloth.h"
 #include "FreeFormDeform.h"
-#include "adaptiveCloth\simulation.hpp"
 GlobalDataHolder g_dataholder;
 
 void GlobalDataHolder::init()
@@ -17,7 +16,8 @@ void GlobalDataHolder::init()
 	m_clothUiListener.reset(new CDesigner2D_Cloth);
 
 	// arcsim
-	m_simulator.reset(new arcsim::Simulation);
+	m_bodyFileName = "models/wm2_15k.obj";
+	m_simManager.reset(new arcsim::SimulationManager);
 }
 
 void GlobalDataHolder::generateClothDebug()

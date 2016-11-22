@@ -3,13 +3,10 @@
 #include "ldputil.h"
 #include "Param.h"
 #include <map>
+#include "SimulationManager.h"
 namespace svg
 {
 class SvgManager;
-};
-namespace arcsim
-{
-	struct Simulation;
 };
 class CAnalysis2D_Cloth_Static;
 class CDesigner2D_Cloth;
@@ -33,7 +30,9 @@ public:
 	std::map<int, unsigned int> m_svgId2clothLoopIdMap;
 	Param m_param;
 
-	std::shared_ptr<arcsim::Simulation> m_simulator;
+
+	std::string m_bodyFileName;
+	std::shared_ptr<arcsim::SimulationManager> m_simManager;
 };
 
 extern GlobalDataHolder g_dataholder;

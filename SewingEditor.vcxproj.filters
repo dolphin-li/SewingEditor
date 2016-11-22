@@ -125,6 +125,9 @@
     <Filter Include="algorithm\arcsim\alglib">
       <UniqueIdentifier>{fad2f7cc-ff10-417e-8e34-32efd25b2e4f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="algorithm\arcsim\libjason">
+      <UniqueIdentifier>{ece91190-9653-48ce-8a0d-31986918b255}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -1129,6 +1132,21 @@
     <ClCompile Include="event_handles\AbstractSimEventHandle.cpp">
       <Filter>event_handles</Filter>
     </ClCompile>
+    <ClCompile Include="algorithm\arcsim\SimulationManager.cpp">
+      <Filter>algorithm\arcsim</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\conf.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\jsoncpp\src\lib_json\json_reader.cpp">
+      <Filter>algorithm\arcsim\libjason</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\jsoncpp\src\lib_json\json_value.cpp">
+      <Filter>algorithm\arcsim\libjason</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\jsoncpp\src\lib_json\json_writer.cpp">
+      <Filter>algorithm\arcsim\libjason</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="sewingeditor.ui">
@@ -1982,6 +2000,15 @@
     <ClInclude Include="event_handles\AbstractSimEventHandle.h">
       <Filter>event_handles</Filter>
     </ClInclude>
+    <ClInclude Include="algorithm\arcsim\SimulationManager.h">
+      <Filter>algorithm\arcsim</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\conf.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\jsoncpp\src\lib_json\json_batchallocator.h">
+      <Filter>algorithm\arcsim\libjason</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SewingEditor.rc" />
@@ -2108,6 +2135,15 @@
   <ItemGroup>
     <None Include="qdarkstyle\style.qss">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="algorithm\arcsim\jsoncpp\src\lib_json\json_internalarray.inl">
+      <Filter>algorithm\arcsim\libjason</Filter>
+    </None>
+    <None Include="algorithm\arcsim\jsoncpp\src\lib_json\json_internalmap.inl">
+      <Filter>algorithm\arcsim\libjason</Filter>
+    </None>
+    <None Include="algorithm\arcsim\jsoncpp\src\lib_json\json_valueiterator.inl">
+      <Filter>algorithm\arcsim\libjason</Filter>
     </None>
   </ItemGroup>
 </Project>

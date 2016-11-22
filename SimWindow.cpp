@@ -93,7 +93,6 @@ void SimWindow::initLeftDockActions()
 	{
 		m_ldbSignalMapper->setMapping(it.second.data(), it.first);
 		connect(it.second.data(), SIGNAL(clicked()), m_ldbSignalMapper.data(), SLOT(map()));
-		connect(it.second.data(), SIGNAL(toggled(bool)), m_ldbSignalMapper.data(), SLOT(leftDocButtonsToggled(bool)));
 	}
 }
 

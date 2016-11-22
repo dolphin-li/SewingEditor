@@ -26,22 +26,17 @@
 
 #include "io.hpp"
 
-//#include "display.hpp"
-//#include "opengl.hpp"
 #include "util.hpp"
 #include <boost/filesystem.hpp>
 #include <cassert>
 #include <cfloat>
-//#include <json/json.h>
+#include <json/json.h>
 #include <fstream>
-//#include <png.h>
 #include <sstream>
 using namespace std;
-
+#define NO_OPENGL
 namespace arcsim
 {
-
-#define NO_OPENGL
 	// OBJ meshes
 
 	void get_valid_line(istream &in, string &line)
@@ -341,31 +336,34 @@ namespace arcsim
 		unsigned char *pixels, bool has_alpha = false);
 
 #ifndef NO_OPENGL
-	void save_screenshot (const string &filename) {
+	void save_screenshot(const string &filename)
+	{
 		int w = 0, h = 0;
-		for (int s = 0; s < 3; s++) {
+		for (int s = 0; s < 3; s++)
+		{
 			glutSetWindow(subwindows[s]);
 			w += glutGet(GLUT_WINDOW_WIDTH);
 			h = max(h, glutGet(GLUT_WINDOW_HEIGHT));
 		}
-		unsigned char *pixels = new unsigned char[w*h*3];
+		unsigned char *pixels = new unsigned char[w*h * 3];
 		int x = 0;
-		for (int s = 0; s < 3; s++) {
+		for (int s = 0; s < 3; s++)
+		{
 			glutSetWindow(subwindows[s]);
 			int wsub = glutGet(GLUT_WINDOW_WIDTH),
 				hsub = glutGet(GLUT_WINDOW_HEIGHT);
-			unsigned char *pixelsub = new unsigned char[wsub*hsub*3];
+			unsigned char *pixelsub = new unsigned char[wsub*hsub * 3];
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
-			glReadPixels(0,0, wsub,hsub, GL_RGB, GL_UNSIGNED_BYTE, pixelsub);
+			glReadPixels(0, 0, wsub, hsub, GL_RGB, GL_UNSIGNED_BYTE, pixelsub);
 			for (int j = 0; j < hsub; j++)
 			for (int i = 0; i < wsub; i++)
 			for (int c = 0; c < 3; c++)
-				pixels[(x+i+w*j)*3+c] = pixelsub[(i+wsub*j)*3+c];
+				pixels[(x + i + w*j) * 3 + c] = pixelsub[(i + wsub*j) * 3 + c];
 			x += wsub;
 			delete[] pixelsub;
 		}
-		flip_image(w,h, pixels);
-		save_png(filename.c_str(), w,h, pixels);
+		flip_image(w, h, pixels);
+		save_png(filename.c_str(), w, h, pixels);
 		delete[] pixels;
 	}
 #endif

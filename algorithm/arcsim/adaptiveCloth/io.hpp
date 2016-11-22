@@ -23,10 +23,12 @@
   IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
+
 #pragma once
 #include "mesh.hpp"
 namespace arcsim
 {
+
 	void triangle_to_obj(const std::string &infile, const std::string &outfile);
 
 	void load_obj(Mesh &mesh, const std::string &filename);

@@ -93,7 +93,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;UNICODE;WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\arcsim;$(ProjectDir)\algorithm\SC\DelFEM\include\delfem;$(ProjectDir)\algorithm\SC;$(ProjectDir)\algorithm\SC\DelFEM\include;$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\arcsim\jsoncpp\include;$(ProjectDir)\algorithm\arcsim;$(ProjectDir)\algorithm\SC\DelFEM\include\delfem;$(ProjectDir)\algorithm\SC;$(ProjectDir)\algorithm\SC\DelFEM\include;$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -102,7 +102,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName)d.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(ProjectDir)\algorithm\arcsim\taucs\lib;D:\boost\boost_1_56_0\lib64-msvc-12.0;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\freeImage;$(ProjectDir)\algorithm\GL;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\algorithm\arcsim\lib;$(ProjectDir)\algorithm\arcsim\taucs\lib;D:\boost\boost_1_56_0\lib64-msvc-12.0;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\freeImage;$(ProjectDir)\algorithm\GL;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -126,7 +126,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\arcsim;$(ProjectDir)\algorithm\SC\DelFEM\include\delfem;$(ProjectDir)\algorithm\SC;$(ProjectDir)\algorithm\SC\DelFEM\include;$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\arcsim\jsoncpp\include;$(ProjectDir)\algorithm\arcsim;$(ProjectDir)\algorithm\SC\DelFEM\include\delfem;$(ProjectDir)\algorithm\SC;$(ProjectDir)\algorithm\SC\DelFEM\include;$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -135,7 +135,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(ProjectDir)\algorithm\arcsim\taucs\lib;D:\boost\boost_1_56_0\lib64-msvc-12.0;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\freeImage;$(ProjectDir)\algorithm\GL;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\algorithm\arcsim\lib;$(ProjectDir)\algorithm\arcsim\taucs\lib;D:\boost\boost_1_56_0\lib64-msvc-12.0;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\freeImage;$(ProjectDir)\algorithm\GL;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -147,6 +147,7 @@
     <ClCompile Include="algorithm\arcsim\adaptiveCloth\cloth.cpp" />
     <ClCompile Include="algorithm\arcsim\adaptiveCloth\collision.cpp" />
     <ClCompile Include="algorithm\arcsim\adaptiveCloth\collisionutil.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\conf.cpp" />
     <ClCompile Include="algorithm\arcsim\adaptiveCloth\constraint.cpp" />
     <ClCompile Include="algorithm\arcsim\adaptiveCloth\dde.cpp" />
     <ClCompile Include="algorithm\arcsim\adaptiveCloth\dynamicremesh.cpp" />
@@ -194,6 +195,10 @@
     <ClCompile Include="algorithm\arcsim\alglib\solvers.cpp" />
     <ClCompile Include="algorithm\arcsim\alglib\specialfunctions.cpp" />
     <ClCompile Include="algorithm\arcsim\alglib\statistics.cpp" />
+    <ClCompile Include="algorithm\arcsim\jsoncpp\src\lib_json\json_reader.cpp" />
+    <ClCompile Include="algorithm\arcsim\jsoncpp\src\lib_json\json_value.cpp" />
+    <ClCompile Include="algorithm\arcsim\jsoncpp\src\lib_json\json_writer.cpp" />
+    <ClCompile Include="algorithm\arcsim\SimulationManager.cpp" />
     <ClCompile Include="algorithm\camera\Camera.cpp" />
     <ClCompile Include="algorithm\conv\ConvolutionPyramid.cpp" />
     <ClCompile Include="algorithm\conv\Convolution_Helper.cpp" />
@@ -578,6 +583,7 @@
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\cloth.hpp" />
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\collision.hpp" />
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\collisionutil.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\conf.hpp" />
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\constraint.hpp" />
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\dde.hpp" />
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\dynamicremesh.hpp" />
@@ -624,6 +630,8 @@
     <ClInclude Include="algorithm\arcsim\alglib\solvers.h" />
     <ClInclude Include="algorithm\arcsim\alglib\specialfunctions.h" />
     <ClInclude Include="algorithm\arcsim\alglib\statistics.h" />
+    <ClInclude Include="algorithm\arcsim\jsoncpp\src\lib_json\json_batchallocator.h" />
+    <ClInclude Include="algorithm\arcsim\SimulationManager.h" />
     <ClInclude Include="algorithm\camera\Camera.h" />
     <ClInclude Include="algorithm\camera\fmath.h" />
     <ClInclude Include="algorithm\conv\ConvolutionPyramid.h" />
@@ -1232,6 +1240,9 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
     </CustomBuild>
+    <None Include="algorithm\arcsim\jsoncpp\src\lib_json\json_internalarray.inl" />
+    <None Include="algorithm\arcsim\jsoncpp\src\lib_json\json_internalmap.inl" />
+    <None Include="algorithm\arcsim\jsoncpp\src\lib_json\json_valueiterator.inl" />
     <None Include="qdarkstyle\style.qss">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

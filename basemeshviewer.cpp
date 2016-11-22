@@ -79,6 +79,7 @@ BaseMeshViewer::BaseMeshViewer(QWidget *parent)
 	m_isEdgeMode = false;
 	m_trackBallMode = TrackBall_None;
 	m_currentEventHandle = nullptr;
+	m_fbo = nullptr;
 
 	m_eventHandles.resize((size_t)AbstractMeshEventHandle::ProcessorTypeEnd, nullptr);
 	for (size_t i = (size_t)AbstractMeshEventHandle::ProcessorTypeGeneral;
@@ -127,8 +128,6 @@ void BaseMeshViewer::initializeGL()
 	glEnable(GL_LIGHT0);
 	glEnable(GL_FRONT_AND_BACK);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-	//glEnable(GL_CULL_FACE);
-	//glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1, 1);
@@ -141,8 +140,6 @@ void BaseMeshViewer::initializeGL()
 	m_fbo = new QGLFramebufferObject(width(), height(), fmt);
 	if (!m_fbo->isValid())
 		printf("error: invalid depth fbo!\n");
-	if (glGetError() != GL_NO_ERROR)
-		printf("%s\n", gluErrorString(glGetError()));
 }
 
 void BaseMeshViewer::resizeGL(int w, int h)

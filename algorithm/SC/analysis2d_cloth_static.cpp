@@ -3055,7 +3055,7 @@ void CAnalysis2D_Cloth_Static::SetModelClothFromSvg(Cad::CCadObj2D_Move& cad_2d,
 	obj_mesh.SetIsNormal(true);
 	CSurfaceMeshReader cnt_mesh;
 	obj_mesh.Load_Ply("models/wm2_15k.ply");
-	cnt_mesh.Load_Ply("models/wm2_cnt.ply");
+	cnt_mesh.Load_Ply("models/wm2_15k.ply");
 	double c[3], w[3];
 	obj_mesh.GetCenterWidth(c[0], c[1], c[2], w[0], w[1], w[2]);
 	double scale = 2 / std::max(std::max(w[0], w[1]), w[2]); // debug, the person should be of 1.65 meters

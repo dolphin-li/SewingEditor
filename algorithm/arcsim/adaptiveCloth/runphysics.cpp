@@ -26,7 +26,7 @@
 
 #include "runphysics.hpp"
 
-//#include "conf.hpp"
+#include "conf.hpp"
 #include "io.hpp"
 #include "misc.hpp"
 #include "separateobs.hpp"
@@ -54,7 +54,7 @@ namespace arcsim
 	void init_physics(const string &json_file, string outprefix,
 		bool is_reloading)
 	{
-		// load_json(json_file, sim);
+		load_json(json_file, sim);
 		arcsim::outprefix = outprefix;
 		if (!outprefix.empty())
 		{

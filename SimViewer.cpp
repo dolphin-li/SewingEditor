@@ -83,6 +83,7 @@ SimViewer::SimViewer(QWidget *parent)
 	m_isEdgeMode = false;
 	m_trackBallMode = TrackBall_None;
 	m_currentEventHandle = nullptr;
+	m_fbo = nullptr;
 
 	m_eventHandles.resize((size_t)AbstractSimEventHandle::ProcessorTypeEnd, nullptr);
 	for (size_t i = (size_t)AbstractSimEventHandle::ProcessorTypeGeneral;
@@ -92,7 +93,7 @@ SimViewer::SimViewer(QWidget *parent)
 			AbstractSimEventHandle::create(AbstractSimEventHandle::ProcessorType(i), this));
 	}
 	setEventHandleType(AbstractSimEventHandle::ProcessorTypeGeneral);
-	m_simulator = nullptr;
+	m_simManager = nullptr;
 	m_fps = 0;
 	m_computeTimer = startTimer(1);
 	m_renderTimer = startTimer(30);
@@ -128,8 +129,6 @@ void SimViewer::initializeGL()
 	glEnable(GL_LIGHT0);
 	glEnable(GL_FRONT_AND_BACK);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-	//glEnable(GL_CULL_FACE);
-	//glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1, 1);
@@ -142,8 +141,6 @@ void SimViewer::initializeGL()
 	m_fbo = new QGLFramebufferObject(width(), height(), fmt);
 	if (!m_fbo->isValid())
 		printf("error: invalid depth fbo!\n");
-	if (glGetError() != GL_NO_ERROR)
-		printf("%s\n", gluErrorString(glGetError()));
 }
 
 void SimViewer::resizeGL(int w, int h)
@@ -162,9 +159,9 @@ void SimViewer::resizeGL(int w, int h)
 
 void SimViewer::timerEvent(QTimerEvent* ev)
 {
-	if (!m_simulator)
+	if (!m_simManager)
 		return;
-	if (ev->timerId() == m_computeTimer && m_simulator)
+	if (ev->timerId() == m_computeTimer && m_simManager)
 	{
 	//	if (!m_pListener->GetCad().isEmpty() && m_pListener->ldp_disable_update == false)
 	//	{
@@ -196,7 +193,7 @@ void SimViewer::paintGL()
 
 	// show cloth simulation=============================
 	m_camera.apply();
-	if (m_simulator)
+	if (m_simManager)
 	{
 	//	if (isEdgeMode())
 	//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -352,11 +349,11 @@ void SimViewer::renderDragBox()
 	glPopAttrib();
 }
 
-void SimViewer::initCloth(arcsim::Simulation* sim)
+void SimViewer::initCloth(arcsim::SimulationManager* sim)
 {
 	if (sim == nullptr)
 		throw std::exception("initCloth(): nullptr error");
-	m_simulator = sim;
+	m_simManager = sim;
 }
 
 void SimViewer::getModelBound(ldp::Float3& bmin, ldp::Float3& bmax)

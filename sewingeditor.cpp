@@ -43,6 +43,7 @@ SewingEditor::~SewingEditor()
 void SewingEditor::closeEvent(QCloseEvent* ev)
 {
 	m_meshWindow->close();
+	m_simWindow->close();
 }
 
 void SewingEditor::dragEnterEvent(QDragEnterEvent* event)

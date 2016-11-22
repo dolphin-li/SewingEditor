@@ -274,6 +274,7 @@ public:
 
         sbCoarseMesh = new QSpinBox(groupBox_4);
         sbCoarseMesh->setObjectName(QStringLiteral("sbCoarseMesh"));
+        sbCoarseMesh->setMaximum(999999);
 
         gridLayout_5->addWidget(sbCoarseMesh, 0, 1, 2, 1);
 
@@ -284,6 +285,7 @@ public:
 
         sbDetailMesh = new QSpinBox(groupBox_4);
         sbDetailMesh->setObjectName(QStringLiteral("sbDetailMesh"));
+        sbDetailMesh->setMaximum(999999);
 
         gridLayout_5->addWidget(sbDetailMesh, 2, 1, 1, 1);
 

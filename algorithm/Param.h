@@ -1,6 +1,6 @@
 #pragma once
 #include "ldp_basic_mat.h"
-#include "util.h"
+#include "ldputil.h"
 class CClothParam;
 class Param
 {

@@ -1,6 +1,6 @@
 #include "CreaseMesh.h"
 #include "bmesh.h"
-#include "util.h"
+#include "ldputil.h"
 #include <set>
 #include "OpenMeshWrapper.h"
 #include <queue>

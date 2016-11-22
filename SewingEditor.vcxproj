@@ -93,7 +93,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;UNICODE;WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\SC\DelFEM\include\delfem;$(ProjectDir)\algorithm\SC;$(ProjectDir)\algorithm\SC\DelFEM\include;$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\arcsim;$(ProjectDir)\algorithm\SC\DelFEM\include\delfem;$(ProjectDir)\algorithm\SC;$(ProjectDir)\algorithm\SC\DelFEM\include;$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -102,7 +102,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName)d.exe</OutputFile>
-      <AdditionalLibraryDirectories>D:\boost\boost_1_56_0\lib64-msvc-12.0;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\freeImage;$(ProjectDir)\algorithm\GL;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\algorithm\arcsim\taucs\lib;D:\boost\boost_1_56_0\lib64-msvc-12.0;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\freeImage;$(ProjectDir)\algorithm\GL;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -126,7 +126,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\SC\DelFEM\include\delfem;$(ProjectDir)\algorithm\SC;$(ProjectDir)\algorithm\SC\DelFEM\include;$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\algorithm\arcsim;$(ProjectDir)\algorithm\SC\DelFEM\include\delfem;$(ProjectDir)\algorithm\SC;$(ProjectDir)\algorithm\SC\DelFEM\include;$(ProjectDir)\algorithm\svgpp\;D:\boost\boost_1_56_0;$(ProjectDir)\algorithm\svgpp\nvprsvg\common;$(ProjectDir)\algorithm\svgpp\nvprsvg\cg4cpp\include;$(ProjectDir)\algorithm\svgpp\nvprsvg;$(ProjectDir)\algorithm\renderable;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\ldpMat;$(ProjectDir)\algorithm\kdtree;$(ProjectDir)\algorithm\freeimage;$(ProjectDir)\algorithm\GL;$(ProjectDir)\algorithm\conv;$(ProjectDir)\algorithm\camera;$(ProjectDir)\algorithm;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -135,12 +135,65 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>D:\boost\boost_1_56_0\lib64-msvc-12.0;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\freeImage;$(ProjectDir)\algorithm\GL;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\algorithm\arcsim\taucs\lib;D:\boost\boost_1_56_0\lib64-msvc-12.0;$(ProjectDir)\algorithm\openmesh;$(ProjectDir)\algorithm\freeImage;$(ProjectDir)\algorithm\GL;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\auglag.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\bah.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\bvh.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\cloth.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\collision.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\collisionutil.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\constraint.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\dde.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\dynamicremesh.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\geometry.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\handle.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\io.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\lbfgs.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\lsnewton.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\magic.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\mesh.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\misc.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\morph.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\mot_parser.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\nearobs.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\nlcg.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\obstacle.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\physics.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\plasticity.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\popfilter.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\proximity.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\remesh.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\runphysics.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\separate.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\separateobs.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\simulation.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\spline.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\strainlimiting.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\taucs.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\tensormax.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\timer.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\transformation.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\trustregion.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\util.cpp" />
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\vectors.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\alglibinternal.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\alglibmisc.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\ap.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\dataanalysis.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\diffequations.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\fasttransforms.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\integration.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\interpolation.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\linalg.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\optimization.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\solvers.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\specialfunctions.cpp" />
+    <ClCompile Include="algorithm\arcsim\alglib\statistics.cpp" />
     <ClCompile Include="algorithm\camera\Camera.cpp" />
     <ClCompile Include="algorithm\conv\ConvolutionPyramid.cpp" />
     <ClCompile Include="algorithm\conv\Convolution_Helper.cpp" />
@@ -389,7 +442,7 @@
     <ClCompile Include="algorithm\tinyxml\tinyxml.cpp" />
     <ClCompile Include="algorithm\tinyxml\tinyxmlerror.cpp" />
     <ClCompile Include="algorithm\tinyxml\tinyxmlparser.cpp" />
-    <ClCompile Include="algorithm\util.cpp" />
+    <ClCompile Include="algorithm\ldputil.cpp" />
     <ClCompile Include="basemeshviewer.cpp" />
     <ClCompile Include="event_handles\AbstractEventHandle.cpp" />
     <ClCompile Include="event_handles\AbstractMeshEventHandle.cpp" />
@@ -499,6 +552,60 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\auglag.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\bah.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\blockvectors.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\bvh.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\cloth.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\collision.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\collisionutil.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\constraint.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\dde.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\dynamicremesh.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\geometry.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\handle.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\io.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\magic.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\mesh.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\misc.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\morph.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\mot_parser.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\nearobs.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\obstacle.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\opengl.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\optimization.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\physics.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\plasticity.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\popfilter.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\proximity.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\remesh.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\runphysics.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\separate.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\separateobs.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\simulation.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\sparse.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\spline.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\strainlimiting.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\taucs.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\tensormax.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\timer.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\transformation.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\util.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\vectors.hpp" />
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\winport.hpp" />
+    <ClInclude Include="algorithm\arcsim\alglib\alglibinternal.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\alglibmisc.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\ap.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\dataanalysis.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\diffequations.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\fasttransforms.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\integration.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\interpolation.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\linalg.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\optimization.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\solvers.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\specialfunctions.h" />
+    <ClInclude Include="algorithm\arcsim\alglib\statistics.h" />
     <ClInclude Include="algorithm\camera\Camera.h" />
     <ClInclude Include="algorithm\camera\fmath.h" />
     <ClInclude Include="algorithm\conv\ConvolutionPyramid.h" />
@@ -703,7 +810,7 @@
     <ClInclude Include="algorithm\svgpp\SvgText.h" />
     <ClInclude Include="algorithm\tinyxml\tinystr.h" />
     <ClInclude Include="algorithm\tinyxml\tinyxml.h" />
-    <ClInclude Include="algorithm\util.h" />
+    <ClInclude Include="algorithm\ldputil.h" />
     <CustomBuild Include="SvgViewer.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing SvgViewer.h...</Message>

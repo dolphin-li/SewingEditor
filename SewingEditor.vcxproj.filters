@@ -116,6 +116,15 @@
     <Filter Include="algorithm\SC\DelFEM\com">
       <UniqueIdentifier>{740d2522-b51c-4dba-b4ef-767362b7f55f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="algorithm\arcsim">
+      <UniqueIdentifier>{050509fd-65d4-4ac7-9ad2-dcba7be39a7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\arcsim\adaptiveCloth">
+      <UniqueIdentifier>{1632ed37-bb3f-4a9e-953b-12007934dde0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algorithm\arcsim\alglib">
+      <UniqueIdentifier>{fad2f7cc-ff10-417e-8e34-32efd25b2e4f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -152,9 +161,6 @@
       <Filter>algorithm</Filter>
     </ClCompile>
     <ClCompile Include="algorithm\qimdebug.cpp">
-      <Filter>algorithm</Filter>
-    </ClCompile>
-    <ClCompile Include="algorithm\util.cpp">
       <Filter>algorithm</Filter>
     </ClCompile>
     <ClCompile Include="algorithm\camera\Camera.cpp">
@@ -940,6 +946,168 @@
     <ClCompile Include="algorithm\FreeFormDeform.cpp">
       <Filter>algorithm</Filter>
     </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\auglag.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\bah.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\bvh.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\cloth.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\collision.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\collisionutil.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\constraint.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\dde.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\dynamicremesh.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\geometry.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\handle.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\io.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\lbfgs.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\lsnewton.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\magic.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\mesh.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\misc.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\morph.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\mot_parser.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\nearobs.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\nlcg.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\obstacle.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\physics.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\plasticity.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\popfilter.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\proximity.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\remesh.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\runphysics.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\separate.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\separateobs.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\simulation.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\spline.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\strainlimiting.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\taucs.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\tensormax.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\timer.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\transformation.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\trustregion.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\util.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\adaptiveCloth\vectors.cpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\alglibinternal.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\alglibmisc.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\ap.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\dataanalysis.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\diffequations.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\fasttransforms.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\integration.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\interpolation.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\linalg.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\optimization.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\solvers.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\specialfunctions.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\arcsim\alglib\statistics.cpp">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm\ldputil.cpp">
+      <Filter>algorithm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="sewingeditor.ui">
@@ -984,9 +1152,6 @@
       <Filter>algorithm</Filter>
     </ClInclude>
     <ClInclude Include="algorithm\qimdebug.h">
-      <Filter>algorithm</Filter>
-    </ClInclude>
-    <ClInclude Include="algorithm\util.h">
       <Filter>algorithm</Filter>
     </ClInclude>
     <ClInclude Include="algorithm\ldpMat\half.hpp">
@@ -1617,6 +1782,171 @@
       <Filter>event_handles</Filter>
     </ClInclude>
     <ClInclude Include="algorithm\FreeFormDeform.h">
+      <Filter>algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\auglag.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\bah.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\blockvectors.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\bvh.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\cloth.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\collision.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\collisionutil.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\constraint.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\dde.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\dynamicremesh.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\geometry.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\handle.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\io.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\magic.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\mesh.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\misc.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\morph.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\mot_parser.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\nearobs.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\obstacle.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\opengl.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\optimization.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\physics.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\plasticity.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\popfilter.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\proximity.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\remesh.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\runphysics.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\separate.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\separateobs.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\simulation.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\sparse.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\spline.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\strainlimiting.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\taucs.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\tensormax.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\timer.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\transformation.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\util.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\vectors.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\adaptiveCloth\winport.hpp">
+      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\alglibinternal.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\alglibmisc.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\ap.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\dataanalysis.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\diffequations.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\fasttransforms.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\integration.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\interpolation.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\linalg.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\optimization.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\solvers.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\specialfunctions.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\arcsim\alglib\statistics.h">
+      <Filter>algorithm\arcsim\alglib</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\ldputil.h">
       <Filter>algorithm</Filter>
     </ClInclude>
   </ItemGroup>

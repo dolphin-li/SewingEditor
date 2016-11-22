@@ -3,7 +3,7 @@
 
 #include "SvgManager.h"
 
-#include "util.h"
+#include "ldputil.h"
 #include "kdtree\PointTree.h"
 
 #include "nvprsvg\svg_loader.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ldpMat\ldp_basic_mat.h"
-#include "util.h"
+#include "ldputil.h"
 namespace svg
 {
 	class SvgPolyPath;

@@ -1,8 +1,12 @@
 #include <GL\glew.h>
+#include <QtOpenGL>
+#include <GL\glut.h>
 #include "SimViewer.h"
-#include "designer2d_cloth.h"
-#include "analysis2d_cloth_static.h"
+#include "adaptiveCloth\simulation.hpp"
 #include "ldpMat\Quaternion.h"
+
+
+
 #pragma region --mat_utils
 
 inline ldp::Mat3f angles2rot(ldp::Float3 v)
@@ -88,6 +92,7 @@ SimViewer::SimViewer(QWidget *parent)
 			AbstractSimEventHandle::create(AbstractSimEventHandle::ProcessorType(i), this));
 	}
 	setEventHandleType(AbstractSimEventHandle::ProcessorTypeGeneral);
+	m_simulator = nullptr;
 	m_fps = 0;
 	m_computeTimer = startTimer(1);
 	m_renderTimer = startTimer(30);
@@ -157,10 +162,10 @@ void SimViewer::resizeGL(int w, int h)
 
 void SimViewer::timerEvent(QTimerEvent* ev)
 {
-	//if (!m_pListener || !m_pAnalysis)
-	//	return;
-	//if (ev->timerId() == m_computeTimer && m_pAnalysis && m_pListener)
-	//{
+	if (!m_simulator)
+		return;
+	if (ev->timerId() == m_computeTimer && m_simulator)
+	{
 	//	if (!m_pListener->GetCad().isEmpty() && m_pListener->ldp_disable_update == false)
 	//	{
 	//		gtime_t t1 = ldp::gtime_now();
@@ -175,7 +180,7 @@ void SimViewer::timerEvent(QTimerEvent* ev)
 	//		double sec = ldp::gtime_seconds(t1, t2);
 	//		m_fps = 1 / sec;
 	//	}
-	//}
+	}
 	if (ev->timerId() == m_renderTimer)
 		updateGL();
 }
@@ -191,15 +196,15 @@ void SimViewer::paintGL()
 
 	// show cloth simulation=============================
 	m_camera.apply();
-	//if (m_pListener)
-	//{
+	if (m_simulator)
+	{
 	//	if (isEdgeMode())
 	//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//	else
 	//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	//	if (!m_pListener->GetCad().isEmpty())
 	//		m_pListener->Draw(4);
-	//}
+	}
 	renderTrackBall(false);
 	renderDragBox();
 }
@@ -347,12 +352,11 @@ void SimViewer::renderDragBox()
 	glPopAttrib();
 }
 
-void SimViewer::initCloth()
+void SimViewer::initCloth(arcsim::Simulation* sim)
 {
-	//if (pAnalysis == nullptr || pListener == nullptr)
-	//	throw std::exception("initCloth(): nullptr error");
-	//m_pAnalysis = pAnalysis;
-	//m_pListener = pListener;
+	if (sim == nullptr)
+		throw std::exception("initCloth(): nullptr error");
+	m_simulator = sim;
 }
 
 void SimViewer::getModelBound(ldp::Float3& bmin, ldp::Float3& bmax)

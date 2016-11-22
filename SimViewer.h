@@ -4,8 +4,10 @@
 #include <QtOpenGL>
 #include "Camera\camera.h"
 #include "event_handles\AbstractSimEventHandle.h"
-class CAnalysis2D_Cloth_Static;
-class CDesigner2D_Cloth;
+namespace arcsim
+{
+	struct Simulation;
+};
 class SimViewer : public QGLWidget
 {
 	Q_OBJECT
@@ -25,7 +27,7 @@ public:
 	SimViewer(QWidget *parent);
 	~SimViewer();
 
-	void initCloth();
+	void initCloth(arcsim::Simulation* sim);
 	void getModelBound(ldp::Float3& bmin, ldp::Float3& bmax);
 
 	float getFps()const{ return m_fps; }
@@ -87,6 +89,7 @@ protected:
 	AbstractSimEventHandle* m_currentEventHandle;
 	std::vector<std::shared_ptr<AbstractSimEventHandle>> m_eventHandles;
 
+	arcsim::Simulation* m_simulator;
 	ldp::Float3 m_modelBound[2];
 	int m_computeTimer, m_renderTimer;
 	float m_fps;

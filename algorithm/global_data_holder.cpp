@@ -3,6 +3,7 @@
 #include "analysis2d_cloth_static.h"
 #include "designer2d_cloth.h"
 #include "FreeFormDeform.h"
+#include "adaptiveCloth\simulation.hpp"
 GlobalDataHolder g_dataholder;
 
 void GlobalDataHolder::init()
@@ -14,6 +15,9 @@ void GlobalDataHolder::init()
 	// clothes related
 	m_clothManger.reset(new CAnalysis2D_Cloth_Static);
 	m_clothUiListener.reset(new CDesigner2D_Cloth);
+
+	// arcsim
+	m_simulator.reset(new arcsim::Simulation);
 }
 
 void GlobalDataHolder::generateClothDebug()
@@ -46,4 +50,9 @@ void GlobalDataHolder::svgToCloth()
 	//m_clothManger->PerformStaticSolver();
 	m_clothManger->SetClothPiecePlacingMode();
 	m_clothUiListener->ldp_disable_update = false;
+}
+
+void GlobalDataHolder::svgToSim()
+{
+
 }

@@ -3,9 +3,14 @@
 #include "ldputil.h"
 #include "Param.h"
 #include <map>
-namespace svg{
+namespace svg
+{
 class SvgManager;
-}
+};
+namespace arcsim
+{
+	struct Simulation;
+};
 class CAnalysis2D_Cloth_Static;
 class CDesigner2D_Cloth;
 class FreeFormDeform;
@@ -17,6 +22,8 @@ public:
 	void generateClothDebug();
 
 	void svgToCloth();
+
+	void svgToSim();
 public:
 	std::shared_ptr<svg::SvgManager> m_svgManager;
 	std::shared_ptr<CAnalysis2D_Cloth_Static> m_clothManger;
@@ -25,6 +32,8 @@ public:
 	std::map<unsigned int, int> m_clothLoopId2svgIdMap;
 	std::map<int, unsigned int> m_svgId2clothLoopIdMap;
 	Param m_param;
+
+	std::shared_ptr<arcsim::Simulation> m_simulator;
 };
 
 extern GlobalDataHolder g_dataholder;

@@ -23,17 +23,17 @@
   IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
-
-#ifndef TAUCS_HPP
-#define TAUCS_HPP
-
+#pragma once
 #include "sparse.hpp"
 #include "vectors.hpp"
 
-std::vector<double> taucs_linear_solve (const SpMat<double> &A,
-                                        const std::vector<double> &b);
+namespace arcsim
+{
 
-template <int m> std::vector< Vec<m> > taucs_linear_solve
-    (const SpMat< Mat<m,m> > &A, const std::vector< Vec<m> > &b);
+	std::vector<double> taucs_linear_solve(const SpMat<double> &A,
+		const std::vector<double> &b);
 
-#endif
+	template <int m> std::vector< Vec<m> > taucs_linear_solve
+		(const SpMat< Mat<m, m> > &A, const std::vector< Vec<m> > &b);
+
+}

@@ -29,105 +29,124 @@
 #include "magic.hpp"
 using namespace std;
 
-double EqCon::value (int *sign) {
-    if (sign) *sign = 0;
-    return dot(n, node->x - x);
-}
-MeshGrad EqCon::gradient () {MeshGrad grad; grad[node] = n; return grad;}
-MeshGrad EqCon::project () {return MeshGrad();}
-double EqCon::energy (double value) {return stiff*sq(value)/2.;}
-double EqCon::energy_grad (double value) {return stiff*value;}
-double EqCon::energy_hess (double value) {return stiff;}
-MeshGrad EqCon::friction (double dt, MeshHess &jac) {return MeshGrad();}
+namespace arcsim
+{
 
-double GlueCon::value (int *sign) {
-    if (sign) *sign = 0;
-    return dot(n, nodes[1]->x - nodes[0]->x);
-}
-MeshGrad GlueCon::gradient () {
-    MeshGrad grad;
-    grad[nodes[0]] = -n;
-    grad[nodes[1]] = n;
-    return grad;
-}
-MeshGrad GlueCon::project () {return MeshGrad();}
-double GlueCon::energy (double value) {return stiff*sq(value)/2.;}
-double GlueCon::energy_grad (double value) {return stiff*value;}
-double GlueCon::energy_hess (double value) {return stiff;}
-MeshGrad GlueCon::friction (double dt, MeshHess &jac) {return MeshGrad();}
+	double EqCon::value(int *sign)
+	{
+		if (sign) *sign = 0;
+		return dot(n, node->x - x);
+	}
+	MeshGrad EqCon::gradient() { MeshGrad grad; grad[node] = n; return grad; }
+	MeshGrad EqCon::project() { return MeshGrad(); }
+	double EqCon::energy(double value) { return stiff*sq(value) / 2.; }
+	double EqCon::energy_grad(double value) { return stiff*value; }
+	double EqCon::energy_hess(double value) { return stiff; }
+	MeshGrad EqCon::friction(double dt, MeshHess &jac) { return MeshGrad(); }
 
-double IneqCon::value (int *sign) {
-    if (sign)
-        *sign = 1;
-    double d = 0;
-    for (int i = 0; i < 4; i++)
-        d += w[i]*dot(n, nodes[i]->x);
-    d -= ::magic.repulsion_thickness;
-    return d;
-}
+	double GlueCon::value(int *sign)
+	{
+		if (sign) *sign = 0;
+		return dot(n, nodes[1]->x - nodes[0]->x);
+	}
+	MeshGrad GlueCon::gradient()
+	{
+		MeshGrad grad;
+		grad[nodes[0]] = -n;
+		grad[nodes[1]] = n;
+		return grad;
+	}
+	MeshGrad GlueCon::project() { return MeshGrad(); }
+	double GlueCon::energy(double value) { return stiff*sq(value) / 2.; }
+	double GlueCon::energy_grad(double value) { return stiff*value; }
+	double GlueCon::energy_hess(double value) { return stiff; }
+	MeshGrad GlueCon::friction(double dt, MeshHess &jac) { return MeshGrad(); }
 
-MeshGrad IneqCon::gradient () {
-    MeshGrad grad;
-    for (int i = 0; i < 4; i++)
-        grad[nodes[i]] = w[i]*n;
-    return grad;
-}
+	double IneqCon::value(int *sign)
+	{
+		if (sign)
+			*sign = 1;
+		double d = 0;
+		for (int i = 0; i < 4; i++)
+			d += w[i] * dot(n, nodes[i]->x);
+		d -= arcsim::magic.repulsion_thickness;
+		return d;
+	}
 
-MeshGrad IneqCon::project () {
-    double d = value() + ::magic.repulsion_thickness - ::magic.projection_thickness;
-    if (d >= 0)
-        return MeshGrad();
-    double inv_mass = 0;
-    for (int i = 0; i < 4; i++)
-        if (free[i])
-            inv_mass += sq(w[i])/nodes[i]->m;
-    MeshGrad dx;
-    for (int i = 0; i < 4; i++)
-        if (free[i])
-            dx[nodes[i]] = -(w[i]/nodes[i]->m)/inv_mass*n*d;
-    return dx;
-}
+	MeshGrad IneqCon::gradient()
+	{
+		MeshGrad grad;
+		for (int i = 0; i < 4; i++)
+			grad[nodes[i]] = w[i] * n;
+		return grad;
+	}
 
-double violation (double value) {return std::max(-value, 0.);}
+	MeshGrad IneqCon::project()
+	{
+		double d = value() + arcsim::magic.repulsion_thickness - arcsim::magic.projection_thickness;
+		if (d >= 0)
+			return MeshGrad();
+		double inv_mass = 0;
+		for (int i = 0; i < 4; i++)
+		if (free[i])
+			inv_mass += sq(w[i]) / nodes[i]->m;
+		MeshGrad dx;
+		for (int i = 0; i < 4; i++)
+		if (free[i])
+			dx[nodes[i]] = -(w[i] / nodes[i]->m) / inv_mass*n*d;
+		return dx;
+	}
 
-double IneqCon::energy (double value) {
-    double v = violation(value);
-    return stiff*v*v*v/::magic.repulsion_thickness/6;
-}
-double IneqCon::energy_grad (double value) {
-    return -stiff*sq(violation(value))/::magic.repulsion_thickness/2;
-}
-double IneqCon::energy_hess (double value) {
-    return stiff*violation(value)/::magic.repulsion_thickness;
-}
+	double violation(double value) { return std::max(-value, 0.); }
 
-MeshGrad IneqCon::friction (double dt, MeshHess &jac) {
-    if (mu == 0)
-        return MeshGrad();
-    double fn = abs(energy_grad(value()));
-    if (fn == 0)
-        return MeshGrad();
-    Vec3 v = Vec3(0);
-    double inv_mass = 0;
-    for (int i = 0; i < 4; i++) {
-        v += w[i]*nodes[i]->v;
-        if (free[i])
-            inv_mass += sq(w[i])/nodes[i]->m;
-    }
-    Mat3x3 T = Mat3x3(1) - outer(n,n);
-    double vt = norm(T*v);
-    double f_by_v = min(mu*fn/vt, 1/(dt*inv_mass));
-    // double f_by_v = mu*fn/max(vt, 1e-1);
-    MeshGrad force;
-    for (int i = 0; i < 4; i++) {
-        if (free[i]) {
-            force[nodes[i]] = -w[i]*f_by_v*T*v;
-            for (int j = 0; j < 4; j++) {
-                if (free[j]) {
-                    jac[make_pair(nodes[i],nodes[j])] = -w[i]*w[j]*f_by_v*T;
-                }
-            }
-        }
-    }
-    return force;
+	double IneqCon::energy(double value)
+	{
+		double v = violation(value);
+		return stiff*v*v*v / arcsim::magic.repulsion_thickness / 6;
+	}
+	double IneqCon::energy_grad(double value)
+	{
+		return -stiff*sq(violation(value)) / arcsim::magic.repulsion_thickness / 2;
+	}
+	double IneqCon::energy_hess(double value)
+	{
+		return stiff*violation(value) / arcsim::magic.repulsion_thickness;
+	}
+
+	MeshGrad IneqCon::friction(double dt, MeshHess &jac)
+	{
+		if (mu == 0)
+			return MeshGrad();
+		double fn = abs(energy_grad(value()));
+		if (fn == 0)
+			return MeshGrad();
+		Vec3 v = Vec3(0);
+		double inv_mass = 0;
+		for (int i = 0; i < 4; i++)
+		{
+			v += w[i] * nodes[i]->v;
+			if (free[i])
+				inv_mass += sq(w[i]) / nodes[i]->m;
+		}
+		Mat3x3 T = Mat3x3(1) - outer(n, n);
+		double vt = norm(T*v);
+		double f_by_v = std::min(mu*fn / vt, 1 / (dt*inv_mass));
+		// double f_by_v = mu*fn/max(vt, 1e-1);
+		MeshGrad force;
+		for (int i = 0; i < 4; i++)
+		{
+			if (free[i])
+			{
+				force[nodes[i]] = -w[i] * f_by_v*T*v;
+				for (int j = 0; j < 4; j++)
+				{
+					if (free[j])
+					{
+						jac[make_pair(nodes[i], nodes[j])] = -w[i] * w[j] * f_by_v*T;
+					}
+				}
+			}
+		}
+		return force;
+	}
 }

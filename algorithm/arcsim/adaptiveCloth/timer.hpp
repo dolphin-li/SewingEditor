@@ -25,19 +25,20 @@
 */
 
 // Armin's timer class
-#ifndef __TIMER_H
-#define __TIMER_H
-
+#pragma once
 #include <time.h>
 #include <cstdlib>
 #include <iostream>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-struct Timer {
-    boost::posix_time::ptime then;
-    double last, total;
-    Timer ();
-    void tick (), tock ();
-};
+namespace arcsim
+{
 
-#endif
+	struct Timer
+	{
+		boost::posix_time::ptime then;
+		double last, total;
+		Timer();
+		void tick(), tock();
+	};
+}

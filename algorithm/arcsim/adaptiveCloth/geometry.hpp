@@ -24,41 +24,43 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef GEOMETRY_HPP
-#define GEOMETRY_HPP
-
+#pragma once
 #include "mesh.hpp"
 #include "util.hpp"
+namespace arcsim
+{
 
-double signed_vf_distance (const Vec3 &x,
-                           const Vec3 &y0, const Vec3 &y1, const Vec3 &y2,
-                           Vec3 *n, double *w);
 
-double signed_ee_distance (const Vec3 &x0, const Vec3 &x1,
-                           const Vec3 &y0, const Vec3 &y1,
-                           Vec3 *n, double *w);
 
-double unsigned_vf_distance (const Vec3 &x,
-                             const Vec3 &y0, const Vec3 &y1, const Vec3 &y2,
-                             Vec3 *n, double *w);
+	double signed_vf_distance(const Vec3 &x,
+		const Vec3 &y0, const Vec3 &y1, const Vec3 &y2,
+		Vec3 *n, double *w);
 
-double unsigned_ee_distance (const Vec3 &x0, const Vec3 &x1,
-                             const Vec3 &y0, const Vec3 &y1,
-                             Vec3 *n, double *w);
+	double signed_ee_distance(const Vec3 &x0, const Vec3 &x1,
+		const Vec3 &y0, const Vec3 &y1,
+		Vec3 *n, double *w);
 
-Vec3 get_barycentric_coords (const Vec2 &point, const Face *face);
+	double unsigned_vf_distance(const Vec3 &x,
+		const Vec3 &y0, const Vec3 &y1, const Vec3 &y2,
+		Vec3 *n, double *w);
 
-Face* get_enclosing_face (const Mesh& mesh, const Vec2& u,
-                          Face *starting_face_hint = NULL);
+	double unsigned_ee_distance(const Vec3 &x0, const Vec3 &x1,
+		const Vec3 &y0, const Vec3 &y1,
+		Vec3 *n, double *w);
 
-enum Space {PS, WS}; // plastic space, world space
+	Vec3 get_barycentric_coords(const Vec2 &point, const Face *face);
 
-template <Space s> const Vec3 &pos (const Node *node);
-template <Space s> Vec3 &pos (Node *node);
-template <Space s> Vec3 nor (const Face *face);
-template <Space s> double dihedral_angle (const Edge *edge);
-template <Space s> Mat2x2 curvature (const Face *face);
+	Face* get_enclosing_face(const Mesh& mesh, const Vec2& u,
+		Face *starting_face_hint = NULL);
 
-double unwrap_angle (double theta, double theta_ref);
+	enum Space { PS, WS }; // plastic space, world space
 
-#endif
+	template <Space s> const Vec3 &pos(const Node *node);
+	template <Space s> Vec3 &pos(Node *node);
+	template <Space s> Vec3 nor(const Face *face);
+	template <Space s> double dihedral_angle(const Edge *edge);
+	template <Space s> Mat2x2 curvature(const Face *face);
+
+	double unwrap_angle(double theta, double theta_ref);
+
+}

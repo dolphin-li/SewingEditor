@@ -23,15 +23,12 @@
   IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
-
-#ifndef NEAROBS_HPP
-#define NEAROBS_HPP
-
+#pragma once
 #include "mesh.hpp"
+namespace arcsim
+{
+	typedef std::pair<Vec3, Vec3> Plane;
 
-typedef std::pair<Vec3,Vec3> Plane;
-
-std::vector<Plane> nearest_obstacle_planes
-    (const Mesh &mesh, const std::vector<Mesh*> &obs_meshes);
-
-#endif
+	std::vector<Plane> nearest_obstacle_planes
+		(const Mesh &mesh, const std::vector<Mesh*> &obs_meshes);
+}

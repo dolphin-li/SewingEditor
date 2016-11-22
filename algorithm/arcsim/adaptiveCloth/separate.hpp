@@ -24,12 +24,10 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef SEPARATE_HPP
-#define SEPARATE_HPP
-
+#pragma once
 #include "mesh.hpp"
-
-void separate (std::vector<Mesh*> &meshes, const std::vector<Mesh*> &old_meshes,
-               const std::vector<Mesh*> &obs_meshes);
-
-#endif
+namespace arcsim
+{
+	void separate(std::vector<Mesh*> &meshes, const std::vector<Mesh*> &old_meshes,
+		const std::vector<Mesh*> &obs_meshes);
+}

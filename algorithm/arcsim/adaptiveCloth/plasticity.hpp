@@ -24,20 +24,18 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef PLASTICITY_HPP
-#define PLASTICITY_HPP
-
+#pragma once
 #include "cloth.hpp"
+namespace arcsim
+{
+	void reset_plasticity(Cloth &cloth);
 
-void reset_plasticity (Cloth &cloth);
+	void plastic_update(Cloth &cloth);
 
-void plastic_update (Cloth &cloth);
+	void optimize_plastic_embedding(Cloth &cloth);
 
-void optimize_plastic_embedding (Cloth &cloth);
-
-struct Residual {Mat2x2 S_res; double damage;};
-std::vector<Residual> back_up_residuals (Mesh &mesh);
-void restore_residuals (Mesh &mesh, const Mesh &old_mesh,
-                        const std::vector<Residual> &res);
-
-#endif
+	struct Residual { Mat2x2 S_res; double damage; };
+	std::vector<Residual> back_up_residuals(Mesh &mesh);
+	void restore_residuals(Mesh &mesh, const Mesh &old_mesh,
+		const std::vector<Residual> &res);
+}

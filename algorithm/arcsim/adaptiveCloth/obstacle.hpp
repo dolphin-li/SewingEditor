@@ -24,47 +24,50 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef OBSTACLE_HPP
-#define OBSTACLE_HPP
-
+#pragma once
 #include "mesh.hpp"
 #include "spline.hpp"
 #include "util.hpp"
+namespace arcsim
+{
 
-// A class which holds both moving and static meshes.
-// Note that moving meshes MUST retain their structure across frames with only
-// positions changing.
-struct Obstacle {
-public:
-    double start_time, end_time;
-    bool activated;
-    // Gets the last-returned mesh or its transformation
-    Mesh& get_mesh();
-    const Mesh& get_mesh() const;
 
-    // Gets the state of the mesh at a given time, and updates the internal
-    // meshes
-    Mesh& get_mesh(double time_sec);
 
-    // lerp with previous mesh at time t - dt
-    void blend_with_previous (double t, double dt, double blend);
+	// A class which holds both moving and static meshes.
+	// Note that moving meshes MUST retain their structure across frames with only
+	// positions changing.
+	struct Obstacle
+	{
+	public:
+		double start_time, end_time;
+		bool activated;
+		// Gets the last-returned mesh or its transformation
+		Mesh& get_mesh();
+		const Mesh& get_mesh() const;
 
-    const Motion *transform_spline;
+		// Gets the state of the mesh at a given time, and updates the internal
+		// meshes
+		Mesh& get_mesh(double time_sec);
 
-    // A mesh containing the original, untransformed object
-    Mesh base_mesh;
-    // A mesh containing the correct mesh structure
-    Mesh curr_state_mesh;
+		// lerp with previous mesh at time t - dt
+		void blend_with_previous(double t, double dt, double blend);
 
-    Obstacle (): start_time(0), end_time(infinity), activated(false) {}
-};
+		const Motion *transform_spline;
 
-// // Default arguments imply it's a static obstacle
-// // An obstacle mesh may have multiple parts, so when you read one in,
-// // you get a vector of obstacles back, each representing one part.
-// std::vector<Obstacle> make_obstacle
-//     (std::string filename, Transformation overall_transform = identity(),
-//      std::vector<Transformation> global_transforms = std::vector<Transformation>(),
-//      double fps = 1, double start_time = 0, double pause_time = 0);
+		// A mesh containing the original, untransformed object
+		Mesh base_mesh;
+		// A mesh containing the correct mesh structure
+		Mesh curr_state_mesh;
 
-#endif
+		Obstacle() : start_time(0), end_time(infinity), activated(false) {}
+	};
+
+	// // Default arguments imply it's a static obstacle
+	// // An obstacle mesh may have multiple parts, so when you read one in,
+	// // you get a vector of obstacles back, each representing one part.
+	// std::vector<Obstacle> make_obstacle
+	//     (std::string filename, Transformation overall_transform = identity(),
+	//      std::vector<Transformation> global_transforms = std::vector<Transformation>(),
+	//      double fps = 1, double start_time = 0, double pause_time = 0);
+
+}

@@ -24,14 +24,12 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef PROXIMITY_HPP
-#define PROXIMITY_HPP
-
+#pragma once
 #include "cloth.hpp"
 #include "constraint.hpp"
-
-std::vector<Constraint*> proximity_constraints
-    (const std::vector<Mesh*> &meshes, const std::vector<Mesh*> &obs_meshes,
-     double friction, double obs_friction);
-
-#endif
+namespace arcsim
+{
+	std::vector<Constraint*> proximity_constraints
+		(const std::vector<Mesh*> &meshes, const std::vector<Mesh*> &obs_meshes,
+		double friction, double obs_friction);
+}

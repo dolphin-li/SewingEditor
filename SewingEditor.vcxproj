@@ -572,7 +572,6 @@
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\mot_parser.hpp" />
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\nearobs.hpp" />
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\obstacle.hpp" />
-    <ClInclude Include="algorithm\arcsim\adaptiveCloth\opengl.hpp" />
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\optimization.hpp" />
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\physics.hpp" />
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\plasticity.hpp" />

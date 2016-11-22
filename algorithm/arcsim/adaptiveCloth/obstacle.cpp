@@ -31,46 +31,56 @@
 
 using namespace std;
 
-Mesh& Obstacle::get_mesh() {
-    return curr_state_mesh;
-}
+namespace arcsim
+{
 
-const Mesh& Obstacle::get_mesh() const {
-    return curr_state_mesh;
-}
+	Mesh& Obstacle::get_mesh()
+	{
+		return curr_state_mesh;
+	}
 
-Mesh& Obstacle::get_mesh(double time) {
-    if (time > end_time)
-        delete_mesh(curr_state_mesh);
-    if (time < start_time || time > end_time)
-        return curr_state_mesh;
-    if (!activated)
-        curr_state_mesh = deep_copy(base_mesh);
-    if (transform_spline) {
-        DTransformation dtrans = get_dtrans(*transform_spline, time);
-        Mesh &mesh = curr_state_mesh;
-        for (int n = 0; n < curr_state_mesh.nodes.size(); n++)
-            mesh.nodes[n]->x = apply_dtrans(dtrans, base_mesh.nodes[n]->x,
-                                            &mesh.nodes[n]->v);
-        compute_ws_data(mesh);
-    }
-    if (!activated)
-        update_x0(curr_state_mesh);
-    activated = true;
-    return curr_state_mesh;
-}
+	const Mesh& Obstacle::get_mesh() const
+	{
+		return curr_state_mesh;
+	}
 
-void Obstacle::blend_with_previous (double t, double dt, double blend) {
-    const Motion *spline = transform_spline;
-    Transformation trans = (spline)
-                         ? get_trans(*spline, t)
-                           * inverse(get_trans(*spline, t-dt))
-                         : ::identity();
-    Mesh &mesh = curr_state_mesh;
-    for (int n = 0; n < mesh.nodes.size(); n++) {
-        Node *node = mesh.nodes[n];
-        Vec3 x0 = trans.apply(node->x0);
-        node->x = x0 + blend*(node->x - x0);
-    }
-    compute_ws_data(mesh);
+	Mesh& Obstacle::get_mesh(double time)
+	{
+		if (time > end_time)
+			delete_mesh(curr_state_mesh);
+		if (time < start_time || time > end_time)
+			return curr_state_mesh;
+		if (!activated)
+			curr_state_mesh = deep_copy(base_mesh);
+		if (transform_spline)
+		{
+			DTransformation dtrans = get_dtrans(*transform_spline, time);
+			Mesh &mesh = curr_state_mesh;
+			for (int n = 0; n < curr_state_mesh.nodes.size(); n++)
+				mesh.nodes[n]->x = apply_dtrans(dtrans, base_mesh.nodes[n]->x,
+				&mesh.nodes[n]->v);
+			compute_ws_data(mesh);
+		}
+		if (!activated)
+			update_x0(curr_state_mesh);
+		activated = true;
+		return curr_state_mesh;
+	}
+
+	void Obstacle::blend_with_previous(double t, double dt, double blend)
+	{
+		const Motion *spline = transform_spline;
+		Transformation trans = (spline)
+			? get_trans(*spline, t)
+			* inverse(get_trans(*spline, t - dt))
+			: arcsim::identity();
+		Mesh &mesh = curr_state_mesh;
+		for (int n = 0; n < mesh.nodes.size(); n++)
+		{
+			Node *node = mesh.nodes[n];
+			Vec3 x0 = trans.apply(node->x0);
+			node->x = x0 + blend*(node->x - x0);
+		}
+		compute_ws_data(mesh);
+	}
 }

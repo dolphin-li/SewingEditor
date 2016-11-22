@@ -24,31 +24,35 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef MAGIC_HPP
-#define MAGIC_HPP
+#pragma once
+namespace arcsim
+{
 
-// Magic numbers and other hacks
 
-struct Magic {
-    bool fixed_high_res_mesh;
-    double handle_stiffness, collision_stiffness;
-    double repulsion_thickness, projection_thickness;
-    double edge_flip_threshold;
-    double rib_stiffening;
-    bool combine_tensors;
-    bool preserve_creases;
-    Magic ():
-        fixed_high_res_mesh(false),
-        handle_stiffness(1e3),
-        collision_stiffness(1e9),
-        repulsion_thickness(1e-3),
-        projection_thickness(1e-4),
-        edge_flip_threshold(1e-2),
-        rib_stiffening(1),
-        combine_tensors(true),
-        preserve_creases(false) {}
-};
+	// Magic numbers and other hacks
 
-extern Magic magic;
+	struct Magic
+	{
+		bool fixed_high_res_mesh;
+		double handle_stiffness, collision_stiffness;
+		double repulsion_thickness, projection_thickness;
+		double edge_flip_threshold;
+		double rib_stiffening;
+		bool combine_tensors;
+		bool preserve_creases;
+		Magic() :
+			fixed_high_res_mesh(false),
+			handle_stiffness(1e3),
+			collision_stiffness(1e9),
+			repulsion_thickness(1e-3),
+			projection_thickness(1e-4),
+			edge_flip_threshold(1e-2),
+			rib_stiffening(1),
+			combine_tensors(true),
+			preserve_creases(false)
+		{}
+	};
 
-#endif
+	extern Magic magic;
+
+}

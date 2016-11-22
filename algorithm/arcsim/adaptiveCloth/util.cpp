@@ -36,120 +36,145 @@
 #include <sstream>
 using namespace std; 
 
-void Stats::add (double x) {
-    xs.push_back(x);
-    sum += x;
-    sorted = false;
-}
+namespace arcsim
+{
 
-void Stats::sort () const {
-    if (sorted) return;
-    std::sort(xs.begin(), xs.end());
-    sorted = true;
-}
+	void Stats::add(double x)
+	{
+		xs.push_back(x);
+		sum += x;
+		sorted = false;
+	}
 
-double Stats::min () const {sort(); return xs.front();}
-double Stats::max () const {sort(); return xs.back();}
-double Stats::mean () const {return sum/xs.size();}
-double Stats::median () const {return quantile(0.5);}
-double Stats::quantile (double q) const {sort(); return xs[(int)(q*xs.size())];}
+	void Stats::sort() const
+	{
+		if (sorted) return;
+		std::sort(xs.begin(), xs.end());
+		sorted = true;
+	}
 
-ostream &operator<< (ostream &out, const Stats &stats) {
-    if (stats.xs.empty())
-        out << "no data";
-    else
-        out << stats.min() << " " << stats.quantile(0.05) << " "
-            << stats.quantile(0.25) << " " << stats.median() << " "
-            << stats.quantile(0.75) << " " << stats.quantile(0.95) << " "
-            << stats.max();
-    return out;
-}
+	double Stats::min() const { sort(); return xs.front(); }
+	double Stats::max() const { sort(); return xs.back(); }
+	double Stats::mean() const { return sum / xs.size(); }
+	double Stats::median() const { return quantile(0.5); }
+	double Stats::quantile(double q) const { sort(); return xs[(int)(q*xs.size())]; }
 
-inline string stringf (const string &format, ...) {
-    char buf[256];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buf, 256, format.c_str(), args);
-    va_end(args);
-    return std::string(buf);
-}
+	ostream &operator<< (ostream &out, const Stats &stats)
+	{
+		if (stats.xs.empty())
+			out << "no data";
+		else
+			out << stats.min() << " " << stats.quantile(0.05) << " "
+			<< stats.quantile(0.25) << " " << stats.median() << " "
+			<< stats.quantile(0.75) << " " << stats.quantile(0.95) << " "
+			<< stats.max();
+		return out;
+	}
 
-template <typename T> string name (const T *p) {
-    stringstream ss;
-    ss << setw(3) << setfill('0') << hex << ((size_t)p/sizeof(T))%0xfff;
-    return ss.str();
-}
+	inline string stringf(const string &format, ...)
+	{
+		char buf[256];
+		va_list args;
+		va_start(args, format);
+		vsnprintf(buf, 256, format.c_str(), args);
+		va_end(args);
+		return std::string(buf);
+	}
 
-ostream &operator<< (ostream &out, const Vert *vert) {
-    out << "v:" << name(vert); return out;}
+	template <typename T> string name(const T *p)
+	{
+		stringstream ss;
+		ss << setw(3) << setfill('0') << hex << ((size_t)p / sizeof(T)) % 0xfff;
+		return ss.str();
+	}
 
-ostream &operator<< (ostream &out, const Node *node) {
-    out << "n:" << name(node) << node->verts; return out;}
+	ostream &operator<< (ostream &out, const Vert *vert)
+	{
+		out << "v:" << name(vert); return out;
+	}
 
-ostream &operator<< (ostream &out, const Edge *edge) {
-    out << "e:" << name(edge) << "(" << edge->n[0] << "-" << edge->n[1] << ")"; return out;}
+	ostream &operator<< (ostream &out, const Node *node)
+	{
+		out << "n:" << name(node) << node->verts; return out;
+	}
 
-ostream &operator<< (ostream &out, const Face *face) {
-    out << "f:" << name(face) << "(" << face->v[0] << "-" << face->v[1] << "-" << face->v[2] << ")"; return out;}
+	ostream &operator<< (ostream &out, const Edge *edge)
+	{
+		out << "e:" << name(edge) << "(" << edge->n[0] << "-" << edge->n[1] << ")"; return out;
+	}
 
-const double infinity = numeric_limits<double>::infinity();
+	ostream &operator<< (ostream &out, const Face *face)
+	{
+		out << "f:" << name(face) << "(" << face->v[0] << "-" << face->v[1] << "-" << face->v[2] << ")"; return out;
+	}
 
-int solve_quadratic (double a, double b, double c, double x[2]) {
-    // http://en.wikipedia.org/wiki/Quadratic_formula#Floating_point_implementation
-    double d = b*b - 4*a*c;
-    if (d < 0) {
-        x[0] = -b/(2*a);
-        return 0;
-    }
-    double q = -(b + sgn(b)*sqrt(d))/2;
-    int i = 0;
-    if (abs(a) > 1e-12*abs(q))
-        x[i++] = q/a;
-    if (abs(q) > 1e-12*abs(c))
-        x[i++] = c/q;
-    if (i==2 && x[0] > x[1])
-        swap(x[0], x[1]);
-    return i;
-}
+	const double infinity = numeric_limits<double>::infinity();
 
-bool is_seam_or_boundary (const Vert *v) {
-    return is_seam_or_boundary(v->node);
-}
+	int solve_quadratic(double a, double b, double c, double x[2])
+	{
+		// http://en.wikipedia.org/wiki/Quadratic_formula#Floating_point_implementation
+		double d = b*b - 4 * a*c;
+		if (d < 0)
+		{
+			x[0] = -b / (2 * a);
+			return 0;
+		}
+		double q = -(b + sgn(b)*sqrt(d)) / 2;
+		int i = 0;
+		if (abs(a) > 1e-12*abs(q))
+			x[i++] = q / a;
+		if (abs(q) > 1e-12*abs(c))
+			x[i++] = c / q;
+		if (i == 2 && x[0] > x[1])
+			swap(x[0], x[1]);
+		return i;
+	}
 
-bool is_seam_or_boundary (const Node *n) {
-    for (int e = 0; e < n->adje.size(); e++)
-        if (is_seam_or_boundary(n->adje[e]))
-            return true;
-    return false;
-}
+	bool is_seam_or_boundary(const Vert *v)
+	{
+		return is_seam_or_boundary(v->node);
+	}
 
-bool is_seam_or_boundary (const Edge *e) {
-    return !e->adjf[0] || !e->adjf[1] || edge_vert(e,0,0) != edge_vert(e,1,0);
-}
+	bool is_seam_or_boundary(const Node *n)
+	{
+		for (int e = 0; e < n->adje.size(); e++)
+		if (is_seam_or_boundary(n->adje[e]))
+			return true;
+		return false;
+	}
 
-bool is_seam_or_boundary (const Face *f) {
-    return is_seam_or_boundary(f->adje[0])
-        || is_seam_or_boundary(f->adje[1])
-        || is_seam_or_boundary(f->adje[2]);
-}
+	bool is_seam_or_boundary(const Edge *e)
+	{
+		return !e->adjf[0] || !e->adjf[1] || edge_vert(e, 0, 0) != edge_vert(e, 1, 0);
+	}
 
-void debug_save_meshes (const vector<Mesh*> &meshvec, const string &name,
-                        int n) {
-    static map<string,int> savecount;
-    if (n == -1)
-        n = savecount[name];
-    else
-        savecount[name] = n;
-    save_objs(meshvec, stringf("tmp/%s%04d", name.c_str(), n));
-    savecount[name]++;
-}
+	bool is_seam_or_boundary(const Face *f)
+	{
+		return is_seam_or_boundary(f->adje[0])
+			|| is_seam_or_boundary(f->adje[1])
+			|| is_seam_or_boundary(f->adje[2]);
+	}
 
-void debug_save_mesh (const Mesh &mesh, const string &name, int n) {
-    static map<string,int> savecount;
-    if (n == -1)
-        n = savecount[name];
-    else
-        savecount[name] = n;
-    save_obj(mesh, stringf("tmp/%s%04d.obj", name.c_str(), n));
-    savecount[name]++;
+	void debug_save_meshes(const vector<Mesh*> &meshvec, const string &name,
+		int n)
+	{
+		static map<string, int> savecount;
+		if (n == -1)
+			n = savecount[name];
+		else
+			savecount[name] = n;
+		save_objs(meshvec, stringf("tmp/%s%04d", name.c_str(), n));
+		savecount[name]++;
+	}
+
+	void debug_save_mesh(const Mesh &mesh, const string &name, int n)
+	{
+		static map<string, int> savecount;
+		if (n == -1)
+			n = savecount[name];
+		else
+			savecount[name] = n;
+		save_obj(mesh, stringf("tmp/%s%04d.obj", name.c_str(), n));
+		savecount[name]++;
+	}
 }

@@ -24,26 +24,28 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef DDE_HPP
-#define DDE_HPP
+#pragma once
 
 #include "sparse.hpp"
 #include "util.hpp"
 
-typedef Vec<4> Vec4;
+namespace arcsim
+{
 
-struct StretchingData {Vec4 d[2][5];};
+	typedef Vec<4> Vec4;
 
-struct StretchingSamples {Vec4 s[40][40][40];};
+	struct StretchingData { Vec4 d[2][5]; };
 
-struct BendingData {double d[3][5];};
+	struct StretchingSamples { Vec4 s[40][40][40]; };
 
-void evaluate_stretching_samples (StretchingSamples &samples,
-                                  const StretchingData &data);
+	struct BendingData { double d[3][5]; };
 
-Vec4 stretching_stiffness (const Mat2x2 &G, const StretchingSamples &samples);
+	void evaluate_stretching_samples(StretchingSamples &samples,
+		const StretchingData &data);
 
-double bending_stiffness (const Edge *edge, int side, const BendingData &data,
-                          double initial_angle=0);
+	Vec4 stretching_stiffness(const Mat2x2 &G, const StretchingSamples &samples);
 
-#endif
+	double bending_stiffness(const Edge *edge, int side, const BendingData &data,
+		double initial_angle = 0);
+
+}

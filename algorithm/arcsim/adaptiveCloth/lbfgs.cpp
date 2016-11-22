@@ -32,37 +32,44 @@
 using namespace std;
 using namespace alglib;
 
-static const NLOpt *problem;
+namespace arcsim
+{
 
-static void lbfgs_value_and_grad (const real_1d_array &x, double &value,
-                                  real_1d_array &grad, void *ptr=NULL);
+	static const NLOpt *problem;
 
-void l_bfgs_method (const NLOpt &problem, OptOptions opt, bool verbose) {
-    ::problem = &problem;
-    real_1d_array x;
-    x.setlength(::problem->nvar);
-    ::problem->initialize(&x[0]);
-    minlbfgsstate state;
-    minlbfgsreport rep;
-    int m = 10;
-    minlbfgscreate(m, x, state);
-    minlbfgssetcond(state, opt.eps_g(), opt.eps_f(), opt.eps_x(),
-                           opt.max_iter());
-    minlbfgsoptimize(state, lbfgs_value_and_grad);
-    minlbfgsresults(state, x, rep);
-    if (verbose)
-        cout << rep.iterationscount << " iterations" << endl;
-    ::problem->finalize(&x[0]);
-}
+	static void lbfgs_value_and_grad(const real_1d_array &x, double &value,
+		real_1d_array &grad, void *ptr = NULL);
 
-static void add (real_1d_array &x, const vector<double> &y) {
-    for (int i = 0; i < y.size(); i++)
-        x[i] += y[i];
-}
+	void l_bfgs_method(const NLOpt &problem, OptOptions opt, bool verbose)
+	{
+		arcsim::problem = &problem;
+		real_1d_array x;
+		x.setlength(arcsim::problem->nvar);
+		arcsim::problem->initialize(&x[0]);
+		minlbfgsstate state;
+		minlbfgsreport rep;
+		int m = 10;
+		minlbfgscreate(m, x, state);
+		minlbfgssetcond(state, opt.eps_g(), opt.eps_f(), opt.eps_x(),
+			opt.max_iter());
+		minlbfgsoptimize(state, lbfgs_value_and_grad);
+		minlbfgsresults(state, x, rep);
+		if (verbose)
+			cout << rep.iterationscount << " iterations" << endl;
+		arcsim::problem->finalize(&x[0]);
+	}
 
-static void lbfgs_value_and_grad (const real_1d_array &x, double &value,
-                                 real_1d_array &grad, void *ptr) {
-    ::problem->precompute(&x[0]);
-    value = ::problem->objective(&x[0]);
-    ::problem->gradient(&x[0], &grad[0]);
+	static void add(real_1d_array &x, const vector<double> &y)
+	{
+		for (int i = 0; i < y.size(); i++)
+			x[i] += y[i];
+	}
+
+	static void lbfgs_value_and_grad(const real_1d_array &x, double &value,
+		real_1d_array &grad, void *ptr)
+	{
+		arcsim::problem->precompute(&x[0]);
+		value = arcsim::problem->objective(&x[0]);
+		arcsim::problem->gradient(&x[0], &grad[0]);
+	}
 }

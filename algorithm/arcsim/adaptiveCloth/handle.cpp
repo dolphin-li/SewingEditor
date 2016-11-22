@@ -28,81 +28,95 @@
 #include "magic.hpp"
 using namespace std;
 
-static Vec3 directions[3] = {Vec3(1,0,0), Vec3(0,1,0), Vec3(0,0,1)};
+namespace arcsim
+{
 
-void add_position_constraints (const Node *node, const Vec3 &x, double stiff,
-                               vector<Constraint*> &cons);
+	static Vec3 directions[3] = { Vec3(1, 0, 0), Vec3(0, 1, 0), Vec3(0, 0, 1) };
 
-Transformation normalize (const Transformation &T) {
-    Transformation T1 = T;
-    T1.rotation = normalize(T1.rotation);
-    return T1;
-}
+	void add_position_constraints(const Node *node, const Vec3 &x, double stiff,
+		vector<Constraint*> &cons);
 
-vector<Constraint*> NodeHandle::get_constraints (double t) {
-    double s = strength(t);
-    if (!s)
-        return vector<Constraint*>();
-    if (!activated) {
-        // handle just got started, fill in its original position
-        x0 = motion ? inverse(normalize(motion->pos(t))).apply(node->x) : node->x;
-        activated = true;
-    }
-    Vec3 x = motion ? normalize(motion->pos(t)).apply(x0) : x0;
-    vector<Constraint*> cons;
-    add_position_constraints(node, x, s*::magic.handle_stiffness, cons);
-    return cons;
-}
+	Transformation normalize(const Transformation &T)
+	{
+		Transformation T1 = T;
+		T1.rotation = normalize(T1.rotation);
+		return T1;
+	}
 
-vector<Constraint*> CircleHandle::get_constraints (double t) {
-    double s = strength(t);
-    if (!s)
-        return vector<Constraint*>();
-    vector<Constraint*> cons;
-    for (int n = 0; n < mesh->nodes.size(); n++) {
-        Node *node = mesh->nodes[n];
-        if (node->label != label)
-            continue;
-        double theta = 2*M_PI*dot(node->verts[0]->u, u)/c;
-        Vec3 x = xc + (dx0*cos(theta) + dx1*sin(theta))*c/(2*M_PI);
-        if (motion)
-            x = motion->pos(t).apply(x);
-        double l = 0;
-        for (int e = 0; e < node->adje.size(); e++) {
-            const Edge *edge = node->adje[e];
-            if (edge->n[0]->label != label || edge->n[1]->label != label)
-                continue;
-            l += edge->l;
-        }
-        add_position_constraints(node, x, s*::magic.handle_stiffness*l, cons);
-    }
-    return cons;
-}
+	vector<Constraint*> NodeHandle::get_constraints(double t)
+	{
+		double s = strength(t);
+		if (!s)
+			return vector<Constraint*>();
+		if (!activated)
+		{
+			// handle just got started, fill in its original position
+			x0 = motion ? inverse(normalize(motion->pos(t))).apply(node->x) : node->x;
+			activated = true;
+		}
+		Vec3 x = motion ? normalize(motion->pos(t)).apply(x0) : x0;
+		vector<Constraint*> cons;
+		add_position_constraints(node, x, s*arcsim::magic.handle_stiffness, cons);
+		return cons;
+	}
 
-vector<Constraint*> GlueHandle::get_constraints (double t) {
-    double s = strength(t);
-    if (!s)
-        return vector<Constraint*>();
-    vector<Constraint*> cons;
-    for (int i = 0; i < 3; i++) {
-        GlueCon *con = new GlueCon;
-        con->nodes[0] = nodes[0];
-        con->nodes[1] = nodes[1];
-        con->n = directions[i];
-        con->stiff = s*::magic.handle_stiffness;
-        cons.push_back(con);
-    }
-    return cons;
-}
+	vector<Constraint*> CircleHandle::get_constraints(double t)
+	{
+		double s = strength(t);
+		if (!s)
+			return vector<Constraint*>();
+		vector<Constraint*> cons;
+		for (int n = 0; n < mesh->nodes.size(); n++)
+		{
+			Node *node = mesh->nodes[n];
+			if (node->label != label)
+				continue;
+			double theta = 2 * M_PI*dot(node->verts[0]->u, u) / c;
+			Vec3 x = xc + (dx0*cos(theta) + dx1*sin(theta))*c / (2 * M_PI);
+			if (motion)
+				x = motion->pos(t).apply(x);
+			double l = 0;
+			for (int e = 0; e < node->adje.size(); e++)
+			{
+				const Edge *edge = node->adje[e];
+				if (edge->n[0]->label != label || edge->n[1]->label != label)
+					continue;
+				l += edge->l;
+			}
+			add_position_constraints(node, x, s*arcsim::magic.handle_stiffness*l, cons);
+		}
+		return cons;
+	}
 
-void add_position_constraints (const Node *node, const Vec3 &x, double stiff,
-                               vector<Constraint*> &cons) {
-    for (int i = 0; i < 3; i++) {
-        EqCon *con = new EqCon;
-        con->node = (Node*)node;
-        con->x = x;
-        con->n = directions[i];
-        con->stiff = stiff;
-        cons.push_back(con);
-    }
+	vector<Constraint*> GlueHandle::get_constraints(double t)
+	{
+		double s = strength(t);
+		if (!s)
+			return vector<Constraint*>();
+		vector<Constraint*> cons;
+		for (int i = 0; i < 3; i++)
+		{
+			GlueCon *con = new GlueCon;
+			con->nodes[0] = nodes[0];
+			con->nodes[1] = nodes[1];
+			con->n = directions[i];
+			con->stiff = s*arcsim::magic.handle_stiffness;
+			cons.push_back(con);
+		}
+		return cons;
+	}
+
+	void add_position_constraints(const Node *node, const Vec3 &x, double stiff,
+		vector<Constraint*> &cons)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			EqCon *con = new EqCon;
+			con->node = (Node*)node;
+			con->x = x;
+			con->n = directions[i];
+			con->stiff = stiff;
+			cons.push_back(con);
+		}
+	}
 }

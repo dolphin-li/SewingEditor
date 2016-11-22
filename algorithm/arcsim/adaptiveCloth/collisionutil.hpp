@@ -23,55 +23,58 @@
   IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
-
-#ifndef COLLISIONUTIL_HPP
-#define COLLISIONUTIL_HPP
+#pragma once
 
 #include "bvh.hpp"
 
-typedef DeformBVHNode BVHNode;
-typedef DeformBVHTree BVHTree;
+namespace arcsim
+{
 
-struct AccelStruct {
-    BVHTree tree;
-    BVHNode *root;
-    std::vector<BVHNode*> leaves;
-    AccelStruct (const Mesh &mesh, bool ccd);
-};
+	typedef DeformBVHNode BVHNode;
+	typedef DeformBVHTree BVHTree;
 
-void update_accel_struct (AccelStruct &acc);
+	struct AccelStruct
+	{
+		BVHTree tree;
+		BVHNode *root;
+		std::vector<BVHNode*> leaves;
+		AccelStruct(const Mesh &mesh, bool ccd);
+	};
 
-void mark_all_inactive (AccelStruct &acc);
-void mark_active (AccelStruct &acc, const Face *face);
+	void update_accel_struct(AccelStruct &acc);
 
-// callback must be safe to parallelize via OpenMP
-typedef void (*BVHCallback) (const Face *face0, const Face *face1);
+	void mark_all_inactive(AccelStruct &acc);
+	void mark_active(AccelStruct &acc, const Face *face);
 
-void for_overlapping_faces (BVHNode *node, float thickness,
-                            BVHCallback callback);
-void for_overlapping_faces (BVHNode *node0, BVHNode *node1, float thickness,
-                            BVHCallback callback);
-void for_overlapping_faces (const std::vector<AccelStruct*> &accs,
-                            const std::vector<AccelStruct*> &obs_accs,
-                            double thickness, BVHCallback callback,
-                            bool parallel=true);
-void for_faces_overlapping_obstacles (const std::vector<AccelStruct*> &accs,
-                                      const std::vector<AccelStruct*> &obs_accs,
-                                      double thickness, BVHCallback callback,
-                                      bool parallel=true);
+	// callback must be safe to parallelize via OpenMP
+	typedef void(*BVHCallback) (const Face *face0, const Face *face1);
 
-std::vector<AccelStruct*> create_accel_structs
-    (const std::vector<Mesh*> &meshes, bool ccd);
-void destroy_accel_structs (std::vector<AccelStruct*> &accs);
+	void for_overlapping_faces(BVHNode *node, float thickness,
+		BVHCallback callback);
+	void for_overlapping_faces(BVHNode *node0, BVHNode *node1, float thickness,
+		BVHCallback callback);
+	void for_overlapping_faces(const std::vector<AccelStruct*> &accs,
+		const std::vector<AccelStruct*> &obs_accs,
+		double thickness, BVHCallback callback,
+		bool parallel = true);
+	void for_faces_overlapping_obstacles(const std::vector<AccelStruct*> &accs,
+		const std::vector<AccelStruct*> &obs_accs,
+		double thickness, BVHCallback callback,
+		bool parallel = true);
 
-// find index of mesh containing specified element
-template <typename Prim>
-int find_mesh (const Prim *p, const std::vector<Mesh*> &meshes);
+	std::vector<AccelStruct*> create_accel_structs
+		(const std::vector<Mesh*> &meshes, bool ccd);
+	void destroy_accel_structs(std::vector<AccelStruct*> &accs);
 
-extern const std::vector<Mesh*> *meshes; // to check if element is cloth or obs
-extern const std::vector<Mesh*> *obs_meshes;
-template <typename Primitive> bool is_free (const Primitive *p) {
-    return find_mesh(p, *::meshes) != -1;
+	// find index of mesh containing specified element
+	template <typename Prim>
+	int find_mesh(const Prim *p, const std::vector<Mesh*> &meshes);
+
+	extern const std::vector<Mesh*> *meshes; // to check if element is cloth or obs
+	extern const std::vector<Mesh*> *obs_meshes;
+	template <typename Primitive> bool is_free(const Primitive *p)
+	{
+		return find_mesh(p, *arcsim::meshes) != -1;
+	}
+
 }
-
-#endif

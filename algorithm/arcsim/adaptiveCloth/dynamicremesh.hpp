@@ -24,16 +24,18 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef DYNAMICREMESH_HPP
-#define DYNAMICREMESH_HPP
+#pragma once
 
 #include <map>
 #include "cloth.hpp"
 #include "nearobs.hpp"
 
-void static_remesh (Cloth &cloth);
+namespace arcsim
+{
 
-void dynamic_remesh (Cloth &cloth, const std::vector<Plane> &planes,
-                     bool plasticity);
+	void static_remesh(Cloth &cloth);
 
-#endif
+	void dynamic_remesh(Cloth &cloth, const std::vector<Plane> &planes,
+		bool plasticity);
+
+}

@@ -24,13 +24,11 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef POPFILTER_HPP
-#define POPFILTER_HPP
-
+#pragma once
 #include "cloth.hpp"
 #include "constraint.hpp"
-
-void apply_pop_filter (Cloth &cloth, const std::vector<Constraint*> &cons,
-                       double regularization=1e3);
-
-#endif
+namespace arcsim
+{
+	void apply_pop_filter(Cloth &cloth, const std::vector<Constraint*> &cons,
+		double regularization = 1e3);
+}

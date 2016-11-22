@@ -24,14 +24,14 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef COLLISION_HPP
-#define COLLISION_HPP
-
+#pragma once
 #include "cloth.hpp"
 #include "constraint.hpp"
 
-void collision_response (std::vector<Mesh*> &meshes,
-                         const std::vector<Constraint*> &cons,
-                         const std::vector<Mesh*> &obs_meshes);
+namespace arcsim
+{
+	void collision_response(std::vector<Mesh*> &meshes,
+		const std::vector<Constraint*> &cons,
+		const std::vector<Mesh*> &obs_meshes);
 
-#endif
+}

@@ -23,19 +23,19 @@
   IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
-
-#ifndef RUNPHYSICS_HPP
-#define RUNPHYSICS_HPP
-
+#pragma once
 #include "simulation.hpp"
 #include <string>
 #include <vector>
+namespace arcsim
+{
 
-void save (const Simulation &sim, int frame);
-void init_physics (const std::string &json_file, std::string outprefix, bool is_reloading);
-void init_resume(const std::vector<std::string> &args);
-void sim_step();
-void run_physics (const std::vector<std::string> &args);
-void resume_physics (const std::vector<std::string> &args);
 
-#endif
+	void save(const Simulation &sim, int frame);
+	void init_physics(const std::string &json_file, std::string outprefix, bool is_reloading);
+	void init_resume(const std::vector<std::string> &args);
+	void sim_step();
+	void run_physics(const std::vector<std::string> &args);
+	void resume_physics(const std::vector<std::string> &args);
+
+}

@@ -24,22 +24,24 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef MISC_HPP
-#define MISC_HPP
-
+#pragma once
 #include <string>
 #include <vector>
+namespace arcsim
+{
 
-// Converts Shewchuck's triangle output (.node/.ele) to a .obj
-void tri2obj (const std::vector<std::string> &args);
 
-// Combines two meshes into a single obj
-void merge_meshes (const std::vector<std::string> &args);
 
-// Does the opposite of merge_meshes
-void split_meshes (const std::vector<std::string> &args);
+	// Converts Shewchuck's triangle output (.node/.ele) to a .obj
+	void tri2obj(const std::vector<std::string> &args);
 
-// This function can exist anywhere and the linker will find it
-void debug (const std::vector<std::string> &args);
+	// Combines two meshes into a single obj
+	void merge_meshes(const std::vector<std::string> &args);
 
-#endif
+	// Does the opposite of merge_meshes
+	void split_meshes(const std::vector<std::string> &args);
+
+	// This function can exist anywhere and the linker will find it
+	void debug(const std::vector<std::string> &args);
+
+}

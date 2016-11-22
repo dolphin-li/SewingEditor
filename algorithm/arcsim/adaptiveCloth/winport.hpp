@@ -23,10 +23,9 @@
   IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
+#pragma once
 
-#ifndef WINPORT_HPP
-#define WINPORT_HPP
-// MS Windows bindings, etc
+	// MS Windows bindings, etc
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 
@@ -49,15 +48,16 @@
 #define snprintf _snprintf
 
 #include <boost/math/special_functions/fpclassify.hpp> 
-template <class T> inline bool isfinite(const T& number) { return boost::math::isfinite(number); }
-template <class T> inline bool   finite(const T& number) { return boost::math::isfinite(number); }
+namespace arcsim
+{
+	template <class T> inline bool isfinite(const T& number) { return boost::math::isfinite(number); }
+	template <class T> inline bool   finite(const T& number) { return boost::math::isfinite(number); }
 
-inline double sqrt(int n) { return sqrt(double(n)); }
+	inline double sqrt(int n) { return ::sqrt(double(n)); }
 
-template <class T> inline T log2(const T& number) { return log(number)/log(T(2)); }
+	template <class T> inline T log2(const T& number) { return log(number) / log(T(2)); }
 
-extern std::ostream cdbg;
-
+	extern std::ostream cdbg;
+}
 #endif
 
-#endif

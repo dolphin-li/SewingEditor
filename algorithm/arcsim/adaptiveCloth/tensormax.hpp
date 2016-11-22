@@ -23,13 +23,12 @@
   IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
-
-#ifndef TENSORMAX_HPP
-#define TENSORMAX_HPP
+#pragma once
 
 #include "vectors.hpp"
 #include <vector>
 
-Mat2x2 tensor_max (const std::vector<Mat2x2> &Ms);
-
-#endif
+namespace arcsim
+{
+	Mat2x2 tensor_max(const std::vector<Mat2x2> &Ms);
+}

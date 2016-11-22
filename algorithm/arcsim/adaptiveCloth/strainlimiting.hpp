@@ -23,17 +23,17 @@
   IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
-
-#ifndef STRAINLIMITING_HPP
-#define STRAINLIMITING_HPP
-
+#pragma once
 #include "cloth.hpp"
 #include "constraint.hpp"
+namespace arcsim
+{
 
-std::vector<Vec2> get_strain_limits (const std::vector<Cloth> &cloths);
 
-void strain_limiting (std::vector<Mesh*> &meshes,
-                      const std::vector<Vec2> &strain_limits,
-                      const std::vector<Constraint*> &cons);
+	std::vector<Vec2> get_strain_limits(const std::vector<Cloth> &cloths);
 
-#endif
+	void strain_limiting(std::vector<Mesh*> &meshes,
+		const std::vector<Vec2> &strain_limits,
+		const std::vector<Constraint*> &cons);
+
+}

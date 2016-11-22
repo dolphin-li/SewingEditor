@@ -1844,9 +1844,6 @@
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\obstacle.hpp">
       <Filter>algorithm\arcsim\adaptiveCloth</Filter>
     </ClInclude>
-    <ClInclude Include="algorithm\arcsim\adaptiveCloth\opengl.hpp">
-      <Filter>algorithm\arcsim\adaptiveCloth</Filter>
-    </ClInclude>
     <ClInclude Include="algorithm\arcsim\adaptiveCloth\optimization.hpp">
       <Filter>algorithm\arcsim\adaptiveCloth</Filter>
     </ClInclude>

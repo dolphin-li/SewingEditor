@@ -24,12 +24,14 @@
   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef SEPARATEOBS_HPP
-#define SEPARATEOBS_HPP
+#pragma once
 
 #include "mesh.hpp"
 
-void separate_obstacles (std::vector<Mesh*> &obs_meshes,
-                         const std::vector<Mesh*> &meshes);
+namespace arcsim
+{
 
-#endif
+	void separate_obstacles(std::vector<Mesh*> &obs_meshes,
+		const std::vector<Mesh*> &meshes);
+
+}

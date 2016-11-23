@@ -28,11 +28,52 @@
 #include "timer.hpp"
 #include <cstdlib>
 #include <iostream>
+
+#define USE_EIGEN_INSTEADOF_TAUCS
+
 using namespace std;
 
 namespace arcsim
 {
+#ifdef USE_EIGEN_INSTEADOF_TAUCS
+#include <eigen\Sparse>
+#include <eigen\Dense>
 
+	void sparse_to_eigen(const SpMat<double> &As, Eigen::SparseMatrix<double>& A)
+	{
+		vector<Eigen::Triplet<double>> cooSys;
+		// assumption: A is square and symmetric
+		A.resize(As.n, As.n);
+		for (int i = 0; i < As.n; i++)
+		{
+			for (int k = 0; k < As.rows[i].indices.size(); k++)
+				cooSys.push_back(Eigen::Triplet<double>(As.rows[i].indices[k], i, As.rows[i].entries[k]));
+		}
+		if (cooSys.size())
+			A.setFromTriplets(cooSys.begin(), cooSys.end());
+	}	
+	template <int m> void sparse_to_eigen(const SpMat< Mat<m, m> > &As, Eigen::SparseMatrix<double>& A)
+	{
+		vector<Eigen::Triplet<double>> cooSys;
+		// assumption: A is square and symmetric
+		A.resize(As.n * m, As.n * m);
+		for (int i = 0; i < As.n; i++)
+		{
+			for (int k = 0; k < m; k++)
+			{
+				for (int jj = 0; jj < As.rows[i].indices.size(); jj++)
+				{
+					int j = As.rows[i].indices[jj];
+					const Mat<m, m> &Aij = As.rows[i].entries[jj];
+					for (int l = 0; l < m; l++)
+						cooSys.push_back(Eigen::Triplet<double>(j*m + l, i*m + k, Aij(k, l)));
+				}
+			}
+		}
+		if (cooSys.size())
+			A.setFromTriplets(cooSys.begin(), cooSys.end());
+	}
+#else
 	extern "C" {
 #include "taucs\include\taucs.h"
 		int taucs_linsolve(taucs_ccs_matrix* A, // input matrix
@@ -96,8 +137,7 @@ namespace arcsim
 		}
 		At->colptr[n] = pos;
 		return At;
-	}
-
+	}	
 	template <int m> taucs_ccs_matrix *sparse_to_taucs(const SpMat< Mat<m, m> > &As)
 	{
 		// assumption: A is square and symmetric
@@ -139,13 +179,33 @@ namespace arcsim
 		At->colptr[n*m] = pos;
 		return At;
 	}
+#endif
+
 
 	vector<double> taucs_linear_solve(const SpMat<double> &A, const vector<double> &b)
 	{
+#ifdef USE_EIGEN_INSTEADOF_TAUCS
+		typedef Eigen::SparseMatrix<double> SpMat;
+		typedef Eigen::MatrixXd DMat;
+		typedef Eigen::VectorXd DVec;
+		typedef Eigen::SimplicialCholesky<SpMat> Solver;
+		SpMat eA;
+		DVec eb(b.size());
+		for (size_t i = 0; i < b.size(); i++)
+			eb[i] = b[i];
+		sparse_to_eigen(A, eA);
+		Solver solver(eA);
+		DVec ex = solver.solve(eb);
+		vector<double> x(ex.size());
+		for(size_t i=0; i<x.size(); i++)
+			x[i] = ex[i];
+		return x;
+#else
 		// taucs_logfile("stdout");
 		taucs_ccs_matrix *Ataucs = sparse_to_taucs(A);
 		vector<double> x(b.size());
 		char *options[] = { (char*)"taucs.factor.LLT=true", NULL };
+		//debug_save_spmat(A);
 		int retval = taucs_linsolve(Ataucs, NULL, 1, &x[0], (double*)&b[0], options, NULL);
 		if (retval != TAUCS_SUCCESS)
 		{
@@ -154,11 +214,35 @@ namespace arcsim
 		}
 		taucs_ccs_free(Ataucs);
 		return x;
+#endif
 	}
 
 	template <int m> vector< Vec<m> > taucs_linear_solve
 		(const SpMat< Mat<m, m> > &A, const vector< Vec<m> > &b)
 	{
+#ifdef USE_EIGEN_INSTEADOF_TAUCS
+		typedef Eigen::SparseMatrix<double> SpMat;
+		typedef Eigen::MatrixXd DMat;
+		typedef Eigen::VectorXd DVec;
+		typedef Eigen::SimplicialCholesky<SpMat> Solver;
+		SpMat eA;
+		DVec eb(b.size()*m);
+		for (size_t i = 0; i < b.size(); i++)
+		{
+			for (int k = 0; k < m; k++)
+				eb[i*m + k] = b[i][k];
+		}
+		sparse_to_eigen(A, eA);
+		Solver solver(eA);
+		DVec ex = solver.solve(eb);
+		vector<Vec<m>> x(ex.size()/m);
+		for (size_t i = 0; i < x.size(); i++)
+		{
+			for (int k = 0; k < m; k++)
+				x[i][k] = ex[i*m + k];
+		}
+		return x;
+#else
 		// taucs_logfile("stdout");
 		taucs_ccs_matrix *Ataucs = sparse_to_taucs(A);
 		vector< Vec<m> > x(b.size());
@@ -171,6 +255,7 @@ namespace arcsim
 		}
 		taucs_ccs_free(Ataucs);
 		return x;
+#endif
 	}
 
 	template vector<Vec3> taucs_linear_solve(const SpMat<Mat3x3> &A,

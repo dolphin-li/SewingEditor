@@ -1,16 +1,11 @@
 #include "SimulationManager.h"
 #include "adaptiveCloth\conf.hpp"
+#include "adaptiveCloth\separateobs.hpp"
 #include "SvgManager.h"
 #include "SvgPolyPath.h"
 extern "C"{
 #include "triangle.h"
 };
-
-#pragma comment(lib, "blas.lib")
-#pragma comment(lib, "clapack.lib")
-#pragma comment(lib, "libmetis.lib")
-#pragma comment(lib, "libtaucs.lib")
-#pragma comment(lib, "vcf2c.lib")
 
 namespace arcsim
 {
@@ -68,8 +63,14 @@ namespace arcsim
 		m_svgManager = &svgManager;
 		m_triangleNumWanted = triangleNumWanted;
 		m_sim.reset(new Simulation);
-		load_json(bodyMeshFileName, *m_sim.get());
-		extractFromSvg();
+		//load_json(bodyMeshFileName, *m_sim.get());
+		//extractFromSvg();
+		load_json("conf/dress-blue.json", *m_sim.get());
+
+		// prepare for simulation
+		prepare(*m_sim);
+		separate_obstacles(m_sim->obstacle_meshes, m_sim->cloth_meshes);
+		relax_initial_state(*m_sim);
 	}
 
 	void SimulationManager::extractFromSvg()
@@ -142,6 +143,18 @@ namespace arcsim
 			mark_nodes_to_preserve(cloth.mesh);
 			compute_ms_data(cloth.mesh);
 		}
+	}
+
+	void SimulationManager::simulate(int nsteps)
+	{
+		if (m_sim.get() == nullptr)
+			return;
+		Timer fps;
+		fps.tick();
+		for (int k = 0; k < nsteps; k++)
+			advance_step(*m_sim);
+		fps.tock();
+		printf("step, time=%f/%f, tic=%f\n", m_sim->time, m_sim->end_time, fps.last);
 	}
 
 #pragma region -- triangle

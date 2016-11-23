@@ -16,6 +16,7 @@ namespace arcsim
 		void clear();
 		Simulation* getSimulator() { return m_sim.get(); }
 		const Simulation* getSimulator()const { return m_sim.get(); }
+		void simulate(int nsteps);
 	protected:
 		void extractFromSvg();
 		void triangulate(const std::vector<std::vector<ldp::Float2>>& polyVerts, 

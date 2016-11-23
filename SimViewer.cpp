@@ -95,7 +95,7 @@ SimViewer::SimViewer(QWidget *parent)
 	setEventHandleType(AbstractSimEventHandle::ProcessorTypeGeneral);
 	m_simManager = nullptr;
 	m_fps = 0;
-	m_computeTimer = startTimer(1);
+	m_computeTimer = startTimer(1000);
 	m_renderTimer = startTimer(30);
 }
 
@@ -164,20 +164,7 @@ void SimViewer::timerEvent(QTimerEvent* ev)
 		return;
 	if (ev->timerId() == m_computeTimer && m_simManager)
 	{
-	//	if (!m_pListener->GetCad().isEmpty() && m_pListener->ldp_disable_update == false)
-	//	{
-	//		gtime_t t1 = ldp::gtime_now();
-	//		m_pListener->FollowMshToCad_ifNeeded();
-	//		m_pListener->Solve_ifNeeded();
-	//		if (m_pAnalysis->IsBlowUp())
-	//		{
-	//			std::cout << "BlowUp" << std::endl;
-	//			m_pListener->LoadTimeStamp();
-	//		}
-	//		gtime_t t2 = ldp::gtime_now();
-	//		double sec = ldp::gtime_seconds(t1, t2);
-	//		m_fps = 1 / sec;
-	//	}
+		m_simManager->simulate(1);
 	}
 	if (ev->timerId() == m_renderTimer)
 		updateGL();

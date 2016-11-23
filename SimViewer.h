@@ -71,6 +71,9 @@ protected:
 	void renderDragBox();
 	void renderTrackBall(bool idxMode);
 	void timerEvent(QTimerEvent* ev);
+
+	void renderCloth(int idxMode);
+	void renderBody(int idxMode);
 protected:
 	ldp::Camera m_camera;
 	QPoint m_lastPos;

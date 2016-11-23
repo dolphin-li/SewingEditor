@@ -55,5 +55,5 @@ void GlobalDataHolder::svgToCloth()
 
 void GlobalDataHolder::svgToSim()
 {
-	m_simManager->init(*m_svgManager.get(), m_simConfigFileName);
+	m_simManager->init(*m_svgManager.get(), m_simConfigFileName, g_dataholder.m_param.m_coarse_mesh_ntri);
 }

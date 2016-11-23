@@ -109,13 +109,14 @@ void SimViewer::resetCamera()
 	m_camera.setPerspective(60, float(width()) / float(height()), 0.1, 100);
 	ldp::Float3 c = 0.f;
 	float l = 1.f;
-	//if (m_pAnalysis)
-	//{
-	//	ldp::Float3 bmin, bmax;
-	//	getModelBound(bmin, bmax);
-	//	c = (bmax + bmin) / 2.f;
-	//	l = (bmax - bmin).length();
-	//}
+	if (m_simManager)
+	if (m_simManager->getSimulator())
+	{
+		ldp::Float3 bmin, bmax;
+		getModelBound(bmin, bmax);
+		c = (bmax + bmin) / 2.f;
+		l = (bmax - bmin).length();
+	}
 	m_camera.lookAt(ldp::Float3(0, -l, 0) + c, c, ldp::Float3(0, 0, 1));
 	m_camera.arcballSetCenter(c);
 }
@@ -193,15 +194,8 @@ void SimViewer::paintGL()
 
 	// show cloth simulation=============================
 	m_camera.apply();
-	if (m_simManager)
-	{
-	//	if (isEdgeMode())
-	//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//	else
-	//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//	if (!m_pListener->GetCad().isEmpty())
-	//		m_pListener->Draw(4);
-	}
+	renderCloth(0);
+	renderBody(0);
 	renderTrackBall(false);
 	renderDragBox();
 }
@@ -360,12 +354,27 @@ void SimViewer::getModelBound(ldp::Float3& bmin, ldp::Float3& bmax)
 {
 	bmin = FLT_MAX;
 	bmax = -FLT_MAX;
-	//if (m_pAnalysis)
-	//{
-	//	auto box = m_pAnalysis->GetBoundingBox(nullptr);
-	//	bmin = ldp::Float3(box.x_min, box.y_min, box.z_min);
-	//	bmax = ldp::Float3(box.x_max, box.y_max, box.z_max);
-	//}
+	if (m_simManager == nullptr)
+		return;
+	
+	const auto& sim = m_simManager->getSimulator();
+	if (sim == nullptr)
+		return;
+	for (const auto& obs : sim->obstacles)
+	{
+		if (!obs.activated)
+			continue;
+		const auto& mesh = obs.base_mesh;
+		for (const auto& node : mesh.nodes)
+		{
+			for (int k = 0; k < 3; k++)
+			{
+				bmin[k] = std::min(bmin[k], (float)node->x[k]);
+				bmax[k] = std::max(bmax[k], (float)node->x[k]);
+			}	
+		} // end for nodes
+	} // end for obs
+	
 }
 
 void SimViewer::beginTrackBall(TrackBallMode mode, ldp::Float3 p, ldp::Mat3f R, float scale)
@@ -474,5 +483,92 @@ void SimViewer::renderTrackBall(bool indexMode)
 	}
 
 	glPopMatrix();
+	glPopAttrib();
+}
+
+void SimViewer::renderCloth(int idxMode)
+{
+	if (!m_simManager)
+		return;
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+	const auto& sim = m_simManager->getSimulator();
+
+	if (idxMode == 0)
+	{
+		if (m_isEdgeMode)
+		{
+			glDisable(GL_LIGHTING);
+			glColor3f(0, 1, 0);
+			glBegin(GL_LINES);
+			for (const auto& cloth : sim->cloths)
+			{
+				const auto& mesh = cloth.mesh;
+				for (const auto& face : mesh.faces)
+				{
+					for (int k = 0; k < 3; k++)
+					{
+						glVertex3dv(&face->v[k]->node->x[0]);
+						glVertex3dv(&face->v[(k+1)%3]->node->x[0]);
+					}
+				} // end for face
+			} // end for obs
+			glEnd();
+		}
+		else
+		{
+			float diff[3] = { 0.8, 0.8, 0.8 };
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
+			glBegin(GL_TRIANGLES);
+			for (const auto& cloth : sim->cloths)
+			{
+				const auto& mesh = cloth.mesh;
+				for (const auto& face : mesh.faces)
+				{
+					for (int k = 0; k < 3; k++)
+					{
+						glNormal3dv(&face->v[k]->node->n[0]);
+						glVertex3dv(&face->v[k]->node->x[0]);
+					}
+				} // end for face
+			} // end for obs
+			glEnd();
+		}// end if not edge mode
+	} // end if idxMode == 0
+
+	glPopAttrib();
+}
+
+void SimViewer::renderBody(int idxMode)
+{
+	if (!m_simManager)
+		return;
+
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+	const auto& sim = m_simManager->getSimulator();
+
+	if (idxMode == 0)
+	{
+		float diff[3] = {0.5, 0.6, 0.8};
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
+		glBegin(GL_TRIANGLES);
+		for (const auto& obs : sim->obstacles)
+		{
+			if (!obs.activated)
+				continue;
+			const auto& mesh = obs.curr_state_mesh;
+			for (const auto& face : mesh.faces)
+			{
+				for (int k = 0; k < 3; k++)
+				{
+					glNormal3dv(&face->v[k]->node->n[0]);
+					glVertex3dv(&face->v[k]->node->x[0]);
+				}
+			} // end for face
+		} // end for obs
+		glEnd();
+	} // end if idxMode == 0
+
 	glPopAttrib();
 }

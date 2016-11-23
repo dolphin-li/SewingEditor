@@ -1028,6 +1028,7 @@ void SewingEditor::on_pbGenerateSim_clicked()
 	{
 		g_dataholder.svgToSim();
 		m_simWindow->updateParamUI();
+		m_simWindow->getViewer()->resetCamera();
 		m_simWindow->show();
 	} catch (std::exception e)
 	{

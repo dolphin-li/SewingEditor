@@ -5,6 +5,7 @@
 #include "adaptiveCloth\simulation.hpp"
 #include "ldpMat\Quaternion.h"
 #include "SimulationManager.h"
+#include "alglib\ap.h"
 
 
 #pragma region --mat_utils
@@ -117,7 +118,7 @@ void SimViewer::resetCamera()
 		c = (bmax + bmin) / 2.f;
 		l = (bmax - bmin).length();
 	}
-	m_camera.lookAt(ldp::Float3(0, -l, 0) + c, c, ldp::Float3(0, 0, 1));
+	m_camera.lookAt(ldp::Float3(0, -l*2, 0) + c, c, ldp::Float3(0, 0, 1));
 	m_camera.arcballSetCenter(c);
 }
 
@@ -162,12 +163,25 @@ void SimViewer::timerEvent(QTimerEvent* ev)
 {
 	if (!m_simManager)
 		return;
-	if (ev->timerId() == m_computeTimer && m_simManager)
+	try
 	{
-		m_simManager->simulate(1);
+		if (ev->timerId() == m_computeTimer && m_simManager)
+		{
+			m_simManager->simulate(1);
+		}
+		if (ev->timerId() == m_renderTimer)
+			updateGL();
 	}
-	if (ev->timerId() == m_renderTimer)
-		updateGL();
+	catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (alglib::ap_error e)
+	{
+		std::cout << e.msg << std::endl;
+	}catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SimViewer::paintGL()

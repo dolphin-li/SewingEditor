@@ -36,6 +36,7 @@ class Ui_MeshWindow
 {
 public:
     QAction *actionOpen;
+    QAction *actionSave;
     QWidget *centralwidget;
     QGridLayout *gridLayout;
     BaseMeshViewer *widget;
@@ -90,6 +91,8 @@ public:
         MeshWindow->resize(800, 681);
         actionOpen = new QAction(MeshWindow);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
+        actionSave = new QAction(MeshWindow);
+        actionSave->setObjectName(QStringLiteral("actionSave"));
         centralwidget = new QWidget(MeshWindow);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         gridLayout = new QGridLayout(centralwidget);
@@ -306,6 +309,7 @@ public:
 
         menubar->addAction(menuFile->menuAction());
         menuFile->addAction(actionOpen);
+        menuFile->addAction(actionSave);
 
         retranslateUi(MeshWindow);
 
@@ -319,6 +323,7 @@ public:
     {
         MeshWindow->setWindowTitle(QApplication::translate("MeshWindow", "MainWindow", 0));
         actionOpen->setText(QApplication::translate("MeshWindow", "open", 0));
+        actionSave->setText(QApplication::translate("MeshWindow", "save", 0));
         menuFile->setTitle(QApplication::translate("MeshWindow", "file", 0));
         groupBox->setTitle(QApplication::translate("MeshWindow", "cloth param", 0));
         label->setText(QApplication::translate("MeshWindow", "Thickness", 0));

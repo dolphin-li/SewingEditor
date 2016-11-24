@@ -30,6 +30,7 @@ class Ui_SimWindow
 {
 public:
     QAction *actionOpen;
+    QAction *actionSave;
     QWidget *centralwidget;
     QGridLayout *gridLayout;
     SimViewer *widget;
@@ -50,6 +51,8 @@ public:
         SimWindow->resize(800, 681);
         actionOpen = new QAction(SimWindow);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
+        actionSave = new QAction(SimWindow);
+        actionSave->setObjectName(QStringLiteral("actionSave"));
         centralwidget = new QWidget(SimWindow);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         gridLayout = new QGridLayout(centralwidget);
@@ -95,6 +98,7 @@ public:
 
         menubar->addAction(menuFile->menuAction());
         menuFile->addAction(actionOpen);
+        menuFile->addAction(actionSave);
 
         retranslateUi(SimWindow);
 
@@ -105,6 +109,7 @@ public:
     {
         SimWindow->setWindowTitle(QApplication::translate("SimWindow", "MainWindow", 0));
         actionOpen->setText(QApplication::translate("SimWindow", "open", 0));
+        actionSave->setText(QApplication::translate("SimWindow", "save", 0));
         menuFile->setTitle(QApplication::translate("SimWindow", "file", 0));
     } // retranslateUi
 

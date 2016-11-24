@@ -31,6 +31,8 @@ public:
 	void on_sbCoarseMesh_valueChanged(int v);
 	void on_sbDetailMesh_valueChanged(int v);
 	void on_pbReInitMesh_clicked();
+
+	void on_actionSave_triggered();
 protected:
 	void dragEnterEvent(QDragEnterEvent* ev);
 	void dropEvent(QDropEvent* ev);

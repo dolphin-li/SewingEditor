@@ -15,6 +15,7 @@ public:
 	const SimViewer* getViewer()const;
 	void updateParamUI();
 	public slots:
+	void on_actionSave_triggered();
 	void leftDocButtonsClicked(int i);
 protected:
 	void dragEnterEvent(QDragEnterEvent* ev);

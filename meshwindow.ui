@@ -34,6 +34,7 @@
      <string>file</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -346,6 +347,11 @@
   <action name="actionOpen">
    <property name="text">
     <string>open</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>save</string>
    </property>
   </action>
  </widget>

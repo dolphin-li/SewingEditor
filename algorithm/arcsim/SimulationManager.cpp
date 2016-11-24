@@ -1,8 +1,10 @@
 #include "SimulationManager.h"
 #include "adaptiveCloth\conf.hpp"
 #include "adaptiveCloth\separateobs.hpp"
+#include "adaptiveCloth\io.hpp"
 #include "SvgManager.h"
 #include "SvgPolyPath.h"
+#include "ldputil.h"
 extern "C"{
 #include "triangle.h"
 };
@@ -41,16 +43,6 @@ namespace arcsim
 				delete_mesh(o.base_mesh);
 				delete_mesh(o.curr_state_mesh);
 			}
-			for (auto& c : m_sim->cloth_meshes)
-			{
-				delete_mesh(*c);
-				delete c;
-			}
-			for (auto& o : m_sim->obstacle_meshes)
-			{
-				delete_mesh(*o);
-				delete o;
-			}
 			m_sim.reset((Simulation*)nullptr);
 		}
 
@@ -63,14 +55,30 @@ namespace arcsim
 		m_svgManager = &svgManager;
 		m_triangleNumWanted = triangleNumWanted;
 		m_sim.reset(new Simulation);
-		//load_json(bodyMeshFileName, *m_sim.get());
+		load_json(bodyMeshFileName, *m_sim.get());
 		//extractFromSvg();
-		load_json("conf/dress-blue.json", *m_sim.get());
+		//load_json("conf/dress-blue.json", *m_sim.get());
 
 		// prepare for simulation
 		prepare(*m_sim);
 		separate_obstacles(m_sim->obstacle_meshes, m_sim->cloth_meshes);
 		relax_initial_state(*m_sim);
+	}
+
+	void SimulationManager::saveCurrentCloth(std::string fullname)
+	{
+		if (m_sim.get() == nullptr)
+			return;
+		std::string path, name, ext;
+		ldp::fileparts(fullname, path, name, ext);
+		for (size_t i = 0; i < m_sim->cloths.size(); i++)
+		{
+			const auto& cloth = m_sim->cloths[i];
+			std::string nm = fullname;
+			if (m_sim->cloths.size() > 1)
+				nm = ldp::fullfile(path, name + "_" + std::to_string(i) + ext);
+			arcsim::save_obj(cloth.mesh, nm);
+		} // end for cloth
 	}
 
 	void SimulationManager::extractFromSvg()

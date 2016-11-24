@@ -2,6 +2,7 @@
 #include "global_data_holder.h"
 #include "svgpp\SvgManager.h"
 #include "svgpp\SvgPolyPath.h"
+#include "SimulationManager.h"
 SimWindow::SimWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -31,6 +32,25 @@ const SimViewer* SimWindow::getViewer()const
 void SimWindow::updateParamUI()
 {
 
+}
+
+void SimWindow::on_actionSave_triggered()
+{
+	try
+	{
+		QString name = QFileDialog::getSaveFileName(this, "save mesh", "", "*.obj");
+		if (name.isEmpty())
+			return;
+		if (!name.toLower().endsWith(".obj"))
+			name.append(".obj");
+		g_dataholder.m_simManager->saveCurrentCloth(name.toStdString());
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
 }
 
 void SimWindow::timerEvent(QTimerEvent* ev)

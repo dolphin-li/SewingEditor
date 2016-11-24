@@ -29,6 +29,24 @@ const BaseMeshViewer* MeshWindow::getViewer()const
 	return ui.widget;
 }
 
+void MeshWindow::on_actionSave_triggered()
+{
+	try
+	{
+		QString name = QFileDialog::getOpenFileName(this, "save mesh", "", "*.obj");
+		if (name.isEmpty())
+			return;
+		if (!name.toLower().endsWith(".obj"))
+			name.append(".obj");
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
 void MeshWindow::updateParamUI()
 {
 	auto clothParam = g_dataholder.m_clothManger->GetParam_Cloth();

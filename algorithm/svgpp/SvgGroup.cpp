@@ -75,6 +75,7 @@ namespace svg
 	{
 		std::shared_ptr<SvgAbstractObject> g(new SvgGroup());
 		auto gptr = (SvgGroup*)g.get();
+
 		if (selectedOnly)
 		{
 			if (!(hasSelectedChildren() || isSelected()))

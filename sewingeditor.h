@@ -74,6 +74,7 @@ protected:
 	void on_pbSelectClosed_clicked();
 	void on_pbPixelToMeter_clicked();
 	void on_sbPixelToMeter_valueChanged(double v);
+	void on_sbPointMergeThre_valueChanged(double v);
 	void on_listWidgetEditEnd(QWidget *editor, QAbstractItemDelegate::EndEditHint hint);
 	void on_pbSmoothPoly_clicked();
 	void on_dbSmoothPolyThre_valueChanged(double v);

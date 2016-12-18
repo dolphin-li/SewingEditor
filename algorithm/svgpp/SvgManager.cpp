@@ -17,10 +17,11 @@
 #include "SvgText.h"
 #include "SvgGroup.h"
 
+#include "global_data_holder.h" 
+
 using namespace ldp;
 namespace svg
 {
-	const static float PATH_CONTACT_DIST_THRE = 0.01f;
 	const static float PATH_INTERSECT_DIST_THRE = 0.2f;
 	const static float PATH_COS_ANGLE_DIST_THRE = cos(15.f * ldp::PI_S / 180.f);
 #pragma region --helper
@@ -653,6 +654,11 @@ namespace svg
 					if (obj->objectType() != obj->Group && firstVisit)
 						obj->setSelected(!obj->isSelected(), id);
 					break;
+				case svg::SvgManager::SelectCancel:
+					if (obj->isMyValidIdRange(id) && firstVisit)
+						obj->setSelected(false, id);
+					break;
+					break;
 				default:
 					break;
 				} // end switch
@@ -725,6 +731,10 @@ namespace svg
 					if (obj->objectType() != obj->Group && firstVisit)
 						obj->setSelected(!obj->isSelected());
 					break;
+				case svg::SvgManager::SelectCancel:
+					if (found && firstVisit)
+						obj->setSelected(false);
+					break;
 				default:
 					break;
 				}
@@ -769,8 +779,25 @@ namespace svg
 				case svg::SvgManager::SelectInverse:
 					ans->setSelected(!ans->isSelected());
 					break;
+				case svg::SvgManager::SelectCancel:
+					if (ans == target)
+						ans->setSelected(false);
+					break;
 				default:
 					break;
+				}
+
+				// group selection to children selection
+				if (ans->objectType() == SvgAbstractObject::Group)
+				{
+					auto gp = (SvgGroup*)ans;
+					std::vector<std::shared_ptr<SvgAbstractObject>> objs;
+					gp->collectObjects(SvgAbstractObject::Group, objs, false);
+					gp->collectObjects(SvgAbstractObject::Path, objs, false);
+					gp->collectObjects(SvgAbstractObject::PolyPath, objs, false);
+					gp->collectObjects(SvgAbstractObject::Text, objs, false);
+					for (auto& o : objs)
+						o->setSelected(ans->isSelected());
 				}
 			}
 		}
@@ -818,8 +845,25 @@ namespace svg
 				case svg::SvgManager::SelectInverse:
 					ans->setSelected(!ans->isSelected());
 					break;
+				case svg::SvgManager::SelectCancel:
+					if (targets.find(ans) != targets.end())
+						ans->setSelected(false);
+					break;
 				default:
 					break;
+				}
+
+				// group selection to children selection
+				if (ans->objectType() == SvgAbstractObject::Group)
+				{
+					auto gp = (SvgGroup*)ans;
+					std::vector<std::shared_ptr<SvgAbstractObject>> objs;
+					gp->collectObjects(SvgAbstractObject::Group, objs, false);
+					gp->collectObjects(SvgAbstractObject::Path, objs, false);
+					gp->collectObjects(SvgAbstractObject::PolyPath, objs, false);
+					gp->collectObjects(SvgAbstractObject::Text, objs, false);
+					for (auto& o : objs)
+						o->setSelected(ans->isSelected());
 				}
 			}
 		}
@@ -1670,6 +1714,58 @@ namespace svg
 		} // groupi
 	}
 #pragma endregion
+
+	static void findConnectedComponent(const std::vector<std::set<std::pair<int, float>>>& nearByPoints,
+		std::set<int>& nonVisited, int seed, std::vector<int>& connected)
+	{
+		connected.push_back(seed);
+		const std::set<std::pair<int, float>>& neighbors = nearByPoints[seed];
+		for (const auto& nb : neighbors)
+		{
+			auto iter = nonVisited.find(nb.first);
+			if (iter != nonVisited.end())
+			{
+				nonVisited.erase(iter);
+				findConnectedComponent(nearByPoints, nonVisited, nb.first, connected);
+			}
+		}
+	}
+
+	static void findValidPoints(const std::vector<std::set<std::pair<int, float>>>& nearByPoints,
+		const std::vector<Point>& points, 
+		std::vector<Point>& validPoints, std::vector<int>& pointMapper)
+	{
+		std::set<int> nonVisited;
+		for (int i = 0; i < nearByPoints.size(); i++)
+			nonVisited.insert(i);
+		std::vector<std::vector<int>> components;
+		while (!nonVisited.empty())
+		{
+			int seed = *nonVisited.begin();
+			nonVisited.erase(nonVisited.begin());
+			components.push_back(std::vector<int>());
+			findConnectedComponent(nearByPoints, nonVisited, seed, components.back());
+		} // end while
+
+		validPoints.clear();
+		pointMapper.resize(nearByPoints.size(), -1);
+		for (const auto& cmp : components)
+		{
+			for (const auto& id : cmp)
+				pointMapper[id] = validPoints.size();
+			validPoints.push_back(points[cmp[0]]);
+		}
+	}
+
+	struct SortByDist
+	{
+		bool operator () (const std::pair<size_t, float>& a,
+		const std::pair<size_t, float>& b)const
+		{
+			return a.second < b.second;
+		}
+	};
+
 	void SvgManager::convertSelectedPathToConnectedGroups()
 	{
 		typedef std::shared_ptr<SvgAbstractObject> ObjPtr;
@@ -1687,8 +1783,9 @@ namespace svg
 			// 2. collect all paths, the idx corresponds to paths
 			std::vector<ObjPtr> paths; // each path generate two points, a start point and an end point
 			std::vector<Point> points, validPoints;
-			std::vector<int> pointMapper, validPointIds; // map from points to merged points
+			std::vector<int> pointMapper; // map from points to merged points
 			rootPtr->collectObjects(SvgAbstractObject::Path, paths, true);
+			//rootPtr->collectObjects(SvgAbstractObject::PolyPath, paths, true);
 			for (auto path : paths)
 			{
 				auto ptr = (SvgPath*)path.get();
@@ -1698,51 +1795,20 @@ namespace svg
 
 			// 3. find too-close points and merge them
 			Tree tree; tree.build(points);
-			std::vector<std::vector<int>> mergePaths(points.size());
+			std::vector<std::set<std::pair<int, float>>> mergePaths(points.size());
 			std::set<ldp::Int2> pathGraph;
 			for (auto p : points)
 			{
 				std::vector<std::pair<size_t, float>> results;
-				tree.pointInSphere(p, PATH_CONTACT_DIST_THRE, results);
+				tree.pointInSphere(p, ldp::sqr(g_dataholder.m_param.m_pointMergeThre), results);
+				std::sort(results.begin(), results.end(), SortByDist());
 				for (auto r : results){
 					if (r.first / 2 == p.idx / 2) continue;
-					mergePaths[p.idx].push_back(r.first);
+					mergePaths[p.idx].insert(std::make_pair(int(r.first), r.second));
+					if (mergePaths[p.idx].size() >= 1) break; // ldp hack here: we only handle single-loops by adding this constraint
 				}
 			}
-			for (int iPoint = 0; iPoint < (int)points.size(); iPoint++)
-			{
-				bool valid = true;
-				for (auto c : mergePaths[iPoint])
-				if (c < iPoint){
-					valid = false;
-					break;
-				}
-				if (valid){
-					validPointIds.push_back(iPoint);
-					validPoints.push_back(points[iPoint]);
-				}
-			}
-			pointMapper.resize(points.size(), -1);
-			for (int i = 0; i < (int)validPointIds.size(); i++)
-			{
-				int vid = validPointIds[i];
-				pointMapper[vid] = i;
-				for (auto c : mergePaths[vid])
-					pointMapper[c] = i;
-			}
-
-			// debug
-			for (int i = 0; i < pointMapper.size(); i++)
-			{
-				if (pointMapper[i] == -1)
-				{
-					// the reason for this warning is due to current merge policy:
-					// if dist(A,B) < PATH_CONTACT_DIST_THRE, dist(B,C) < PATH_CONTACT_DIST_THRE
-					//		dist(A, C) >= PATH_CONTACT_DIST_THRE
-					// then this warning may occure
-					printf("warning: point %d seems invalid, results may be incorrecrt!\n", i);
-				}
-			}
+			findValidPoints(mergePaths, points, validPoints, pointMapper);
 
 			// 3.1 finally we construct the connection graph
 			for (int i = 0; i < (int)points.size(); i += 2)
@@ -1756,7 +1822,7 @@ namespace svg
 
 			// 4. group each polygons and associates
 			std::vector<PolyPath> pathGroups;
-			graph_to_connected_components(pathGraph, (int)validPointIds.size(), pathGroups);
+			graph_to_connected_components(pathGraph, (int)validPoints.size(), pathGroups);
 			graph_convert_inner_loops_to_segs(pathGroups, validPoints);
 
 			// 5. create new path groups
@@ -1770,10 +1836,10 @@ namespace svg
 				auto newPathPtr = (SvgPolyPath*)nullptr;
 				for (int i = 0; i < (int)gIds.nodes.size(); i++)
 				{
-					int pointId = validPointIds[gIds.nodes[i]];
+					int pointId = validPoints[gIds.nodes[i]].idx;
 					if (i == 0)
 					{
-						auto oldPathPtr = (SvgPolyPath*)paths[validPointIds[0]].get();
+						auto oldPathPtr = (SvgPolyPath*)paths[validPoints[0].idx].get();
 						newPath.reset(new SvgPolyPath);
 						newPathPtr = (SvgPolyPath*)newPath.get();
 						oldPathPtr->SvgAbstractObject::copyTo(newPathPtr);
@@ -1792,7 +1858,7 @@ namespace svg
 				if (gIds.closed)
 				{
 					newPathPtr->m_cmds.push_back(GL_LINE_TO_NV);
-					int pid = validPointIds[gIds.nodes[0]];
+					int pid = validPoints[gIds.nodes[0]].idx;
 					newPathPtr->m_coords.push_back(points[pid].p[0]);
 					newPathPtr->m_coords.push_back(points[pid].p[1]);
 				}

@@ -24,6 +24,9 @@ public:
 	void svgToCloth();
 
 	void svgToSim();
+
+	void loadLastSvgDir();
+	void saveLastSvgDir();
 public:
 	std::shared_ptr<svg::SvgManager> m_svgManager;
 	std::shared_ptr<CAnalysis2D_Cloth_Static> m_clothManger;
@@ -36,6 +39,8 @@ public:
 
 	std::string m_simConfigFileName;
 	std::shared_ptr<arcsim::SimulationManager> m_simManager;
+
+	std::string m_lastSvgDir;
 };
 
 extern GlobalDataHolder g_dataholder;

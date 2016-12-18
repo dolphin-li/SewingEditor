@@ -10,7 +10,7 @@ public:
 	void logToStamp(ldp::TimeStamp& st);
 public:
 	double m_smoothPolyThre;
-
+	double m_pointMergeThre;
 	int m_coarse_mesh_ntri;
 	int m_detail_mesh_ntri;
 };

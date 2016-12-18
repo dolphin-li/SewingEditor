@@ -54,7 +54,7 @@ using std::endl;
 #ifdef NDEBUG
 const static int verbose = 0;
 #else
-const static int verbose = 1;
+const static int verbose = 0;
 #endif
 
 // For debugging to print STL vectors

@@ -38,6 +38,7 @@ namespace svg
 			SelectAll,
 			SelectNone,
 			SelectInverse,
+			SelectCancel,
 		};
 	public:
 		SvgManager(){}

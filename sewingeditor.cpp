@@ -29,6 +29,9 @@ SewingEditor::SewingEditor(QWidget *parent)
 		initLayerList();
 		resetRoll();
 		initHistoryList();
+		ui.sbPointMergeThre->setValue(g_dataholder.m_param.m_pointMergeThre);
+		// debug
+		//g_dataholder.m_svgManager->load("data/Basic_Blouse_10_2016.svg");
 	}
 	catch (std::exception e){
 		std::cout << e.what() << std::endl;
@@ -44,6 +47,7 @@ void SewingEditor::closeEvent(QCloseEvent* ev)
 {
 	m_meshWindow->close();
 	m_simWindow->close();
+	g_dataholder.saveLastSvgDir();
 }
 
 void SewingEditor::dragEnterEvent(QDragEnterEvent* event)
@@ -92,6 +96,7 @@ void SewingEditor::loadSvg(QString name)
 	initLayerList();
 	setWindowTitle(name);
 	ui.dbSmoothPolyThre->setValue(g_dataholder.m_param.m_smoothPolyThre);
+	ui.sbPointMergeThre->setValue(g_dataholder.m_param.m_pointMergeThre);
 }
 
 void SewingEditor::initLeftDockActions()
@@ -149,9 +154,12 @@ void SewingEditor::on_actionLoad_svg_triggered()
 {
 	try
 	{
-		QString name = QFileDialog::getOpenFileName(this, "load svg", "", "*.svg");
+		QString name = QFileDialog::getOpenFileName(this, "load svg", g_dataholder.m_lastSvgDir.c_str(), "*.svg");
 		if (name.isEmpty())
 			return;
+		QFileInfo info(name);
+		g_dataholder.m_lastSvgDir = info.absolutePath().toStdString();
+		g_dataholder.saveLastSvgDir();
 		loadSvg(name);
 	}
 	catch (std::exception e)
@@ -168,7 +176,7 @@ void SewingEditor::on_actionSave_svg_triggered()
 {
 	try
 	{
-		QString name = QFileDialog::getSaveFileName(this, "save svg", "", "*.svg");
+		QString name = QFileDialog::getSaveFileName(this, "save svg", g_dataholder.m_lastSvgDir.c_str(), "*.svg");
 		if (name.isEmpty())
 			return;
 		if (ui.widget->getSvgManager() == nullptr)
@@ -907,6 +915,21 @@ void SewingEditor::on_sbPixelToMeter_valueChanged(double v)
 		std::cout << "unknown error" << std::endl;
 	}
 }
+
+void SewingEditor::on_sbPointMergeThre_valueChanged(double v)
+{
+	try
+	{
+		g_dataholder.m_param.m_pointMergeThre = v;
+	} catch (std::exception e)
+	{
+		std::cout << e.what() << std::endl;
+	} catch (...)
+	{
+		std::cout << "unknown error" << std::endl;
+	}
+}
+
 
 void SewingEditor::on_pbGenerateMesh_clicked()
 {

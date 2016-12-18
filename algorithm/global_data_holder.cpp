@@ -4,6 +4,7 @@
 #include "designer2d_cloth.h"
 #include "FreeFormDeform.h"
 #include "SimulationManager.h"
+#include <fstream>
 GlobalDataHolder g_dataholder;
 
 void GlobalDataHolder::init()
@@ -19,7 +20,28 @@ void GlobalDataHolder::init()
 	// arcsim
 	m_simConfigFileName = "conf/default.json";
 	m_simManager.reset(new arcsim::SimulationManager);
+
+	loadLastSvgDir();
 }
+
+void GlobalDataHolder::loadLastSvgDir()
+{
+	std::ifstream stm("__lastinfo.txt");
+	if (stm.fail())
+		return;
+	std::getline(stm, m_lastSvgDir);
+	stm.close();
+}
+
+void GlobalDataHolder::saveLastSvgDir()
+{
+	std::ofstream stm("__lastinfo.txt");
+	if (stm.fail())
+		return;
+	stm << m_lastSvgDir;
+	stm.close();
+}
+
 
 void GlobalDataHolder::generateClothDebug()
 {
